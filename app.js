@@ -7,11 +7,7 @@ const mongoose = require('mongoose');
 const connectDB = require('./config/db');
 const cors = require('cors');
 ;
-
-
-
 //
-
 var indexRouter = require('./routes/index');
 var usersRouter = require('./routes/users');
 var productsRouter = require('./routes/products');
@@ -24,13 +20,9 @@ app.use(express.static('public'));
 app.set('views', [path.join(__dirname, 'views'), path.join(__dirname, 'views/client'), path.join(__dirname, 'views/admin')]);
 app.set('view engine', 'ejs');
 //config port
-
 const PORT = process.env.PORT || 3000;
 // Kết nối MongoDB
 connectDB();
-
-
-
 //
 app.use('/', indexRouter);
 app.use('/users', usersRouter);

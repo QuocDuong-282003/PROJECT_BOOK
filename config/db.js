@@ -7,11 +7,6 @@ const connectDB = async () => {
         if (!uri) {
             throw new Error('MongoDB URI is undefined!');
         }
-
-        await mongoose.connect(uri, {
-            useNewUrlParser: true,
-            useUnifiedTopology: true,
-        });
         console.log("✅ MongoDB connected successfully!");
     } catch (error) {
         console.error("❌ MongoDB connection failed:", error.message);
