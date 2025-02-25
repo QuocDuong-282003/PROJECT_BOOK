@@ -1,0 +1,6 @@
+<form action="/admin/categories/edit/<%= category._id %>" method="POST">
+    <label for="name">Tên danh mục:</label>
+    <input type="text" id="name" name="name" value="<%= category.name %>" required>
+    <button type="submit">Cập nhật</button>
+</form>
+<a href="/admin/categories">Quay lại danh sách</a>

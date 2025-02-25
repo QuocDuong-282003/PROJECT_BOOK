@@ -1,0 +1,30 @@
+<h2>Danh sách sách</h2>
+<a href="/admin/books/add">Thêm sách mới</a>
+<table>
+    <thead>
+        <tr>
+            <th>Tên sách</th>
+            <th>Tác giả</th>
+            <th>Giá</th>
+            <th>Hành động</th>
+        </tr>
+    </thead>
+    <tbody>
+        <% books.forEach(book => { %>
+            <tr>
+                <td><%= book.title %></td>
+                <td><%= book.author %></td>
+                <td><%= book.price %> VNĐ</td>
+                <td>
+                    <a href="/admin/books/edit/<%= book._id %>">Sửa</a>
+                    <form action="/admin/books/<%= book._id %>?_method=DELETE" method="POST">
+                        <button type="submit">Xóa mềm</button>
+                    </form>
+                    <form action="/admin/books/permanent/<%= book._id %>?_method=DELETE" method="POST">
+                        <button type="submit">Xóa vĩnh viễn</button>
+                    </form>
+                </td>
+            </tr>
+        <% }); %>
+    </tbody>
+</table>

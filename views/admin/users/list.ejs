@@ -1,0 +1,32 @@
+<h2>Danh sách người dùng</h2>
+<table>
+    <thead>
+        <tr>
+            <th>Họ tên</th>
+            <th>Email</th>
+            <th>Vai trò</th>
+            <th>Trạng thái</th>
+            <th>Hành động</th>
+        </tr>
+    </thead>
+    <tbody>
+        <% users.forEach(user => { %>
+            <tr>
+                <td><%= user.fullName %></td>
+                <td><%= user.email %></td>
+                <td><%= user.role %></td>
+                <td>
+                    <% if (user.isBlocked) { %> 🚫 Đã khóa <% } else { %> ✅ Hoạt động <% } %>
+                </td>
+                <td>
+                    <a href="/admin/users/edit/<%= user._id %>">Sửa</a>
+                    <form action="/admin/users/block/<%= user._id %>" method="POST">
+                        <button type="submit">
+                            <% if (user.isBlocked) { %> Mở khóa <% } else { %> Khóa <% } %>
+                        </button>
+                    </form>
+                </td>
+            </tr>
+        <% }); %>
+    </tbody>
+</table>
