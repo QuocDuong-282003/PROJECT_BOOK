@@ -3,7 +3,10 @@ const mongoose = require('mongoose');
 const connectDB = async () => {
     try {
         const uri = process.env.MONGODB_URL; // Sử dụng MONGO_URL thay vì MONGO_URI
-
+        await mongoose.connect(uri, {
+            useNewUrlParser: true,
+            useUnifiedTopology: true,
+        });
         if (!uri) {
             throw new Error('MongoDB URI is undefined!');
         }

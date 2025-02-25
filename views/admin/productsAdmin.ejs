@@ -1,0 +1,106 @@
+<%- include('./layouts/style') %>
+<%- include('./layouts/head') %>
+<%- include('./layouts/menu-list') %>
+
+<div class="col-xl-12 col-md-12">
+    
+    <div class="card table-card">
+        <div class="card-header">
+            <style>
+            
+            </style>
+
+        <div class="title-container">
+            <h5><%= title %></h5>
+            <span class="search-container">
+                <label for="Search">
+                    <input id="Search" class="form-control" type="text" placeholder="Search..">
+                </label>
+                <button type="button" class="btn btn-primary">
+                    <i class="feather icon-search"></i>
+                </button>
+            </span>
+
+        </div>
+           
+            
+            <div class="card-header-right">
+                <div class="btn-group card-option">
+                    <button type="button" class="btn dropdown-toggle" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
+                        <i class="feather icon-more-horizontal"></i>
+                    </button>
+                    <ul class="list-unstyled card-option dropdown-menu dropdown-menu-right">
+                        <li class="dropdown-item full-card"><a href="#!"><span><i class="feather icon-maximize"></i> maximize</span><span style="display:none"><i class="feather icon-minimize"></i> Restore</span></a></li>
+                        <li class="dropdown-item minimize-card"><a href="#!"><span><i class="feather icon-minus"></i> collapse</span><span style="display:none"><i class="feather icon-plus"></i> expand</span></a></li>
+                        <li class="dropdown-item reload-card"><a href="#!"><i class="feather icon-refresh-cw"></i> reload</a></li>
+                    </ul>
+                </div>
+            </div>
+        </div>
+        <div class="card-body p-0">
+            <div class="table-responsive">
+                <table class="table table-hover mb-0">
+                    <thead>
+                        <tr>
+                            <!-- <th>
+                                <div class="chk-option">
+                                    <label class="check-task custom-control custom-checkbox d-flex justify-content-center done-task">
+                                        <input type="checkbox" class="custom-control-input">
+                                        <span class="custom-control-label"></span>
+                                    </label>
+                                </div>
+                                Assigned
+                            </th> -->
+                            <th class="text-center">NO</th>
+                            <th class="text-center">Title</th>
+                            <th class="text-center">Author</th>
+                            <th class="text-center">Category</th>
+                            <th class="text-center">Publisher</th>
+                            <th class="text-center">Price</th>
+                            <th class="text-center">Stock</th>
+                            <th class="text-center">AVG</th>
+                            <th class="text-center">Status</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        <tr>
+                            <td class="text-center">1</td>
+                            <td class="text-center">To Kill a Mockingbird</td>
+                            <td class="text-center">Harper Lee</td>
+                            <td class="text-center">
+                                <div class="col-md-12">
+                                    <select class="mb-12 form-control form-control-sm">
+                                        <option>Horror</option>
+                                        <option>Comedy</option>
+                                    </select>
+                                </div>
+                            </td>
+                            <td class="text-center">
+                                <div class="col-md-12">
+                                    <select class="mb-12 form-control form-control-sm">
+                                        <option>Kim Đồng</option>
+                                        <option>....</option>
+                                    </select>
+                                </div>
+                            </td>
+                            <td class="text-center">25000 VNĐ</td>
+                            <td class="text-center">100</td>
+                            <td class="text-center">4.9</td>
+                            <td class="text-center">
+                                <div class="col-md-12">
+                                    <select class="mb-12 form-control form-control-sm">
+                                        <option>Active</option>
+                                        <option>Inactive</option>
+                                    </select>
+                                </div>
+                            </td>
+                        </tr>
+                    </tbody>
+                </table>
+            </div>
+        </div>
+    </div>
+</div>
+
+<%- include('./layouts/footer') %>
+<%- include('./layouts/script') %>
