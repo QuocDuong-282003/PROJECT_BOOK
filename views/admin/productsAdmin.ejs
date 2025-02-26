@@ -6,24 +6,21 @@
     
     <div class="card table-card">
         <div class="card-header">
-            <style>
-            
-            </style>
-
-        <div class="title-container">
-            <h5><%= title %></h5>
-            <span class="search-container">
-                <label for="Search">
-                    <input id="Search" class="form-control" type="text" placeholder="Search..">
-                </label>
-                <button type="button" class="btn btn-primary">
-                    <i class="feather icon-search"></i>
-                </button>
-            </span>
-
-        </div>
+            <div class="title-container">
+                <h5><%= title %></h5>
+                <span class="search-container">
+                    <label for="Search">
+                        <input id="Search" class="form-control" type="search" placeholder="Search..">
+                    </label>
+                    <button type="button" class="btn btn-primary">
+                        <i class="feather icon-search"></i>
+                    </button>
+                    
+                </span>
+                
+            </div>
            
-            
+            <button type="button" class="btn  btn-success" data-toggle="modal" data-target="#exampleModalLive"><i class="feather icon-plus"></i></button>
             <div class="card-header-right">
                 <div class="btn-group card-option">
                     <button type="button" class="btn dropdown-toggle" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
@@ -42,15 +39,6 @@
                 <table class="table table-hover mb-0">
                     <thead>
                         <tr>
-                            <!-- <th>
-                                <div class="chk-option">
-                                    <label class="check-task custom-control custom-checkbox d-flex justify-content-center done-task">
-                                        <input type="checkbox" class="custom-control-input">
-                                        <span class="custom-control-label"></span>
-                                    </label>
-                                </div>
-                                Assigned
-                            </th> -->
                             <th class="text-center">NO</th>
                             <th class="text-center">Title</th>
                             <th class="text-center">Author</th>
@@ -60,6 +48,7 @@
                             <th class="text-center">Stock</th>
                             <th class="text-center">AVG</th>
                             <th class="text-center">Status</th>
+                            <th class="text-center">EDIT/DELETE</th>
                         </tr>
                     </thead>
                     <tbody>
@@ -67,32 +56,15 @@
                             <td class="text-center">1</td>
                             <td class="text-center">To Kill a Mockingbird</td>
                             <td class="text-center">Harper Lee</td>
-                            <td class="text-center">
-                                <div class="col-md-12">
-                                    <select class="mb-12 form-control form-control-sm">
-                                        <option>Horror</option>
-                                        <option>Comedy</option>
-                                    </select>
-                                </div>
-                            </td>
-                            <td class="text-center">
-                                <div class="col-md-12">
-                                    <select class="mb-12 form-control form-control-sm">
-                                        <option>Kim Đồng</option>
-                                        <option>....</option>
-                                    </select>
-                                </div>
-                            </td>
+                            <td class="text-center">Horror</td>
+                            <td class="text-center">Kim Đồng</td>
                             <td class="text-center">25000 VNĐ</td>
                             <td class="text-center">100</td>
                             <td class="text-center">4.9</td>
-                            <td class="text-center">
-                                <div class="col-md-12">
-                                    <select class="mb-12 form-control form-control-sm">
-                                        <option>Active</option>
-                                        <option>Inactive</option>
-                                    </select>
-                                </div>
+                            <td class="text-center">Active</td>
+                            <td>
+                                <button type="button" class="btn  btn-info" data-toggle="modal" data-target="#updateModalLive"><i class="feather icon-edit"></i></button>
+                                <button type="button" class="btn  btn-danger"><i class="feather icon-trash-2"></i></button>
                             </td>
                         </tr>
                     </tbody>
@@ -101,6 +73,7 @@
         </div>
     </div>
 </div>
-
+<%- include('./model-insert-products') %>
+<%- include('./model-update-product') %>
 <%- include('./layouts/footer') %>
 <%- include('./layouts/script') %>
