@@ -13,14 +13,14 @@ const getAllBooks = async () => {
 // Đảm bảo export đúng
 module.exports = { getAllBooks };
 
-exports.getProductById = async (req, res) => {
+exports.getProductById = async (req, res,_id) => {
     try {
-        const id = req.params.id;
-        const Product = await Book.findById(id);
+        const _id = req.params.id;
+        const Product = await Book.findById(_id);
         if (!Product) {
             res.status(404).json({ message: "Không tìm thấy sản phẩm" });
         } else {
-            res.json(Product);
+            return Product;
         }
     } catch (error) {
         console.error("Lỗi khi lấy sản phẩm:", error);
