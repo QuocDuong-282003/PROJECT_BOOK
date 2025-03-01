@@ -1,22 +1,27 @@
 const express = require('express');
 const router = express.Router();
-const {
-    getBooks,
-    getAddBook,
-    addBook,
-    getEditBook,
-    editBook,
-    softDeleteBook,
-    hardDeleteBook
-} = require('../../controller/admin/book.controller');
+const bookController = require('../../controller/admin/book.controller');
+const multer = require('multer');
 
-// 🔹 Routes quản lý sách
-router.get("/", getBooks);           // Hiển thị danh sách sách
-router.get("/add", getAddBook);      // Trang thêm sách
-router.post("/add", addBook);        // Xử lý thêm sách
-router.get("/edit/:id", getEditBook); // Trang sửa sách
-router.post("/edit/:id", editBook);  // Xử lý sửa sách
-router.delete("/delete/:id", softDeleteBook);  // Xóa mềm
-router.delete("/permanent/:id", hardDeleteBook); // Xóa vĩnh viễn
+const storage = multer.diskStorage({
+    destination: (req, file, cb) => cb(null, 'public/uploads/'),
+    filename: (req, file, cb) => cb(null, Date.now() + "-" + file.originalname)
+});
+
+const upload = multer({ storage });
+
+router.post('/', upload.single('coverImage'), bookController.createBook);
+
+// 📌 Danh sách sách (Hiển thị trang admin EJS)
+router.get('/', bookController.getBooks);
+
+// 📌 Thêm sách
+router.post('/', bookController.createBook);
+
+// 📌 Cập nhật sách
+router.put('/update/:id', bookController.updateBook);
+
+// 📌 Xóa sách
+router.delete('/:id', bookController.deleteBook);
 
 module.exports = router;

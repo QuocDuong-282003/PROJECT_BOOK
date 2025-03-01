@@ -1,69 +1,36 @@
 const Comment = require('../../models/Comment');
+const User = require('../../models/User');
+const Book = require('../../models/Book');
 
-// 📌 Hiển thị danh sách bình luận (chỉ lấy bình luận chưa bị xóa mềm)
-exports.getComments = async (req, res) => {
+// 📌 Lấy danh sách tất cả bình luận
+exports.getAllComments = async (req, res) => {
     try {
-        const comments = await Comment.find({ isDeleted: false }).populate("userId bookId");
-        res.render("admin/comments/list", { comments });
+        const comments = await Comment.find().populate('user', 'username').populate('book', 'title');
+        res.status(200).json({ success: true, data: comments });
     } catch (err) {
-        res.status(500).send("Lỗi server khi lấy danh sách bình luận.");
+        res.status(500).json({ success: false, message: 'Lỗi server khi lấy danh sách bình luận.', error: err.message });
     }
 };
 
-// 📌 Hiển thị trang thêm bình luận
-exports.getAddComment = (req, res) => {
-    res.render("admin/comments/add");
-};
-
-// 📌 Thêm bình luận mới
-exports.addComment = async (req, res) => {
+// 📌 Xóa bình luận theo ID
+exports.deleteComment = async (req, res) => {
     try {
-        const { userId, bookId, content } = req.body;
-        const newComment = new Comment({ userId, bookId, content });
-        await newComment.save();
-        res.redirect("/admin/comments");
+        const comment = await Comment.findByIdAndDelete(req.params.id);
+        if (!comment) {
+            return res.status(404).json({ success: false, message: 'Không tìm thấy bình luận.' });
+        }
+        res.status(200).json({ success: true, message: 'Xóa bình luận thành công.' });
     } catch (err) {
-        res.status(500).send("Lỗi server khi thêm bình luận.");
+        res.status(500).json({ success: false, message: 'Lỗi server khi xóa bình luận.', error: err.message });
     }
 };
 
-// 📌 Hiển thị trang chỉnh sửa bình luận
-exports.getEditComment = async (req, res) => {
+// 📌 Thống kê số lượng bình luận
+exports.getCommentStatistics = async (req, res) => {
     try {
-        const comment = await Comment.findById(req.params.id);
-        res.render("admin/comments/edit", { comment });
+        const totalComments = await Comment.countDocuments();
+        res.status(200).json({ success: true, data: { totalComments } });
     } catch (err) {
-        res.status(500).send("Lỗi server khi lấy dữ liệu bình luận.");
-    }
-};
-
-// 📌 Cập nhật bình luận
-exports.editComment = async (req, res) => {
-    try {
-        const { content } = req.body;
-        await Comment.findByIdAndUpdate(req.params.id, { content });
-        res.redirect("/admin/comments");
-    } catch (err) {
-        res.status(500).send("Lỗi server khi cập nhật bình luận.");
-    }
-};
-
-// 📌 Xóa mềm bình luận (ẩn bình luận thay vì xóa vĩnh viễn)
-exports.softDeleteComment = async (req, res) => {
-    try {
-        await Comment.findByIdAndUpdate(req.params.id, { isDeleted: true });
-        res.redirect("/admin/comments");
-    } catch (err) {
-        res.status(500).send("Lỗi server khi ẩn bình luận.");
-    }
-};
-
-// 📌 Xóa vĩnh viễn bình luận
-exports.hardDeleteComment = async (req, res) => {
-    try {
-        await Comment.findByIdAndDelete(req.params.id);
-        res.redirect("/admin/comments");
-    } catch (err) {
-        res.status(500).send("Lỗi server khi xóa bình luận.");
+        res.status(500).json({ success: false, message: 'Lỗi server khi lấy thống kê bình luận.', error: err.message });
     }
 };

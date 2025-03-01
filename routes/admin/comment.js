@@ -1,31 +1,10 @@
-const express = require("express");
-const { 
-    getComments, 
-    getAddComment, 
-    addComment, 
-    getEditComment, 
-    editComment, 
-    softDeleteComment, 
-    hardDeleteComment 
-} = require("../../controller/admin/comment.controller");
-
+const express = require('express');
 const router = express.Router();
+const commentController = require('../../controller/admin/comment.controller');
 
-// 📌 Hiển thị danh sách bình luận
-router.get("/", getComments);
-
-// 📌 Trang thêm bình luận
-router.get("/add", getAddComment);
-router.post("/add", addComment);
-
-// 📌 Trang chỉnh sửa bình luận
-router.get("/edit/:id", getEditComment);
-router.post("/edit/:id", editComment);
-
-// 📌 Xóa mềm bình luận (ẩn bình luận)
-router.delete("/:id", softDeleteComment);
-
-// 📌 Xóa vĩnh viễn bình luận
-router.delete("/permanent/:id", hardDeleteComment);
+// 🛠️ Định nghĩa các route
+router.get('/', commentController.getAllComments); // Lấy danh sách bình luận
+router.get('/stats', commentController.getCommentStatistics); // Thống kê số lượng bình luận
+router.delete('/:id', commentController.deleteComment); // Xóa bình luận không phù hợp
 
 module.exports = router;

@@ -1,14 +1,24 @@
 const User = require('../../models/User');
-// const bcrypt = require('bcrypt');
-// const jwt = require('jsonwebtoken');
+const bcrypt = require('bcrypt');
+const jwt = require('jsonwebtoken');
 
 exports.renderLogin = (req, res) => {
-    res.render('admin/auth/login', { error: null });
+    res.render('admin/auth/login', {
+        path: 'auth/login',
+        title: 'Login Page',
+        error: null
+    });
 };
 
-exports.login = async (req, res) => {
+exports.login = async (req, res, next) => {
     try {
         const { email, password } = req.body;
+        const adminEmail = "admin@iuh.com"; 
+
+        if (email !== adminEmail) {
+            return res.render('admin/auth/login', { error: 'Bạn không có quyền truy cập!' });
+        }
+
         const user = await User.findOne({ email });
 
         if (!user) {
@@ -20,40 +30,53 @@ exports.login = async (req, res) => {
             return res.render('admin/auth/login', { error: 'Mật khẩu không đúng!' });
         }
 
-        if (user.role !== 'admin') {
-            return res.render('admin/auth/login', { error: 'Bạn không có quyền truy cập!' });
-        }
+        const token = jwt.sign(
+            { id: user._id, role: user.role },
+            process.env.JWT_SECRET,
+            { expiresIn: '1h' }
+        );
 
-        const token = jwt.sign({ id: user._id, role: user.role }, process.env.JWT_SECRET, { expiresIn: '1h' });
+        res.cookie('token', token, {
+            httpOnly: true,
+            secure: process.env.NODE_ENV === 'production',
+            sameSite: 'strict',
+            maxAge: 3600000,
+        });
 
-        res.cookie('token', token, { httpOnly: true, secure: false });
-        return res.redirect('/admin/dashboard'); // Chuyển hướng sau khi đăng nhập thành công
+        return res.redirect('/admin'); 
     } catch (error) {
-        return res.render('admin/auth/login', { error: 'Lỗi server!' });
+        console.error('Lỗi đăng nhập:', error);
+        return next(error);
     }
 };
 
-// 🟢 Đăng xuất
 exports.logout = (req, res) => {
-    res.clearCookie('token');
-    res.redirect('/admin/login'); // Chuyển hướng về trang đăng nhập
+    res.clearCookie('token');  // Xóa cookie token
+    res.redirect('/admin/auth/login');  // Điều hướng về trang đăng nhập
 };
 
-// 🟢 Kiểm tra Admin
+// 🛑 Chặn truy cập vào tất cả các trang admin nếu chưa đăng nhập
+
 exports.checkAdmin = (req, res, next) => {
     try {
         const token = req.cookies.token;
+
         if (!token) {
-            return res.redirect('/admin/login');
+            return res.redirect('/admin/auth/login'); // Chuyển về trang login nếu chưa đăng nhập
         }
 
         const decoded = jwt.verify(token, process.env.JWT_SECRET);
-        if (decoded.role !== 'admin') {
-            return res.status(403).json({ message: 'Bạn không có quyền truy cập!' });
+
+        if (!decoded || decoded.role !== 'admin') {
+            res.clearCookie('token'); // Xóa token nếu không hợp lệ
+            return res.redirect('/admin/auth/login');
         }
 
+        req.user = decoded;
         next();
     } catch (error) {
-        return res.redirect('/admin/login');
+        console.error('Lỗi xác thực admin:', error);
+        res.clearCookie('token');
+        return res.redirect('/admin/auth/login');
     }
 };

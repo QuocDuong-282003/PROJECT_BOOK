@@ -1,59 +1,79 @@
-const Category = require('../../models/Category');
+// controllers/category.controller.js
+const Category = require("../../models/Category");
 
-// 🔹 Lấy danh sách danh mục
+// 📌 Hiển thị danh sách danh mục
 exports.getCategories = async (req, res) => {
     try {
         const categories = await Category.find();
         res.status(200).json(categories);
-    } catch (error) {
-        res.status(500).json({ message: "Lỗi server: Không thể lấy danh mục." });
+    } catch (err) {
+        res.status(500).json({ message: "Lỗi server khi lấy danh sách danh mục." });
     }
 };
 
-// 🔹 Hiển thị trang thêm danh mục
-exports.getAddCategoryPage = (req, res) => {
-    res.render("admin/categories/add");
-};
-
-// 🔹 Thêm danh mục mới
-exports.addCategory = async (req, res) => {
+// 📌 Thêm danh mục mới
+exports.createCategory = async (req, res) => {
     try {
-        const category = new Category(req.body);
-        await category.save();
-        res.redirect("/admin/categories");
-    } catch (error) {
-        res.status(400).json({ message: "Lỗi: Không thể thêm danh mục." });
+        console.log("Dữ liệu nhận được:", req.body); // Kiểm tra dữ liệu gửi lên
+        const { name, description } = req.body;
+        
+        if (!name) {
+            return res.status(400).json({ message: "Tên danh mục là bắt buộc." });
+        }
+
+        const newCategory = new Category({ name, description });
+        await newCategory.save();
+
+        res.status(201).json(newCategory);
+    } catch (err) {
+        console.error("Lỗi khi thêm danh mục:", err); // In lỗi ra terminal
+        res.status(500).json({ message: "Lỗi server khi thêm danh mục.", error: err.message });
     }
 };
 
-// 🔹 Hiển thị trang chỉnh sửa danh mục
-exports.getEditCategoryPage = async (req, res) => {
+// 📌 Chỉnh sửa danh mục
+exports.updateCategory = async (req, res) => {
     try {
-        const category = await Category.findById(req.params.id);
-        if (!category) return res.status(404).json({ message: "Danh mục không tồn tại." });
-        res.render("admin/categories/edit", { category });
-    } catch (error) {
-        res.status(500).json({ message: "Lỗi server khi lấy danh mục." });
+        const { name, description } = req.body;
+        const updatedCategory = await Category.findByIdAndUpdate(req.params.id, { name, description }, { new: true });
+        res.status(200).json(updatedCategory);
+    } catch (err) {
+        res.status(500).json({ message: "Lỗi server khi cập nhật danh mục." });
     }
 };
 
-// 🔹 Chỉnh sửa danh mục
-exports.editCategory = async (req, res) => {
-    try {
-        const category = await Category.findByIdAndUpdate(req.params.id, req.body, { new: true });
-        if (!category) return res.status(404).json({ message: "Danh mục không tồn tại." });
-        res.redirect("/admin/categories");
-    } catch (error) {
-        res.status(400).json({ message: "Lỗi: Không thể chỉnh sửa danh mục." });
-    }
-};
-
-// 🔹 Xóa danh mục (Xóa mềm)
+// 📌 Xóa danh mục
 exports.deleteCategory = async (req, res) => {
     try {
         await Category.findByIdAndDelete(req.params.id);
-        res.redirect("/admin/categories");
-    } catch (error) {
+        res.status(200).json({ message: "Danh mục đã được xóa." });
+    } catch (err) {
         res.status(500).json({ message: "Lỗi server khi xóa danh mục." });
+    }
+};
+
+// 📌 Xem thống kê số lượng sách trong mỗi danh mục
+exports.getCategoryStatistics = async (req, res) => {
+    try {
+        const statistics = await Category.aggregate([
+            {
+                $lookup: {
+                    from: "books",
+                    localField: "_id",
+                    foreignField: "categoryId",
+                    as: "books"
+                }
+            },
+            {
+                $project: {
+                    name: 1,
+                    description: 1,
+                    bookCount: { $size: "$books" }
+                }
+            }
+        ]);
+        res.status(200).json(statistics);
+    } catch (err) {
+        res.status(500).json({ message: "Lỗi server khi lấy thống kê danh mục." });
     }
 };
