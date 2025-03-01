@@ -8,7 +8,7 @@ router.get('/', async function(req, res, next) {
   const AllCategories = await getAllCategories();
   res.render('client/products', { title: 'Products' ,Products, AllCategories});
 });
-router.get('/:_idCategory', async function(req, res, next){
+router.get('/category=:_idCategory', async function(req, res, next){
   const _idCategory = req.params._idCategory;
   const AllCategories = await getAllCategories();
   const Products = await getProductByCategory(_idCategory);

@@ -1,5 +1,6 @@
 const Book = require("../../models/Book");
-
+const mongoose = require("mongoose");
+const ObjectId = mongoose.Types.ObjectId;
 
 const getAllBooks = async () => {
     try {
@@ -26,14 +27,23 @@ const getProductById = async (req, res,_id) => {
 }
 
 // Lấy sản phẩm theo danh mục
-const getProductByCategory = async (categoryId) => {
+const getProductByCategory = async (_idCategory) => {
     try {
-        return await Book.find({ categoryId }); // Tìm theo `categoryId`
+        console.log("categoryId:", _idCategory);
+        const categoryObjectId = new ObjectId(_idCategory);
+        // Tìm tất cả sản phẩm có categoryId = _idCategory
+        const product = await Book.find();
+        const products = await Book.find({ categoryId: categoryObjectId });
+
+        console.log("Số lượng sản phẩm:", products.length);
+        console.log("Số lượng sản phẩm:", product.length);
+        return products; // Trả về danh sách sản phẩm
     } catch (error) {
         console.error("Lỗi khi lấy sản phẩm theo danh mục:", error);
         return [];
     }
 };
+
 
 // Đảm bảo export đúng
 module.exports = { getAllBooks, getProductById , getProductByCategory};
