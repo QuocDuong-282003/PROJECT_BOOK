@@ -10,10 +10,7 @@ const getAllBooks = async () => {
     }
 };
 
-// Đảm bảo export đúng
-module.exports = { getAllBooks };
-
-exports.getProductById = async (req, res,_id) => {
+const getProductById = async (req, res,_id) => {
     try {
         const _id = req.params.id;
         const Product = await Book.findById(_id);
@@ -27,3 +24,16 @@ exports.getProductById = async (req, res,_id) => {
         res.status(500).json({ message: "Lỗi server", error });
      }
 }
+
+// Lấy sản phẩm theo danh mục
+const getProductByCategory = async (categoryId) => {
+    try {
+        return await Book.find({ categoryId }); // Tìm theo `categoryId`
+    } catch (error) {
+        console.error("Lỗi khi lấy sản phẩm theo danh mục:", error);
+        return [];
+    }
+};
+
+// Đảm bảo export đúng
+module.exports = { getAllBooks, getProductById , getProductByCategory};

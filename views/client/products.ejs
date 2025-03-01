@@ -20,7 +20,7 @@
                                 <h3>Categories</h3>
                             </div>
                             <div class="list-group list-group-collapse list-group-sm list-group-tree" id="list-group-men" data-children=".sub-men">
-                                <div class="list-group-collapse sub-men">
+                                <!-- <div class="list-group-collapse sub-men">
                                     <a class="list-group-item list-group-item-action" href="#sub-men1" data-toggle="collapse" aria-expanded="true" aria-controls="sub-men1">Clothing <small class="text-muted">(100)</small>
 								</a>
                                     <div class="collapse show" id="sub-men1" data-parent="#list-group-men">
@@ -32,22 +32,12 @@
                                             <a href="#" class="list-group-item list-group-item-action">Hooded T-Shirts <small class="text-muted">(20)</small></a>
                                         </div>
                                     </div>
-                                </div>
-                                <div class="list-group-collapse sub-men">
-                                    <a class="list-group-item list-group-item-action" href="#sub-men2" data-toggle="collapse" aria-expanded="false" aria-controls="sub-men2">Footwear 
-								<small class="text-muted">(50)</small>
-								</a>
-                                    <div class="collapse" id="sub-men2" data-parent="#list-group-men">
-                                        <div class="list-group">
-                                            <a href="#" class="list-group-item list-group-item-action">Sports Shoes <small class="text-muted">(10)</small></a>
-                                            <a href="#" class="list-group-item list-group-item-action">Sneakers <small class="text-muted">(20)</small></a>
-                                            <a href="#" class="list-group-item list-group-item-action">Formal Shoes <small class="text-muted">(20)</small></a>
-                                        </div>
-                                    </div>
-                                </div>
-                                <a href="#" class="list-group-item list-group-item-action"> Men  <small class="text-muted">(150) </small></a>
-                                <a href="#" class="list-group-item list-group-item-action">Accessories <small class="text-muted">(11)</small></a>
-                                <a href="#" class="list-group-item list-group-item-action">Bags <small class="text-muted">(22)</small></a>
+                                </div> -->
+                                <% AllCategories.forEach( category => { %>
+                          
+                                    <a href="/products/category=<%=category._id%>" class="list-group-item list-group-item-action"> <%= category.name %>  <small class="text-muted">(150) </small></a>
+                                <%}) %>
+                                
                             </div>
                         </div>
                         <div class="filter-price-left">
@@ -166,7 +156,8 @@
                             <div class="tab-content">
                                 <div role="tabpanel" class="tab-pane fade show active" id="grid-view">
                                     <div class="row">
-                                        <div class="col-sm-6 col-md-6 col-lg-4 col-xl-4">
+                                        <% Products.forEach(product =>{ %>
+                                            <div class="col-sm-6 col-md-6 col-lg-4 col-xl-4">
                                             <div class="products-single fix">
                                                 <div class="box-img-hover">
                                                     <div class="type-lb">
@@ -182,15 +173,17 @@
                                                         <a class="cart" href="#">Add to Cart</a>
                                                     </div>
                                                 </div>
-                                                <a href="/products/productdetail">
+                                                <a href="/products/productdetail/<%= product._id %>">
                                                     <div class="why-text">
-                                                        <h4>Lorem ipsum dolor sit amet</h4>
-                                                        <h5> $9.79</h5>
+                                                        <h4><%= product.title%></h4>
+                                                        <h5> <%= product.price%></h5>
                                                     </div>
                                                 </a>
                                                 
                                             </div>
                                         </div>
+                                       <% }) %>
+                                        
                                     </div>
                                 </div>
 

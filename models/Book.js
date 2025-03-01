@@ -3,7 +3,7 @@ const bookSchema = new mongoose.Schema({
     _id: { type: mongoose.Schema.Types.ObjectId, required: true },
     title: { type: String, required: true },
     author: { type: String, required: true },
-    categoryId: { type: mongoose.Schema.Types.ObjectId, ref: 'Category', required: true },
+    categoryId: { type: mongoose.Schema.Types.ObjectId, ref: 'categories', required: true },
     publisherId: { type: mongoose.Schema.Types.ObjectId, ref: 'Publisher', required: true },
     discountId: { type: mongoose.Schema.Types.ObjectId, ref: 'Discount', default: null },
     price: { type: Number, required: true, min: 0 },
