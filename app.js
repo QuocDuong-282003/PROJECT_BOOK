@@ -17,8 +17,6 @@ connectDB();
 const User = require('./models/User');
 const bcrypt = require('bcrypt');
 
-
-
 // Middleware để xử lý JSON và dữ liệu từ form
 app.use(express.static('public'));
 app.set('views', [path.join(__dirname, 'views'), path.join(__dirname, 'views/client'), path.join(__dirname, 'views/admin')]);
@@ -26,6 +24,11 @@ app.set('view engine', 'ejs');
 app.use(express.json());
 app.use(express.urlencoded({ extended: true }));
 app.use(cookieParser());
+app.use(cors({
+    origin: '*', // Hoặc bạn có thể chỉ định domain của client nếu không muốn mở rộng quá nhiều
+    methods: ['GET', 'POST', 'PUT', 'DELETE'],
+    allowedHeaders: ['Content-Type', 'Authorization']
+}));
 
 // Config port
 const PORT = process.env.PORT || 3000;
@@ -38,13 +41,13 @@ var productdetail = require('./routes/client/productdetail');
 var cartRouter = require('./routes/client/cart');
 
 // Admin routes
-var authsRouter = require('./routes/admin/auth');//
+var authsRouter = require('./routes/admin/auth');
 var userRouter = require('./routes/admin/users');
 var categoryRouter = require('./routes/admin/category');
 var bookRouter = require('./routes/admin/book');
 var publisherRoutes = require("./routes/admin/publisher");
 var commentRouter = require('./routes/admin/comment');
-var indexADMIN = require('./routes/admin/indexADMIN'); 
+var indexADMIN = require('./routes/admin/indexADMIN');
 var discountRouter = require('./routes/admin/discount');
 
 // Client routes
