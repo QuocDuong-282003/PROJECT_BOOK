@@ -23,5 +23,5 @@ router.put('/update/:id', bookController.updateBook);
 
 // 📌 Xóa sách
 router.delete('/:id', bookController.deleteBook);
-
+router.get("/search", bookController.searchBooks);
 module.exports = router;

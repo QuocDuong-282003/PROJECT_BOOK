@@ -125,3 +125,25 @@ exports.deleteBook = async (req, res) => {
         res.status(500).json({ success: false, message: "Lỗi server khi xóa sách!" });
     }
 };
+// 📌 API Tìm kiếm sách theo tiêu đề, tác giả, danh mục, NXB
+exports.searchBooks = async (req, res) => {
+    try {
+        const query = req.query.query ? req.query.query.trim() : "";
+
+        if (!query) {
+            return res.status(400).json({ success: false, message: "Vui lòng nhập từ khóa tìm kiếm!" });
+        }
+
+        const books = await Book.find({
+            $or: [
+                { title: new RegExp(query, "i") }, // Tìm theo tiêu đề
+                { author: new RegExp(query, "i") }, // Tìm theo tác giả
+            ]
+        }).populate("categoryId publisherId"); // Lấy thêm dữ liệu danh mục & NXB
+
+        res.json({ success: true, books });
+    } catch (err) {
+        console.error("Lỗi khi tìm kiếm sách:", err);
+        res.status(500).json({ success: false, message: "Lỗi server khi tìm kiếm sách!" });
+    }
+};
