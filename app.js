@@ -22,6 +22,7 @@ var indexADMIN = require('./routes/admin/indexADMIN');
 var productdetail = require('./routes/productdetail');
 var cartRouter = require('./routes/cart');
 var authRouter = require('./routes/auth');
+const Cart = require('./models/Cart');
 const app = express();
 //
 app.use(methodOverride('_method'));
@@ -46,8 +47,24 @@ app.use(session({
     cookie: { secure: false } // Đặt true nếu dùng HTTPS
 }));
 
-app.use((req, res, next) => {
+app.use(async (req, res, next) => {
     res.locals.user = req.session.user || null; // Nếu chưa đăng nhập, user sẽ là null
+    res.locals.cart = { items: [] }; // Giỏ hàng mặc định là rỗng
+    res.locals.count = 0; // Số lượng mặc định là 0
+    if (req.session.user) {
+        try {
+            const cart = await Cart.findOne({ userId: req.session.user.id }).populate("items.bookId");
+            res.locals.cart = cart || { items: [] };  // Nếu không có giỏ hàng, gán mảng rỗng
+            res.locals.count = res.locals.cart.items.length;
+        } catch (error) {
+            console.error("Lỗi khi lấy giỏ hàng:", error);
+            res.locals.cart = { items: [] };
+            res.locals.count = 0;
+        }
+    } else {
+        res.locals.cart = { items: [] }; // Nếu chưa đăng nhập, gán giỏ hàng rỗng
+    }
+    
     next();
 });
 

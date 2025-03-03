@@ -9,24 +9,20 @@ const getAllBooks = async () => {
     }
 };
 
-const getProductById = async (_id) => {
+const getProductById = async (bookId) => {
     try {
-        const Product = await Book.findById(_id);
-        if (!Product) {
-            res.status(404).json({ message: "Không tìm thấy sản phẩm" });
-        } else {
-            return Product;
-        }
+        console.log("id: ",bookId);
+        return await Book.findById(bookId);
     } catch (error) {
         console.error("Lỗi khi lấy sản phẩm:", error);
-        res.status(500).json({ message: "Lỗi server", error });
-     }
-}
+        return null;
+    }
+};
+
 
 // Lấy sản phẩm theo danh mục
 const getProductByCategory = async (_idCategory) => {
     try {
-        console.log("categoryId:", _idCategory);
         const products = await Book.find({ categoryId: _idCategory });
         return products; 
     } catch (error) {
