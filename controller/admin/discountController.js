@@ -36,11 +36,17 @@ exports.createDiscount = async (req, res) => {
     }
 };
 
-// Method updateDiscount trong controller
 exports.updateDiscount = async (req, res) => {
     try {
         const discountId = req.params.id; // Lấy ID từ URL
+        console.log("Updating Discount ID:", discountId);
+
+        if (!discountId) {
+            return res.status(400).json({ message: "Invalid discount ID" });
+        }
+
         const { code, description, discountsType, value, startDate, endDate } = req.body;
+        console.log("Request body:", req.body);
 
         // Kiểm tra nếu có discount với ID đó
         const discount = await Discount.findById(discountId);
@@ -49,23 +55,23 @@ exports.updateDiscount = async (req, res) => {
         }
 
         // Cập nhật dữ liệu
-        discount.code = code;
-        discount.description = description;
-        discount.discountType = discountsType;
-        discount.value = value;
-        discount.startDate = new Date(startDate);
-        discount.endDate = new Date(endDate);
+        discount.code = code || discount.code;
+        discount.description = description || discount.description;
+        discount.discountType = discountsType || discount.discountType;
+        discount.value = value || discount.value;
+        discount.startDate = startDate ? new Date(startDate) : discount.startDate;
+        discount.endDate = endDate ? new Date(endDate) : discount.endDate;
 
         // Lưu vào database
         await discount.save();
 
+        console.log("Discount updated successfully!");
         res.redirect('/admin/discount');
     } catch (error) {
         console.error("Error updating discount:", error);
         res.status(500).json({ message: "Server error" });
     }
 };
-
 
 
 

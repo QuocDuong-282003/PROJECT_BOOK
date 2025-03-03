@@ -70,7 +70,7 @@
                         </tr>
                     </thead>
                     <tbody>
-                        <% discounts.forEach(function(discount) { %>
+                        <% discounts.forEach(discount=>{ %>
                         <tr>
                             <td class="text-center"><%= discount.code
                                 %></td>
@@ -86,11 +86,17 @@
                                 discount.endDate.toDateString() %></td>
 
                             <td style="text-align: center;">
-                                <button type="button"
-                                    class="btn btn-info edit-btn"
+                                <button class="btn btn-info  editBtn"
+                                    data-id="<%= discount._id %>"
+                                    data-code="<%= discount.code %>"
+                                    data-description="<%= discount.description %>"
+                                    data-discount-type="<%= discount.discountType %>"
+                                    data-value="<%= discount.value %>"
+                                    data-start-date="<%= discount.startDate %>"
+                                    data-end-date="<%= discount.endDate %>"
                                     data-toggle="modal"
-                                    data-target="#exampleModalLive">
-                                    <i class="feather icon-edit"></i>
+                                    data-target="#updateModalLive">
+                                    Edit
                                 </button>
 
                                 <form
@@ -106,9 +112,7 @@
                         </tr>
                         <% }); %>
                     </tbody>
-
                 </table>
-
             </div>
         </div>
     </div>
@@ -117,3 +121,21 @@
 <%- include('./model-update-discount') %>
 <%- include('./layouts/footer') %>
 <%- include('./layouts/script') %>
+<script>
+    document.addEventListener("DOMContentLoaded", function () {
+        document.querySelectorAll(".editBtn").forEach(button => {
+            button.addEventListener("click", function () {
+                document.getElementById("discountId").value = this.dataset.id;
+                document.getElementById("code").value = this.dataset.code;
+                document.getElementById("description").value = this.dataset.description;
+                document.getElementById("discountsType").value = this.dataset.discountType;
+                document.getElementById("value").value = this.dataset.value;
+                document.getElementById("startDate").value = this.dataset.startDate;
+                document.getElementById("endDate").value = this.dataset.endDate;
+    
+                // Cập nhật action của form
+                document.getElementById("updateForm").action = `/admin/discount/update/${this.dataset.id}`;
+            });
+        });
+    });
+    </script>

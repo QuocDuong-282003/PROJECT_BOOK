@@ -15,7 +15,7 @@ router.get('/products', function (req, res, next) {
 
 router.get('/discount', discountController.renderDiscountPage);
 router.post('/admin/discount/create/add', discountController.createDiscount);
-router.put('/admin/discount/update/:id', discountController.updateDiscount);
+router.post('/discount/update/:id', discountController.updateDiscount);
 router.delete('/discount/delete/:id', discountController.deleteDiscount);
 
 
