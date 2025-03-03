@@ -1,0 +1,119 @@
+<%- include('./layouts/style') %>
+<%- include('./layouts/head') %>
+<%- include('./layouts/menu-list') %>
+
+<div class="col-xl-12 col-md-12">
+
+    <div class="card table-card">
+        <div class="card-header">
+            <div class="title-container">
+                <h5><%= title %></h5>
+                <span class="search-container">
+                    <label for="Search">
+                        <input id="Search" class="form-control" type="search"
+                            placeholder="Search..">
+                    </label>
+                    <button type="button" class="btn btn-primary">
+                        <i class="feather icon-search"></i>
+                    </button>
+
+                </span>
+
+            </div>
+
+            <button type="button" class="btn  btn-success" data-toggle="modal"
+                data-target="#exampleModalLive"><i
+                    class="feather icon-plus"></i></button>
+            <div class="card-header-right">
+                <div class="btn-group card-option">
+                    <button type="button" class="btn dropdown-toggle"
+                        data-toggle="dropdown" aria-haspopup="true"
+                        aria-expanded="false">
+                        <i class="feather icon-more-horizontal"></i>
+                    </button>
+                    <ul
+                        class="list-unstyled card-option dropdown-menu dropdown-menu-right">
+                        <li class="dropdown-item full-card"><a
+                                href="#!"><span><i
+                                        class="feather icon-maximize"></i>
+                                    maximize</span><span style="display:none"><i
+                                        class="feather icon-minimize"></i>
+                                    Restore</span></a></li>
+                        <li class="dropdown-item minimize-card"><a
+                                href="#!"><span><i
+                                        class="feather icon-minus"></i>
+                                    collapse</span><span style="display:none"><i
+                                        class="feather icon-plus"></i>
+                                    expand</span></a></li>
+                        <li class="dropdown-item reload-card"><a href="#!"><i
+                                    class="feather icon-refresh-cw"></i>
+                                reload</a></li>
+                    </ul>
+                </div>
+            </div>
+        </div>
+        <div class="card-body p-0">
+            <div class="table-responsive">
+
+                <!-- discounts.ejs -->
+                <table class="table table-hover mb-0">
+                    <thead>
+                        <tr>
+                            <!-- //<th class="text-center">NO</th> -->
+                            <th class="text-center">Code</th>
+                            <th class="text-center">Description</th>
+                            <th class="text-center">Discount Type</th>
+                            <th class="text-center">Value</th>
+                            <th class="text-center">Start Date</th>
+                            <th class="text-center">End Date</th>
+                            <th class="text-center">Actions</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        <% discounts.forEach(function(discount) { %>
+                        <tr>
+                            <td class="text-center"><%= discount.code
+                                %></td>
+                            <td class="text-center"><%= discount.description
+                                %></td>
+                            <td class="text-center"><%=
+                                discount.discountType %></td>
+                            <td class="text-center"><%= discount.value
+                                %></td>
+                            <td class="text-center"><%=
+                                discount.startDate.toDateString() %></td>
+                            <td class="text-center"><%=
+                                discount.endDate.toDateString() %></td>
+
+                            <td style="text-align: center;">
+                                <button type="button"
+                                    class="btn btn-info edit-btn"
+                                    data-toggle="modal"
+                                    data-target="#exampleModalLive">
+                                    <i class="feather icon-edit"></i>
+                                </button>
+
+                                <form
+                                    action="/admin/discount/delete/<%= discount._id %>?_method=DELETE"
+                                    method="POST" style="display:inline;">
+                                    <button type="submit"
+                                        class="btn btn-danger">
+                                        <i class="feather icon-trash-2"></i>
+                                    </button>
+                                </form>
+                            </td>
+
+                        </tr>
+                        <% }); %>
+                    </tbody>
+
+                </table>
+
+            </div>
+        </div>
+    </div>
+</div>
+<%- include('./model-insert-discount') %>
+<%- include('./model-update-discount') %>
+<%- include('./layouts/footer') %>
+<%- include('./layouts/script') %>

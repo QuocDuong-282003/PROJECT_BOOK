@@ -6,7 +6,13 @@ const express = require('express');
 const mongoose = require('mongoose');
 const connectDB = require('./config/db');
 const cors = require('cors');
+
 const session = require('express-session'); //thông báo đăng ký tài khoản thành công
+
+const bodyParser = require('body-parser');
+const methodOverride = require('method-override');
+
+
 
 //
 var indexRouter = require('./routes/index');
@@ -17,6 +23,9 @@ var productdetail = require('./routes/productdetail');
 var cartRouter = require('./routes/cart');
 var authRouter = require('./routes/auth');
 const app = express();
+//
+app.use(methodOverride('_method'));
+app.use(cors());
 // view engine setup
 app.use(express.static('public'));
 app.set('views', [path.join(__dirname, 'views'), path.join(__dirname, 'views/client'), path.join(__dirname, 'views/admin')]);
@@ -41,6 +50,16 @@ app.use((req, res, next) => {
     res.locals.user = req.session.user || null; // Nếu chưa đăng nhập, user sẽ là null
     next();
 });
+
+
+// Middleware
+app.use(express.json());
+app.use(cors());
+app.use(bodyParser.urlencoded({ extended: true }));
+app.use(bodyParser.json());
+app.use(express.urlencoded({ extended: true }));
+app.use(express.json());
+
 
 //
 app.use('/', indexRouter);
