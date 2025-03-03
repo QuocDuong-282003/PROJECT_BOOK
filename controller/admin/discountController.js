@@ -18,15 +18,12 @@ exports.renderDiscountPage = async (req, res, next) => {
         next(err);
     }
 };
-
 exports.createDiscount = async (req, res) => {
     try {
         const { code, description, discountType, value, startDate, endDate } = req.body;
         if (!code || !description || !discountType || !value || !startDate || !endDate) {
             return res.status(400).send('Tất cả các trường đều phải được điền');
         }
-
-        // Tạo đối tượng Discount mới và lưu vào database
         const newDiscount = new Discount({ code, description, discountType, value, startDate, endDate });
         await newDiscount.save();
         res.redirect('/admin/discount');
@@ -35,25 +32,20 @@ exports.createDiscount = async (req, res) => {
         res.status(500).send(err.message);
     }
 };
-
 exports.updateDiscount = async (req, res) => {
     try {
         const discountId = req.params.id; // Lấy ID từ URL
         console.log("Updating Discount ID:", discountId);
-
         if (!discountId) {
             return res.status(400).json({ message: "Invalid discount ID" });
         }
-
         const { code, description, discountsType, value, startDate, endDate } = req.body;
         console.log("Request body:", req.body);
 
-        // Kiểm tra nếu có discount với ID đó
         const discount = await Discount.findById(discountId);
         if (!discount) {
             return res.status(404).json({ message: "Discount not found" });
         }
-
         // Cập nhật dữ liệu
         discount.code = code || discount.code;
         discount.description = description || discount.description;
@@ -61,8 +53,6 @@ exports.updateDiscount = async (req, res) => {
         discount.value = value || discount.value;
         discount.startDate = startDate ? new Date(startDate) : discount.startDate;
         discount.endDate = endDate ? new Date(endDate) : discount.endDate;
-
-        // Lưu vào database
         await discount.save();
 
         console.log("Discount updated successfully!");
