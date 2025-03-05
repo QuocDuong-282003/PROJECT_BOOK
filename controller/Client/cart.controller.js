@@ -1,17 +1,21 @@
 const Cart = require('../../models/Cart');
 const Book = require('../../models/Book');
-const User = require('../../models/User');
 
 const getCartByUserId = async (userId) => {
     try {
-        const cart = await Cart.findOne({ userId }).populate('items.bookId');
+        const cart = await Cart.findOne({ userId })
+            .populate({
+                path: 'items.bookId',
+                select: 'title price stock' // Chỉ lấy các trường cần thiết
+            });
+
         return cart;
     } catch (error) {
         console.error("Lỗi khi lấy giỏ hàng:", error);
         return null;
-        
     }
-}
+};
+
 const addBookToCart = async (userId, bookId, quantity) => {
     try {
         const book = await Book.findById(bookId);
@@ -33,21 +37,24 @@ const addBookToCart = async (userId, bookId, quantity) => {
             if (existingItem) {
                 // Nếu sách đã có, cập nhật số lượng
                 existingItem.quantity += quantityNumber;
+                existingItem.price = parseFloat(existingItem.quantity * book.price).toFixed(2);
             } else {
                 // Nếu sách chưa có, thêm mới vào items
-                cart.items.push({ bookId, title: book.title, quantity: quantityNumber, price: book.price });
+                const prices =parseFloat(quantityNumber * book.price).toFixed(2); 
+                cart.items.push({ bookId, title: book.title, quantity: quantityNumber, price: prices });
             }
 
             // Cập nhật tổng giá tiền
-            cart.totalPrice = cart.items.reduce((total, item) => total + item.quantity * item.price, 0);
+            cart.totalPrice = parseFloat(cart.items.reduce((total, item) => total + item.price, 0).toFixed(2));
 
             await cart.save();
         } else {
             // Nếu chưa có giỏ hàng, tạo mới
+            const prices =parseFloat(quantityNumber * book.price).toFixed(2);
             cart = new Cart({
                 userId,
-                items: [{ bookId, title: book.title ,quantity: quantityNumber, price: book.price }],
-                totalPrice: quantityNumber * book.price
+                items: [{ bookId ,quantity: quantityNumber, price: prices }],
+                totalPrice: prices
             });
 
             await cart.save();
@@ -71,7 +78,7 @@ const removeBookFromCart = async (userId, bookId) => {
         }
 
         cart.items.splice(bookIndex, 1);
-        cart.totalPrice = cart.items.reduce((total, item) => total + item.quantity * item.price, 0);
+        cart.totalPrice = parseFloat(cart.items.reduce((total, item) => total + item.quantity * item.price, 0).toFixed(2));
 
         await cart.save();
     } catch (error) {

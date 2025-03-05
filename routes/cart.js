@@ -42,11 +42,11 @@ router.post("/remove", async (req, res) => {
     if (!req.session.user || !req.session.user.id) {
       return res.redirect('/auth/login');
     }
-
+    const previousUrl = req.headers.referer || '/';
     const userId = req.session.user.id;
     const { bookId } = req.body;
     await removeBookFromCart(userId, bookId);
-    return res.redirect("/cart");
+    return res.redirect(previousUrl);
   } catch (error) {
     console.error("Lỗi khi xóa sách khỏi giỏ hàng:", error);
     return res.status(500).json({ message: "Lỗi server" });

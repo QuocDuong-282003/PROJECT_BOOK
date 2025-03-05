@@ -196,13 +196,32 @@
                 <a href="#" class="close-side"><i class="fa fa-times"></i></a>
                 <li class="cart-box">
                     <% if (user) { %> <!-- Nếu đã đăng nhập -->
-                        <% if (cart) { %>
+                        <% if (cart && cart.items.length > 0) { %>
                             <% cart.items.forEach(item => { %>
                                 <ul class="cart-list">
                                     <li>
-                                        <a href="#" class="photo"><img src="/images/img-pro-01.jpg" class="cart-thumb" alt="" /></a>
-                                        <h6><a href="/products/productdetail/<%= item.bookId._id %>"> <%= item.title %></a> </h6>
-                                        <p><%= item.quantity %>x - <span class="price"><%= item.price %></span></p>
+                                        <div style="display: flex; align-items: center; justify-content: space-between; border-bottom: 1px solid #ddd; padding: 10px;">
+                                            <a href="/products/productdetail/<%= item.bookId._id %>" class="photo">
+                                                <img src="/images/img-pro-01.jpg" class="cart-thumb" alt="" style="width: 50px; height: 50px;">
+                                            </a>
+                                            
+                                            <div style="flex-grow: 1; padding-left: 10px;">
+                                                <h6><a href="/products/productdetail/<%= item.bookId._id %>"> <%= item.bookId.title %> </a></h6>
+                                                <div style="display: flex; align-items: center; gap: 5px;">
+                                                    <input type="button" value="-" id="minus" class="minus" data-id="<%= item.bookId._id %>" style="cursor: pointer;">
+                                                    <input type="number" value="<%= item.quantity %>" size="2%" style="text-align: center;" min="0" max="<%= item.bookId.stock %>">
+                                                    <input type="button" value="+" id="plus" class="plus" data-id="<%= item.bookId._id %>" style="cursor: pointer;">
+                                                </div>
+                                                <% prices = item.price*item.quantity %>
+                                                <p><span class="price"> <%= prices.toFixed(2) %> VNĐ</span></p>
+                                            </div>
+                                            <form action="/cart/remove"method="POST" style="padding-top: 7%;">
+                                                <input type="hidden" name="bookId" value="<%= item.bookId._id %>">
+                                                <input type="submit" value="X" style="background-color: red; color: white; border: none; padding: 5px 10px; cursor: pointer;">
+                                            </form>
+                                        </div>
+                                        
+                                        
                                     </li>
                                     
                                 
@@ -254,3 +273,4 @@
         </div>
     </div>
     <!-- End Top Search -->
+
