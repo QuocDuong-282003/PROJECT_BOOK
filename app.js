@@ -8,6 +8,7 @@ const connectDB = require('./config/db');
 const cors = require('cors');
 const bodyParser = require('body-parser');
 const methodOverride = require('method-override');
+const { scheduleDeleteExpiredDiscounts } = require('./controller/admin/discountController');
 
 
 //
@@ -30,7 +31,8 @@ app.set('view engine', 'ejs');
 const PORT = process.env.PORT || 3000;
 // Kết nối MongoDB
 connectDB();
-
+//
+scheduleDeleteExpiredDiscounts();
 // Middleware
 app.use(express.json());
 app.use(cors());

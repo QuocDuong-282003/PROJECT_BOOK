@@ -6,18 +6,44 @@ const cron = require('node-cron');
 
 exports.renderDiscountPage = async (req, res, next) => {
     try {
-        const discounts = await Discount.find();
-        if (discounts.length === 0) {
-            return res.render('discountAdmin', { title: 'Discounts', path: req.path, discounts, message: 'No discounts found.' });
-        }
-        res.render('discountAdmin', {
-            title: 'Discounts', path: req.path, discounts,
+        const perPage = 10; // Số lượng discount trên mỗi trang
+        const page = parseInt(req.query.page) || 1; // Lấy số trang từ query, mặc định là 1
 
+        // Đếm tổng số discount
+        const totalDiscounts = await Discount.countDocuments();
+        const totalPages = Math.ceil(totalDiscounts / perPage); // Tính tổng số trang
+
+        // Lấy danh sách discount theo trang
+        const discounts = await Discount.find()
+            .skip((page - 1) * perPage)
+            .limit(perPage);
+
+        // Nếu không có discount nào
+        if (discounts.length === 0) {
+            return res.render('discountAdmin', {
+                title: 'Discounts',
+                path: req.path,
+                discounts,
+                message: 'No discounts found.',
+                currentPage: page,
+                totalPages
+            });
+        }
+
+        // Render trang với danh sách discount
+        res.render('discountAdmin', {
+            title: 'Discounts',
+            path: req.path,
+            discounts,
+            currentPage: page,
+            totalPages,
+            message: ''
         });
     } catch (err) {
         next(err);
     }
 };
+
 exports.createDiscount = async (req, res) => {
     try {
         const { code, description, discountType, value, startDate, endDate } = req.body;
@@ -34,7 +60,7 @@ exports.createDiscount = async (req, res) => {
 };
 exports.updateDiscount = async (req, res) => {
     try {
-        const discountId = req.params.id; // Lấy ID từ URL
+        const discountId = req.params.id;
         console.log("Updating Discount ID:", discountId);
         if (!discountId) {
             return res.status(400).json({ message: "Invalid discount ID" });
@@ -81,4 +107,21 @@ exports.deleteDiscount = async (req, res) => {
         console.error(err);
         res.status(500).send(err.message);
     }
+};
+// delete giảm giá dã hết hạn
+exports.deleteExpiredDiscounts = async () => {
+    try {
+        const now = new Date();
+        const result = await Discount.deleteMany({ endDate: { $lt: now } }); // Xóa mã hết hạn
+        console.log(`🕰️ Đã xóa ${result.deletedCount} mã giảm giá hết hạn.`);
+    } catch (err) {
+        console.error('❌ Lỗi khi xóa mã giảm giá hết hạn:', err.message);
+    }
+};
+// Chạy tự động lúc 0:00 mỗi ngày
+exports.scheduleDeleteExpiredDiscounts = () => {
+    cron.schedule('0 0 * * *', async () => {
+        console.log('🕰️ Đang kiểm tra và xóa mã giảm giá hết hạn...');
+        await exports.deleteExpiredDiscounts();
+    });
 };

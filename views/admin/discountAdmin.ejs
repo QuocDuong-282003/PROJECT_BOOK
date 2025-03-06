@@ -59,7 +59,7 @@
                 <table class="table table-hover mb-0">
                     <thead>
                         <tr>
-                            <!-- //<th class="text-center">NO</th> -->
+                            <th class="text-center">NO</th>
                             <th class="text-center">Code</th>
                             <th class="text-center">Description</th>
                             <th class="text-center">Discount Type</th>
@@ -70,8 +70,10 @@
                         </tr>
                     </thead>
                     <tbody>
-                        <% discounts.forEach(discount=>{ %>
+                        <% discounts.forEach((discount,index)=>{ %>
                         <tr>
+                            <td class="text-center"><%= (currentPage - 1) * 10 +
+                                index + 1 %></td>
                             <td class="text-center"><%= discount.code
                                 %></td>
                             <td class="text-center"><%= discount.description
@@ -114,6 +116,18 @@
                     </tbody>
                 </table>
             </div>
+            <!-- PHÂN TRANG -->
+            <nav>
+                <ul class="pagination">
+                    <% for(let i = 1; i <= totalPages; i++) { %>
+                    <li
+                        class="page-item <%= i === currentPage ? 'active' : '' %>">
+                        <a class="page-link"
+                            href="/admin/discount?page=<%= i %>"><%= i %></a>
+                    </li>
+                    <% } %>
+                </ul>
+            </nav>
         </div>
     </div>
 </div>
