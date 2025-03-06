@@ -20,7 +20,7 @@ exports.getBooks = async (req, res) => {
         const categories = await Category.find();
         const publishers = await Publisher.find();
 
-        res.render('admin/productsAdmin', { 
+        res.render('admin/book/productsAdmin', { 
             title: 'Quản lý Sách', 
             books, 
             categories, 

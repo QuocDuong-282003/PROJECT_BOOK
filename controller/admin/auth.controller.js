@@ -13,7 +13,8 @@ exports.renderLogin = (req, res) => {
 exports.login = async (req, res, next) => {
     try {
         const { email, password } = req.body;
-        const adminEmail = "admin@iuh.com"; 
+        const adminEmail = process.env.ADMIN_EMAIL; // Lấy email admin từ .env
+
 
         if (email !== adminEmail) {
             return res.render('admin/auth/login', { error: 'Bạn không có quyền truy cập!' });

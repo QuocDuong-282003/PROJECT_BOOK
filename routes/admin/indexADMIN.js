@@ -6,9 +6,9 @@ router.use(checkAdmin); // ✅ Chặn truy cập admin nếu chưa đăng nhập
 
 router.get('/', (req, res) => {
     res.render('admin/indexADMIN', { 
-        title: "Trang Quản Trị", 
+        title: "", 
         user: req.user, 
-        path: "dashboard"
+        path: "admin"
     });
 });
 router.get('/auth/logout', (req, res) => {

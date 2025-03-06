@@ -17,6 +17,7 @@ connectDB();
 const User = require('./models/User');
 const bcrypt = require('bcrypt');
 
+
 // Middleware để xử lý JSON và dữ liệu từ form
 app.use(express.static('public'));
 app.set('views', [path.join(__dirname, 'views'), path.join(__dirname, 'views/client'), path.join(__dirname, 'views/admin')]);
@@ -24,11 +25,6 @@ app.set('view engine', 'ejs');
 app.use(express.json());
 app.use(express.urlencoded({ extended: true }));
 app.use(cookieParser());
-app.use(cors({
-    origin: '*', // Hoặc bạn có thể chỉ định domain của client nếu không muốn mở rộng quá nhiều
-    methods: ['GET', 'POST', 'PUT', 'DELETE'],
-    allowedHeaders: ['Content-Type', 'Authorization']
-}));
 
 // Config port
 const PORT = process.env.PORT || 3000;
@@ -59,7 +55,7 @@ app.use('/cart', cartRouter);
 
 const { checkAdmin } = require('./controller/admin/auth.controller');
 
-app.use('/admin/auth', authsRouter); // Login không cần checkAdmin
+app.use('/admin/auth', authsRouter);
 app.use('/admin', checkAdmin, indexADMIN);
 app.use('/admin/users', checkAdmin, userRouter);
 app.use('/admin/category', checkAdmin, categoryRouter);
