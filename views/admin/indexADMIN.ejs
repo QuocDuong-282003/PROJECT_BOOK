@@ -1,9 +1,9 @@
 <%- include('./layouts/style') %>
-<%- include('./layouts/head', ) %>
+<%- include('./layouts/head', { title: "Trang Quản Trị" }) %>
 
-<% if (user) { %>
-    <%- include('./layouts/menu-list') %>
-<% } %>
+
+<%- include('./layouts/menu-list') %>
+
 
 <div class="container">
     <h1>Chào mừng đến với trang quản trị</h1>

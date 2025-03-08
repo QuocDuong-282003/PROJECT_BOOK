@@ -44,7 +44,7 @@ var bookRouter = require('./routes/admin/book');
 var publisherRoutes = require("./routes/admin/publisher");
 var commentRouter = require('./routes/admin/comment');
 var indexADMIN = require('./routes/admin/indexADMIN');
-var discountRouter = require('./routes/admin/discount');
+//var discountRouter = require('./routes/admin/discount');
 
 // Client routes
 app.use('/client/', indexRouter);
@@ -61,7 +61,7 @@ app.use('/admin/users', checkAdmin, userRouter);
 app.use('/admin/category', checkAdmin, categoryRouter);
 app.use('/admin/comment', checkAdmin, commentRouter);
 app.use('/admin/books', checkAdmin, bookRouter);
-app.use('/admin/discount', checkAdmin, discountRouter);
+//app.use('/admin/discount', checkAdmin, discountRouter);
 app.use('/admin/publishers', checkAdmin, publisherRoutes);
 
 // Start server
