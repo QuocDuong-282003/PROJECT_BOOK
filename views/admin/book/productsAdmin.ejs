@@ -1,0 +1,230 @@
+<%- include('./layouts/style') %>
+<%- include('./layouts/head') %>
+<%- include('./layouts/menu-list') %>
+
+<div class="col-xl-12 col-md-12">
+    <div class="card table-card">
+        <div class="card-header">
+            <div class="title-container">
+                <h5><%= title || 'Quản lý Sách' %></h5>
+                <h5>Tổng số sách: <strong><%= totalBooks %></strong></h5>
+                <button type="button" class="btn btn-success" data-toggle="modal" data-target="#exampleModalLive">
+                    <i class="feather icon-plus"></i>
+                </button>
+                <span class="search-container">
+                    <input id="Search" class="form-control" type="text" placeholder="Search..">
+                    <button type="button" class="btn btn-primary" id="searchButton">
+                        <i class="feather icon-search"></i>
+                    </button>
+                </span>
+            </div>
+            <div class="card-header-right">
+                <div class="btn-group card-option">
+                    <button type="button" class="btn dropdown-toggle" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
+                        <i class="feather icon-more-horizontal"></i>
+                    </button>
+                    <ul class="list-unstyled card-option dropdown-menu dropdown-menu-right">
+                        <li class="dropdown-item full-card"><a href="#!"><span><i class="feather icon-maximize"></i> maximize</span><span style="display:none"><i class="feather icon-minimize"></i> Restore</span></a></li>
+                        <li class="dropdown-item minimize-card"><a href="#!"><span><i class="feather icon-minus"></i> collapse</span><span style="display:none"><i class="feather icon-plus"></i> expand</span></a></li>
+                        <li class="dropdown-item reload-card"><a href="#!"><i class="feather icon-refresh-cw"></i> reload</a></li>
+                    </ul>
+                </div>
+            </div>
+        </div>
+        
+        <div class="card-body p-0">
+            <div class="container mt-3">
+                <div class="table-responsive">
+                    <table class="table table-hover mb-0" id="bookTable">
+                        <thead>
+                            <tr>
+                                <th class="text-center">NO</th>
+                                <th class="text-center">Title</th>
+                                <th class="text-center">Author</th>
+                                <th class="text-center">Category</th>
+                                <th class="text-center">Publisher</th>
+                                <th class="text-center">Price</th>
+                                <th class="text-center">Stock</th>
+                                <th class="text-center">Status</th>
+                                <th class="text-center">Actions</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            <% books.forEach((book, index) => { %>
+                                <tr>
+                                    <td class="text-center"><%= (currentPage - 1) * 10 + index + 1 %></td>
+                                    <td class="text-center"><%= book.title %></td>
+                                    <td class="text-center"><%= book.author %></td>
+                                    <td class="text-center"><%= book.categoryId?.name || "Chưa có danh mục" %></td>
+                                    <td class="text-center"><%= book.publisherId?.name || "Chưa có NXB" %></td>
+                                    <td class="text-center"><%= book.price %> VNĐ</td>
+                                    <td class="text-center"><%= book.stock %></td>
+                                    <td class="text-center"><%= book.isDeleted ? 'Inactive' : 'Active' %></td>
+                                    <td class="text-center">
+                                        <button type="button" class="btn btn-info edit-btn"
+                                            data-id="<%= book._id %>"
+                                            data-title="<%= book.title %>"
+                                            data-author="<%= book.author %>"
+                                            data-category="<%= book.categoryId?._id || '' %>"
+                                            data-publisher="<%= book.publisherId?._id || '' %>"
+                                            data-description="<%= book.description %>"
+                                            data-price="<%= book.price %>"
+                                            data-stock="<%= book.stock %>"
+                                            data-status="<%= book.isDeleted ? 'Inactive' : 'Active' %>">
+                                            <i class="feather icon-edit"></i>
+                                        </button>
+                                        <button type="button" class="btn btn-danger delete-btn" data-id="<%= book._id %>">
+                                            <i class="feather icon-trash-2"></i>
+                                        </button>
+                                    </td>
+                                </tr>
+                            <% }); %>
+                        </tbody>
+                    </table>
+                </div>
+
+                <!-- PHÂN TRANG -->
+                <nav>
+                    <ul class="pagination">
+                        <% for(let i = 1; i <= totalPages; i++) { %>
+                            <li class="page-item <%= i === currentPage ? 'active' : '' %>">
+                                <a class="page-link" href="/admin/books?page=<%= i %>"><%= i %></a>
+                            </li>
+                        <% } %>
+                    </ul>
+                </nav>
+            </div>
+        </div>
+    </div>
+</div>
+
+<%- include('./model-insert-products') %>
+<%- include('./model-update-product') %>
+<%- include('./layouts/footer') %>
+<%- include('./layouts/script') %>
+
+<script>
+document.addEventListener("DOMContentLoaded", function () {
+    const searchInput = document.getElementById("Search");
+    const bookTable = document.getElementById("bookTable");
+
+    // Tìm kiếm sách theo tiêu đề, tác giả, danh mục, nhà xuất bản
+    searchInput.addEventListener("keyup", function () {
+        const searchText = searchInput.value.trim();
+
+        if (searchText.length === 0) {
+            // Nếu không có từ khóa tìm kiếm, tải lại trang để hiển thị toàn bộ dữ liệu
+            window.location.reload();
+            return;
+        }
+
+        // Gửi yêu cầu tìm kiếm đến server
+        fetch(`/admin/books/search?query=${encodeURIComponent(searchText)}`)
+            .then(res => res.json())
+            .then(data => {
+                if (data.success) {
+                    // Xóa dữ liệu cũ trong bảng
+                    bookTable.querySelector("tbody").innerHTML = "";
+
+                    // Thêm dữ liệu mới vào bảng
+                    data.books.forEach((book, index) => {
+                        const row = document.createElement("tr");
+                        row.innerHTML = `
+                            <td class="text-center">${index + 1}</td>
+                            <td class="text-center">${book.title}</td>
+                            <td class="text-center">${book.author}</td>
+                            <td class="text-center">${book.categoryId?.name || "Chưa có danh mục"}</td>
+                            <td class="text-center">${book.publisherId?.name || "Chưa có NXB"}</td>
+                            <td class="text-center">${book.price} VNĐ</td>
+                            <td class="text-center">${book.stock}</td>
+                            <td class="text-center">${book.isDeleted ? 'Inactive' : 'Active'}</td>
+                            <td class="text-center">
+                                <button type="button" class="btn btn-info edit-btn"
+                                    data-id="${book._id}"
+                                    data-title="${book.title}"
+                                    data-author="${book.author}"
+                                    data-category="${book.categoryId?._id || ''}"
+                                    data-publisher="${book.publisherId?._id || ''}"
+                                    data-description="${book.description}"
+                                    data-price="${book.price}"
+                                    data-stock="${book.stock}"
+                                    data-status="${book.isDeleted ? 'Inactive' : 'Active'}">
+                                    <i class="feather icon-edit"></i>
+                                </button>
+                                <button type="button" class="btn btn-danger delete-btn" data-id="${book._id}">
+                                    <i class="feather icon-trash-2"></i>
+                                </button>
+                            </td>
+                        `;
+                        bookTable.querySelector("tbody").appendChild(row);
+                    });
+                } else {
+                    alert("Lỗi khi tìm kiếm sách: " + data.message);
+                }
+            })
+            .catch(err => console.error("Lỗi khi tìm kiếm sách:", err));
+    });
+
+    // Xử lý nút Edit và Delete bằng event delegation
+    bookTable.addEventListener("click", function (event) {
+        const target = event.target.closest("button");
+        if (!target) return;
+
+        const bookId = target.dataset.id;
+
+        if (target.classList.contains("edit-btn")) {
+            document.getElementById("updateBookId").value = bookId;
+            document.getElementById("updateTitle").value = target.dataset.title;
+            document.getElementById("updateAuthor").value = target.dataset.author;
+            document.getElementById("updateCategory").value = target.dataset.category;
+            document.getElementById("updatePublisher").value = target.dataset.publisher;
+            document.getElementById("updateDescription").value = target.dataset.description;
+            document.getElementById("updatePrice").value = target.dataset.price;
+            document.getElementById("updateStock").value = target.dataset.stock;
+            document.getElementById("updateStatus").value = target.dataset.status;
+            
+            $("#updateModalLive").modal("show");
+        }
+
+        if (target.classList.contains("delete-btn") && confirm("Bạn có chắc chắn muốn xóa sách này?")) {
+            fetch(`/admin/books/${bookId}`, { method: "DELETE", headers: { "Content-Type": "application/json" } })
+                .then(res => res.json())
+                .then(data => {
+                    if (data.success) {
+                        alert("Xóa sách thành công!");
+                        location.reload();
+                    } else {
+                        alert("Lỗi khi xóa sách: " + data.message);
+                    }
+                })
+                .catch(err => console.error("Lỗi khi xóa sách:", err));
+        }
+    });
+
+    // Xử lý cập nhật sách
+    document.getElementById("saveUpdate").addEventListener("click", function () {
+        const bookId = document.getElementById("updateBookId").value;
+        const data = {
+            title: document.getElementById("updateTitle").value,
+            author: document.getElementById("updateAuthor").value,
+            categoryId: document.getElementById("updateCategory").value,
+            publisherId: document.getElementById("updatePublisher").value,
+            description: document.getElementById("updateDescription").value,
+            price: parseFloat(document.getElementById("updatePrice").value),
+            stock: parseInt(document.getElementById("updateStock").value),
+            isDeleted: document.getElementById("updateStatus").value === "Inactive"
+        };
+
+        fetch(`/admin/books/update/${bookId}`, {
+            method: "PUT",
+            headers: { "Content-Type": "application/json" },
+            body: JSON.stringify(data)
+        }).then(res => res.json())
+          .then(data => {
+              alert(data.success ? "Cập nhật sách thành công!" : "Lỗi: " + data.message);
+              if (data.success) location.reload();
+          })
+          .catch(err => console.error("Lỗi khi cập nhật sách:", err));
+    });
+});
+  </script>

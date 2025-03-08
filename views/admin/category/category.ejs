@@ -1,0 +1,248 @@
+<%- include('../layouts/style') %>
+<%- include('../layouts/head') %>
+<%- include('../layouts/menu-list') %>
+
+<div class="col-xl-12 col-md-12">
+    <div class="card table-card">
+        <div class="card-header">
+            <div class="title-container">
+                <h5><%= title %></h5>
+                <h5>Tổng số danh mục: <strong><%= totalCategories %></strong></h5>
+                <button type="button" class="btn btn-success" data-toggle="modal" data-target="#categoryModal">
+                    <i class="feather icon-plus"></i> Thêm mới
+                </button>
+                <div class="search-container">
+                    <input type="text" id="searchCategory" class="form-control" placeholder="Tìm kiếm danh mục...">
+                </div>
+            </div>
+            <div class="card-header-right">
+                <div class="btn-group card-option">
+                    <button type="button" class="btn dropdown-toggle" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
+                        <i class="feather icon-more-horizontal"></i>
+                    </button>
+                    <ul class="list-unstyled card-option dropdown-menu dropdown-menu-right">
+                        <li class="dropdown-item full-card"><a href="#!"><span><i class="feather icon-maximize"></i> maximize</span><span style="display:none"><i class="feather icon-minimize"></i> Restore</span></a></li>
+                        <li class="dropdown-item minimize-card"><a href="#!"><span><i class="feather icon-minus"></i> collapse</span><span style="display:none"><i class="feather icon-plus"></i> expand</span></a></li>
+                        <li class="dropdown-item reload-card"><a href="#!"><i class="feather icon-refresh-cw"></i> reload</a></li>
+                    </ul>
+                </div>
+            </div>
+        </div>
+        <div class="card-body p-0">
+            <div class="table-responsive">
+                <table class="table table-hover mb-0" id="categoryTable">
+                    <thead>
+                        <tr>
+                            <th class="text-center">STT</th>
+                            <th class="text-center">Tên danh mục</th>
+                            <th class="text-center">Mô tả</th>
+                            <th class="text-center">Số sách</th>
+                            <th class="text-center">Hành động</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        <% categories.forEach((category, index) => { %>
+                        <tr>
+                            <td class="text-center"><%= index + 1 %></td>
+                            <td class="text-center"><%= category.name %></td>
+                            <td class="text-center"><%= category.description || "Không có mô tả" %></td>
+                            <td class="text-center"><%= category.bookCount || 0 %></td>
+                            <td class="text-center">
+                                <button class="btn btn-info edit-category" data-id="<%= category._id %>" data-name="<%= category.name %>" data-description="<%= category.description %>" data-toggle="modal" data-target="#editCategoryModal">
+                                    <i class="feather icon-edit"></i>
+                                </button>
+                                <button class="btn btn-danger delete-category" data-id="<%= category._id %>">
+                                    <i class="feather icon-trash-2"></i>
+                                </button>
+                            </td>
+                        </tr>
+                        <% }); %>
+                    </tbody>
+                </table>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- Modal thêm danh mục -->
+<div class="modal fade" id="categoryModal" tabindex="-1" role="dialog">
+    <div class="modal-dialog" role="document">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title">Thêm danh mục mới</h5>
+                <button type="button" class="close" data-dismiss="modal">&times;</button>
+            </div>
+            <div class="modal-body">
+                <form id="addCategoryForm">
+                    <div class="form-group">
+                        <label>Tên danh mục</label>
+                        <input type="text" class="form-control" id="categoryName" name="name" required>
+                    </div>
+                    <div class="form-group">
+                        <label>Mô tả</label>
+                        <textarea class="form-control" id="categoryDescription" name="description"></textarea>
+                    </div>
+                    <button type="submit" class="btn btn-success">Thêm</button>
+                </form>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- Modal chỉnh sửa danh mục -->
+<div class="modal fade" id="editCategoryModal" tabindex="-1" role="dialog">
+    <div class="modal-dialog" role="document">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title">Chỉnh sửa danh mục</h5>
+                <button type="button" class="close" data-dismiss="modal">&times;</button>
+            </div>
+            <div class="modal-body">
+                <form id="editCategoryForm">
+                    <input type="hidden" id="editCategoryId" name="id">
+                    <div class="form-group">
+                        <label>Tên danh mục</label>
+                        <input type="text" class="form-control" id="editCategoryName" name="name" required>
+                    </div>
+                    <div class="form-group">
+                        <label>Mô tả</label>
+                        <textarea class="form-control" id="editCategoryDescription" name="description"></textarea>
+                    </div>
+                    <button type="submit" class="btn btn-primary">Cập nhật</button>
+                </form>
+            </div>
+        </div>
+    </div>
+</div>
+
+<%- include('../layouts/footer') %>
+<%- include('../layouts/script') %>
+
+<script>
+    $(document).ready(function () {
+        // Tìm kiếm danh mục
+        $("#searchCategory").on("keyup", function () {
+            const searchQuery = $(this).val();
+            if (searchQuery.length >= 2) { // Chỉ tìm kiếm khi nhập ít nhất 2 ký tự
+                $.ajax({
+                    url: "/admin/category/search",
+                    type: "GET",
+                    data: { q: searchQuery },
+                    success: function (response) {
+                        const tbody = $("#categoryTable tbody");
+                        tbody.empty(); // Xóa dữ liệu cũ
+                        response.forEach((category, index) => {
+                            tbody.append(`
+                                <tr>
+                                    <td class="text-center">${index + 1}</td>
+                                    <td class="text-center">${category.name}</td>
+                                    <td class="text-center">${category.description || "Không có mô tả"}</td>
+                                    <td class="text-center">${category.bookCount || 0}</td>
+                                    <td class="text-center">
+                                        <button class="btn btn-info edit-category" data-id="${category._id}" data-name="${category.name}" data-description="${category.description}" data-toggle="modal" data-target="#editCategoryModal">
+                                            <i class="feather icon-edit"></i>
+                                        </button>
+                                        <button class="btn btn-danger delete-category" data-id="${category._id}">
+                                            <i class="feather icon-trash-2"></i>
+                                        </button>
+                                    </td>
+                                </tr>
+                            `);
+                        });
+                    },
+                    error: function (err) {
+                        console.error("Lỗi khi tìm kiếm danh mục:", err);
+                    },
+                });
+            } else if (searchQuery.length === 0) {
+                location.reload(); // Nếu xóa hết từ khóa, tải lại trang để hiển thị toàn bộ danh sách
+            }
+        });
+
+        // Thêm danh mục
+        $("#addCategoryForm").submit(function (e) {
+            e.preventDefault();
+            const name = $("#categoryName").val();
+            const description = $("#categoryDescription").val();
+
+            $.ajax({
+                url: "/admin/category/create",
+                type: "POST",
+                contentType: "application/json",
+                data: JSON.stringify({ name, description }),
+                success: function (response) {
+                    if (response.success) {
+                        alert(response.message);
+                        location.reload();
+                    } else {
+                        alert("Lỗi: " + response.message);
+                    }
+                },
+                error: function (err) {
+                    console.error("Lỗi khi thêm danh mục:", err);
+                    alert("Lỗi khi thêm danh mục!");
+                },
+            });
+        });
+
+        // Chỉnh sửa danh mục
+        $("#editCategoryForm").submit(function (e) {
+            e.preventDefault();
+            const id = $("#editCategoryId").val();
+            const name = $("#editCategoryName").val();
+            const description = $("#editCategoryDescription").val();
+
+            $.ajax({
+                url: `/admin/category/edit/${id}`,
+                type: "PUT",
+                contentType: "application/json",
+                data: JSON.stringify({ name, description }),
+                success: function (response) {
+                    if (response.success) {
+                        alert(response.message);
+                        location.reload();
+                    } else {
+                        alert("Lỗi: " + response.message);
+                    }
+                },
+                error: function (err) {
+                    console.error("Lỗi khi cập nhật danh mục:", err);
+                    alert("Lỗi khi cập nhật danh mục!");
+                },
+            });
+        });
+
+        // Xóa danh mục
+        $(".delete-category").on("click", function () {
+            const id = $(this).data("id");
+            if (confirm("Bạn có chắc chắn muốn xóa danh mục này?")) {
+                $.ajax({
+                    url: `/admin/category/delete/${id}`,
+                    type: "DELETE",
+                    success: function (response) {
+                        if (response.success) {
+                            alert(response.message);
+                            location.reload();
+                        } else {
+                            alert("Lỗi: " + response.message);
+                        }
+                    },
+                    error: function (err) {
+                        console.error("Lỗi khi xóa danh mục:", err);
+                        alert("Lỗi khi xóa danh mục!");
+                    },
+                });
+            }
+        });
+
+        // Mở modal chỉnh sửa danh mục
+        $(".edit-category").on("click", function () {
+            const id = $(this).data("id");
+            const name = $(this).data("name");
+            const description = $(this).data("description");
+            $("#editCategoryId").val(id);
+            $("#editCategoryName").val(name);
+            $("#editCategoryDescription").val(description);
+        });
+    });
+</script>

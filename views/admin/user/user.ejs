@@ -1,0 +1,279 @@
+<%- include('./layouts/style') %>
+<%- include('./layouts/head') %>
+<%- include('./layouts/menu-list') %>
+
+<div class="col-xl-12 col-md-12">
+  <div class="card table-card">
+    <div class="card-header">
+      <div class="title-container">
+        <h5><%= title || 'Quản lý Người dùng' %></h5>
+        <h5>Tổng số người dùng: <strong><%= totalUsers %></strong></h5>
+        <button type="button" class="btn btn-success" data-toggle="modal" data-target="#addUserModal">
+          <i class="feather icon-plus"></i> Thêm người dùng
+        </button>
+        <span class="search-container">
+          <input id="searchUser" class="form-control" type="text" placeholder="Tìm kiếm người dùng..." />
+          <button type="button" class="btn btn-primary" id="searchUserButton">
+            <i class="feather icon-search"></i>
+          </button>
+        </span>
+      </div>
+      <div class="card-header-right">
+        <div class="btn-group card-option">
+          <button type="button" class="btn dropdown-toggle" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
+            <i class="feather icon-more-horizontal"></i>
+          </button>
+          <ul class="list-unstyled card-option dropdown-menu dropdown-menu-right">
+            <li class="dropdown-item full-card">
+              <a href="#!"><span><i class="feather icon-maximize"></i> maximize</span><span style="display: none"><i class="feather icon-minimize"></i> Restore</span></a>
+            </li>
+            <li class="dropdown-item minimize-card">
+              <a href="#!"><span><i class="feather icon-minus"></i> collapse</span><span style="display: none"><i class="feather icon-plus"></i> expand</span></a>
+            </li>
+            <li class="dropdown-item reload-card">
+              <a href="#!"><i class="feather icon-refresh-cw"></i> reload</a>
+            </li>
+          </ul>
+        </div>
+      </div>
+    </div>
+
+    <div class="card-body p-0">
+      <div class="container mt-3">
+        <div class="table-responsive">
+          <table class="table table-bordered" id="userTable">
+            <thead>
+              <tr>
+                <th class="text-center">#</th>
+                <th class="text-center">Tên</th>
+                <th class="text-center">Email</th>
+                <th class="text-center">Số điện thoại</th>
+                <th class="text-center">Địa chỉ</th>
+                <th class="text-center">Trạng thái</th>
+                <th class="text-center">Vai trò</th>
+                <th class="text-center">Hành động</th>
+              </tr>
+            </thead>
+            <tbody>
+              <% users.forEach((user, index) => { %>
+              <tr data-id="<%= user._id %>">
+                <td class="text-center"><%= index + 1 %></td>
+                <td class="text-center"><%= user.name %></td>
+                <td class="text-center"><%= user.email %></td>
+                <td class="text-center"><%= user.phone %></td>
+                <td class="text-center"><%= user.address %></td>
+                <td class="text-center"><span class="badge <%= user.isActive ? 'badge-success' : 'badge-danger' %>"><%= user.isActive ? 'Active' : 'Inactive' %></span></td>
+                <td class="text-center"><%= user.role %></td>
+                <td class="text-center">
+                  <button class="btn btn-info btn-sm edit-btn" data-id="<%= user._id %>" data-name="<%= user.name %>" data-email="<%= user.email %>" data-phone="<%= user.phone %>" data-address="<%= user.address %>" data-role="<%= user.role %>" data-status="<%= user.isActive ? 'Active' : 'Inactive' %>">
+                    <i class="feather icon-edit"></i>
+                  </button>
+                  <button class="btn btn-danger btn-sm delete-btn" data-id="<%= user._id %>">
+                    <i class="feather icon-trash-2"></i>
+                  </button>
+                  <button class="btn btn-warning btn-sm reset-password-btn" data-id="<%= user._id %>">
+                    <i class="feather icon-refresh-ccw"></i>
+                  </button>
+                  <button class="btn btn-primary btn-sm view-orders-btn" data-id="<%= user._id %>">
+                    <i class="feather icon-shopping-cart"></i> Xem đơn hàng
+                  </button>
+                </td>
+              </tr>
+              <% }) %>
+            </tbody>
+          </table>
+        </div>
+
+        <!-- PHÂN TRANG -->
+        <nav>
+          <ul class="pagination">
+            <% for(let i = 1; i <= totalPages; i++) { %>
+            <li class="page-item <%= i === currentPage ? 'active' : '' %>">
+              <a class="page-link" href="/admin/users?page=<%= i %>"><%= i %></a>
+            </li>
+            <% } %>
+          </ul>
+        </nav>
+      </div>
+    </div>
+  </div>
+</div>
+
+<%- include('./add-user-modal') %>
+<%- include('./edit-user-modal') %>
+<%- include('./reset-password-modal') %>
+<%- include('./orders-user-modal') %>
+<%- include('./layouts/footer') %>
+<%- include('./layouts/script') %>
+<script>document.addEventListener("DOMContentLoaded", () => {
+    const userTable = document.getElementById("userTable");
+    const searchInput = document.getElementById("searchUser");
+  
+    // Debounce function
+    const debounce = (func, delay) => {
+      let debounceTimer;
+      return function() {
+        const context = this;
+        const args = arguments;
+        clearTimeout(debounceTimer);
+        debounceTimer = setTimeout(() => func.apply(context, args), delay);
+      };
+    };
+  
+    // Update user table
+    const updateUserTable = (users) => {
+      const tbody = userTable.querySelector("tbody");
+      tbody.innerHTML = users.map((user, index) => `
+        <tr data-id="${user._id}">
+          <td class="text-center">${index + 1}</td>
+          <td class="text-center">${user.name}</td>
+          <td class="text-center">${user.email}</td>
+          <td class="text-center">${user.phone}</td>
+          <td class="text-center">${user.address}</td>
+          <td class="text-center"><span class="badge ${user.isActive ? 'badge-success' : 'badge-danger'}">${user.isActive ? 'Active' : 'Inactive'}</span></td>
+          <td class="text-center">${user.role}</td>
+          <td class="text-center">
+            <button class="btn btn-info btn-sm edit-btn" data-id="${user._id}" data-name="${user.name}" data-email="${user.email}" data-phone="${user.phone}" data-address="${user.address}" data-role="${user.role}" data-status="${user.isActive ? 'Active' : 'Inactive'}">
+              <i class="feather icon-edit"></i>
+            </button>
+            <button class="btn btn-danger btn-sm delete-btn" data-id="${user._id}">
+              <i class="feather icon-trash-2"></i>
+            </button>
+            <button class="btn btn-warning btn-sm reset-password-btn" data-id="${user._id}">
+              <i class="feather icon-refresh-ccw"></i>
+            </button>
+            <button class="btn btn-primary btn-sm view-orders-btn" data-id="${user._id}">
+              <i class="feather icon-shopping-cart"></i> Xem đơn hàng
+            </button>
+          </td>
+        </tr>
+      `).join('');
+    };
+  
+    // Search users with debounce
+    searchInput.addEventListener("keyup", debounce(() => {
+      const searchText = searchInput.value.trim();
+      if (searchText.length === 0) return location.reload();
+  
+      fetch(`/admin/users/search?query=${encodeURIComponent(searchText)}`)
+        .then(res => res.json())
+        .then(data => {
+          if (data.success) {
+            updateUserTable(data.users);
+          } else {
+            alert("Lỗi khi tìm kiếm người dùng: " + data.message);
+          }
+        }).catch(err => console.error("Lỗi tìm kiếm:", err));
+    }, 300));
+  
+    // Event delegation for buttons
+    userTable.addEventListener("click", (event) => {
+      const target = event.target.closest("button");
+      if (!target) return;
+  
+      const userId = target.dataset.id;
+  
+      if (target.classList.contains("edit-btn")) {
+        document.getElementById("editUserId").value = userId;
+        document.getElementById("editName").value = target.dataset.name;
+        document.getElementById("editEmail").value = target.dataset.email;
+        document.getElementById("editPhone").value = target.dataset.phone;
+        document.getElementById("editAddress").value = target.dataset.address;
+        document.getElementById("editRole").value = target.dataset.role;
+        document.getElementById("editStatus").value = target.dataset.status === "Active" ? "true" : "false";
+        $("#editUserModal").modal("show");
+      }
+  
+      if (target.classList.contains("delete-btn") && confirm("Xóa người dùng này?")) {
+        fetch(`/admin/users/${userId}`, { method: "DELETE" })
+          .then(res => res.json())
+          .then(data => {
+            if (data.success) {
+              alert("Xóa người dùng thành công!");
+              location.reload();
+            } else {
+              alert("Lỗi khi xóa người dùng: " + data.message);
+            }
+          }).catch(err => console.error("Lỗi xóa:", err));
+      }
+  
+      if (target.classList.contains("reset-password-btn") && confirm("Đặt lại mật khẩu?")) {
+        fetch(`/admin/users/reset-password/${userId}`, { method: "POST" })
+          .then(res => res.json())
+          .then(data => {
+            if (data.success) {
+              alert("Đặt lại mật khẩu thành công!");
+              location.reload();
+            } else {
+              alert("Lỗi khi đặt lại mật khẩu: " + data.message);
+            }
+          }).catch(err => console.error("Lỗi reset mật khẩu:", err));
+      }
+  
+      if (target.classList.contains("view-orders-btn")) {
+        fetch(`/admin/users/${userId}/orders`)
+          .then(res => res.json())
+          .then(data => {
+            if (data.success) {
+              const ordersTableBody = document.getElementById("ordersUserTableBody");
+              ordersTableBody.innerHTML = data.orders.map((order, index) => `
+                <tr>
+                  <td>${index + 1}</td>
+                  <td>${new Date(order.orderDate).toLocaleDateString()}</td>
+                  <td>${order.totalAmount.toLocaleString()} VNĐ</td>
+                  <td>${order.paymentMethod}</td>
+                  <td>${order.status}</td>
+                </tr>
+              `).join('');
+              $("#ordersUserModal").modal("show");
+            } else {
+              alert("Lỗi khi lấy lịch sử đơn hàng: " + data.message);
+            }
+          }).catch(err => console.error("Lỗi xem đơn hàng:", err));
+      }
+    });
+  
+    // Update user
+    document.getElementById("saveEditUser").addEventListener("click", () => {
+      const userId = document.getElementById("editUserId").value;
+      const data = {
+        name: document.getElementById("editName").value,
+        email: document.getElementById("editEmail").value,
+        phone: document.getElementById("editPhone").value,
+        address: document.getElementById("editAddress").value,
+        role: document.getElementById("editRole").value,
+        isActive: document.getElementById("editStatus").value === "true",
+      };
+  
+      fetch(`/admin/users/${userId}`, { method: "PUT", headers: { "Content-Type": "application/json" }, body: JSON.stringify(data) })
+        .then(res => res.json())
+        .then(data => {
+          alert(data.success ? "Cập nhật thành công!" : "Lỗi: " + data.message);
+          if (data.success) location.reload();
+        }).catch(err => console.error("Lỗi cập nhật:", err));
+    });
+  
+    // Add user
+    document.getElementById("saveAddUser").addEventListener("click", () => {
+      const formData = {
+        name: document.getElementById("addName").value,
+        email: document.getElementById("addEmail").value,
+        phone: document.getElementById("addPhone").value,
+        address: document.getElementById("addAddress").value,
+        role: document.getElementById("addRole").value,
+        password: document.getElementById("addPassword").value,
+      };
+  
+      fetch("/admin/users/add", { method: "POST", headers: { "Content-Type": "application/json" }, body: JSON.stringify(formData) })
+        .then(res => res.json())
+        .then(data => {
+          if (data.success) {
+            alert("Thêm người dùng thành công!");
+            location.reload();
+          } else {
+            alert("Lỗi: " + data.message);
+          }
+        }).catch(err => console.error("Lỗi thêm người dùng:", err));
+    });
+  });
+  </script>
