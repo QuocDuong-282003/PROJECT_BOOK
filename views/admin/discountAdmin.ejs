@@ -59,7 +59,7 @@
                 <table class="table table-hover mb-0">
                     <thead>
                         <tr>
-                            <!-- //<th class="text-center">NO</th> -->
+                            <th class="text-center">NO</th>
                             <th class="text-center">Code</th>
                             <th class="text-center">Description</th>
                             <th class="text-center">Discount Type</th>
@@ -70,8 +70,10 @@
                         </tr>
                     </thead>
                     <tbody>
-                        <% discounts.forEach(function(discount) { %>
+                        <% discounts.forEach((discount,index)=>{ %>
                         <tr>
+                            <td class="text-center"><%= (currentPage - 1) * 10 +
+                                index + 1 %></td>
                             <td class="text-center"><%= discount.code
                                 %></td>
                             <td class="text-center"><%= discount.description
@@ -86,11 +88,17 @@
                                 discount.endDate.toDateString() %></td>
 
                             <td style="text-align: center;">
-                                <button type="button"
-                                    class="btn btn-info edit-btn"
+                                <button class="btn btn-info  editBtn"
+                                    data-id="<%= discount._id %>"
+                                    data-code="<%= discount.code %>"
+                                    data-description="<%= discount.description %>"
+                                    data-discount-type="<%= discount.discountType %>"
+                                    data-value="<%= discount.value %>"
+                                    data-start-date="<%= discount.startDate %>"
+                                    data-end-date="<%= discount.endDate %>"
                                     data-toggle="modal"
-                                    data-target="#exampleModalLive">
-                                    <i class="feather icon-edit"></i>
+                                    data-target="#updateModalLive">
+                                    Edit
                                 </button>
 
                                 <form
@@ -106,10 +114,20 @@
                         </tr>
                         <% }); %>
                     </tbody>
-
                 </table>
-
             </div>
+            <!-- PHÂN TRANG -->
+            <nav>
+                <ul class="pagination">
+                    <% for(let i = 1; i <= totalPages; i++) { %>
+                    <li
+                        class="page-item <%= i === currentPage ? 'active' : '' %>">
+                        <a class="page-link"
+                            href="/admin/discount?page=<%= i %>"><%= i %></a>
+                    </li>
+                    <% } %>
+                </ul>
+            </nav>
         </div>
     </div>
 </div>
@@ -117,3 +135,21 @@
 <%- include('./model-update-discount') %>
 <%- include('./layouts/footer') %>
 <%- include('./layouts/script') %>
+<script>
+    document.addEventListener("DOMContentLoaded", function () {
+        document.querySelectorAll(".editBtn").forEach(button => {
+            button.addEventListener("click", function () {
+                document.getElementById("discountId").value = this.dataset.id;
+                document.getElementById("code").value = this.dataset.code;
+                document.getElementById("description").value = this.dataset.description;
+                document.getElementById("discountsType").value = this.dataset.discountType;
+                document.getElementById("value").value = this.dataset.value;
+                document.getElementById("startDate").value = this.dataset.startDate;
+                document.getElementById("endDate").value = this.dataset.endDate;
+    
+                // Cập nhật action của form
+                document.getElementById("updateForm").action = `/admin/discount/update/${this.dataset.id}`;
+            });
+        });
+    });
+    </script>

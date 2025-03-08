@@ -12,6 +12,7 @@ const session = require('express-session'); //thông báo đăng ký tài khoả
 
 const bodyParser = require('body-parser');
 const methodOverride = require('method-override');
+const { scheduleDeleteExpiredDiscounts } = require('./controller/admin/discountController');
 
 
 
@@ -70,9 +71,12 @@ app.use(async (req, res, next) => {
 });
 
 
+
+//
+scheduleDeleteExpiredDiscounts();
+
 // Middleware
 app.use(express.json());
-app.use(cors());
 app.use(bodyParser.urlencoded({ extended: true }));
 app.use(bodyParser.json());
 app.use(express.urlencoded({ extended: true }));
