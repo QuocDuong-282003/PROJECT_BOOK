@@ -1,6 +1,6 @@
-<%- include('./layouts/style') %>
-<%- include('./layouts/head') %>
-<%- include('./layouts/menu-list') %>
+<%- include('../layouts/style') %>
+<%- include('../layouts/head') %>
+<%- include('../layouts/menu-list') %>
 
 <div class="col-xl-12 col-md-12">
   <div class="card table-card">
@@ -103,9 +103,10 @@
 <%- include('./edit-user-modal') %>
 <%- include('./reset-password-modal') %>
 <%- include('./orders-user-modal') %>
-<%- include('./layouts/footer') %>
-<%- include('./layouts/script') %>
-<script>document.addEventListener("DOMContentLoaded", () => {
+<%- include('../layouts/footer') %>
+<%- include('../layouts/script') %>
+<script>
+    document.addEventListener("DOMContentLoaded", () => {
     const userTable = document.getElementById("userTable");
     const searchInput = document.getElementById("searchUser");
   
