@@ -7,15 +7,15 @@ const mongoose = require('mongoose');
 const connectDB = require('./config/db');
 const cookieParser = require('cookie-parser');
 const cors = require('cors');
+const User = require('./models/User');
+const bcrypt = require('bcrypt');
 
 const app = express();
 
 // Kết nối MongoDB
 connectDB();
 
-// ✅ Tạo tài khoản admin mặc định
-const User = require('./models/User');
-const bcrypt = require('bcrypt');
+
 
 
 // Middleware để xử lý JSON và dữ liệu từ form
