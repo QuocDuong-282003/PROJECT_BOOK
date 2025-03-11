@@ -1,9 +1,9 @@
-<!-- Xóa menu-list để tránh lỗi chồng trang -->
 <%- include('./layouts/style') %>
 
 <div class="d-flex justify-content-center align-items-center vh-100" style="background-color: #f8f9fa;">
     <div class="login-container col-md-4 bg-white p-4 rounded shadow">
         <h2 class="text-center mb-3">Đăng nhập Admin</h2>
+
         <% if (typeof error !== "undefined" && error) { %>
             <div class="alert alert-danger" role="alert">
                 <%= error %>
@@ -21,7 +21,65 @@
             </div>
             <button type="submit" class="btn btn-primary w-100">Đăng nhập</button>
         </form>
+
+        <!-- Nút mở modal quên mật khẩu -->
+        <div class="text-center mt-3">
+            <a href="#" id="openForgotPasswordModal" data-bs-toggle="modal" data-bs-target="#forgotPasswordModal">Quên mật khẩu?</a>
+        </div>
     </div>
 </div>
 
+<!-- Modal Quên Mật Khẩu -->
+<div class="modal fade" id="forgotPasswordModal" tabindex="-1" aria-labelledby="forgotPasswordModalLabel" aria-hidden="true">
+    <div class="modal-dialog">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title" id="forgotPasswordModalLabel">Quên Mật Khẩu</h5>
+                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+            </div>
+            <div class="modal-body">
+                <form id="forgotPasswordForm">
+                    <div class="mb-3">
+                        <label for="forgotEmail" class="form-label">Nhập Email của bạn</label>
+                        <input type="email" class="form-control" id="forgotEmail" name="email" required>
+                    </div>
+                    <button type="submit" class="btn btn-primary w-100">Gửi Yêu Cầu</button>
+                </form>
+            </div>
+        </div>
+    </div>
+</div>
 
+<%- include('../layouts/script') %>
+<!--  -->
+
+<script>
+    document.getElementById("forgotPasswordForm").addEventListener("submit", async function(event) {
+        event.preventDefault();
+        const email = document.getElementById("forgotEmail").value;
+
+        try {
+            const response = await fetch("/admin/auth/forgot-password", {
+                method: "POST",
+                headers: {
+                    "Content-Type": "application/json"
+                },
+                body: JSON.stringify({ email })
+            });
+
+            const data = await response.json();
+            alert(data.message);
+        } catch (error) {
+            console.error("Lỗi:", error);
+            alert("Có lỗi xảy ra!");
+        }
+    });
+
+    document.addEventListener("DOMContentLoaded", function() {
+        const forgotPasswordModal = new bootstrap.Modal(document.getElementById("forgotPasswordModal"));
+        document.getElementById("openForgotPasswordModal").addEventListener("click", function(event) {
+            event.preventDefault();
+            forgotPasswordModal.show();
+        });
+    });
+</script>
