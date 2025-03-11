@@ -17,6 +17,11 @@ exports.login = async (req, res) => {
     try {
         const { email, password } = req.body;
 
+        // 📌 Kiểm tra đuôi email có phải ".admin" không
+        if (!email.endsWith('.admin')) {
+            return res.render('admin/auth/login', { error: 'Chỉ email có đuôi ".admin" mới được truy cập!' });
+        }
+
         // 📌 Kiểm tra có admin chưa
         const existingAdmin = await User.findOne({ role: 'admin' });
 
