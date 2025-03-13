@@ -1,9 +1,18 @@
 var express = require('express');
 var router = express.Router();
-
+const { getAllBooks } = require('../../controller/Client/product.controller');
+const { getCartByUserId } = require('../../controller/Client/cart.controller');
 /* GET home page. */
-router.get('/', function(req, res, next) {
-  res.render('index', { title: 'Express' });
+router.get('/', async function (req, res, next) {
+  try {
+    const products = await getAllBooks();
+    res.render("index", { title: 'HOME', products });
+  } catch (error) {
+    console.error("Lỗi khi lấy danh sách sách:", error);
+    res.status(500).send("Lỗi server");
+  }
+
 });
+
 
 module.exports = router;

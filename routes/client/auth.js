@@ -1,5 +1,5 @@
 var express = require('express');
-var { register, login, logout } = require('../controller/auth.controller');
+var { register, login, logout } = require('../../controller/auth.controller');
 var router = express.Router();
 
 router.get('/login', function(req, res, next) {

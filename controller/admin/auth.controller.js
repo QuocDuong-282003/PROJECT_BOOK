@@ -3,11 +3,7 @@ const bcrypt = require('bcrypt');
 const jwt = require('jsonwebtoken');
 
 exports.renderLogin = (req, res) => {
-    res.render('admin/auth/login', {
-        path: 'auth/login',
-        title: 'Login Page',
-        error: null
-    });
+    res.render("admin/auth/login")
 };
 
 exports.login = async (req, res, next) => {

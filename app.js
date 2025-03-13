@@ -17,13 +17,12 @@ const { scheduleDeleteExpiredDiscounts } = require('./controller/admin/discountC
 
 
 //
-var indexRouter = require('./routes/index');
-var usersRouter = require('./routes/users');
-var productsRouter = require('./routes/products');
+var indexRouter = require('./routes/client/index');
+var usersRouter = require('./routes/client/users');
+var productsRouter = require('./routes/client/products');
 var indexADMIN = require('./routes/admin/indexADMIN');
-var productdetail = require('./routes/productdetail');
-var cartRouter = require('./routes/cart');
-var authRouter = require('./routes/auth');
+var cartRouter = require('./routes/client/cart');
+var authRouter = require('./routes/client/auth');
 const Cart = require('./models/Cart');
 const app = express();
 //
@@ -85,17 +84,9 @@ app.use(express.json());
 
 //
 app.use('/', indexRouter);
-
-
-
-
-
-
 // ✅ Tạo tài khoản admin mặc định
 const User = require('./models/User');
 const bcrypt = require('bcrypt');
-
-
 // Middleware để xử lý JSON và dữ liệu từ form
 app.use(express.static('public'));
 app.set('views', [path.join(__dirname, 'views'), path.join(__dirname, 'views/client'), path.join(__dirname, 'views/admin')]);
@@ -126,6 +117,7 @@ var discountRouter = require('./routes/admin/discount');
 app.use('/client/', indexRouter);
 app.use('/users', usersRouter);
 app.use('/products', productsRouter);
+app.use('/products',productdetail)
 app.use('/cart', cartRouter);
 app.use('/admin', indexADMIN);
 app.use('/auth', authRouter);
@@ -136,13 +128,20 @@ app.use('/auth', authRouter);
 const { checkAdmin } = require('./controller/admin/auth.controller');
 
 app.use('/admin/auth', authsRouter);
-app.use('/admin', checkAdmin, indexADMIN);
-app.use('/admin/users', checkAdmin, userRouter);
-app.use('/admin/category', checkAdmin, categoryRouter);
-app.use('/admin/comment', checkAdmin, commentRouter);
-app.use('/admin/books', checkAdmin, bookRouter);
-app.use('/admin/discount', checkAdmin, discountRouter);
-app.use('/admin/publishers', checkAdmin, publisherRoutes);
+app.use('/admin', indexADMIN);
+app.use('/admin/users', userRouter);
+app.use('/admin/category',  categoryRouter);
+app.use('/admin/comment',  commentRouter);
+app.use('/admin/books',  bookRouter);
+app.use('/admin/discount',  discountRouter);
+app.use('/admin/publishers',  publisherRoutes);
+// app.use('/admin', checkAdmin, indexADMIN);
+// app.use('/admin/users', checkAdmin, userRouter);
+// app.use('/admin/category', checkAdmin, categoryRouter);
+// app.use('/admin/comment', checkAdmin, commentRouter);
+// app.use('/admin/books', checkAdmin, bookRouter);
+// app.use('/admin/discount', checkAdmin, discountRouter);
+// app.use('/admin/publishers', checkAdmin, publisherRoutes);
 
 
 app.listen(PORT, () => console.log(`🚀 Server running on port http://localhost:${PORT}`));

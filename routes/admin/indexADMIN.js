@@ -23,11 +23,10 @@ router.delete('/discount/delete/:id', discountController.deleteDiscount);
 //order
 router.get('/order', orderController.getAllOrders);
 
-const express = require('express');
-const router = express.Router();
-const { checkAdmin } = require('../../controller/admin/auth.controller');
 
-router.use(checkAdmin); // ✅ Chặn truy cập admin nếu chưa đăng nhập
+// const { checkAdmin } = require('../../controller/admin/auth.controller');
+
+// router.use(checkAdmin); // ✅ Chặn truy cập admin nếu chưa đăng nhập
 
 router.get('/', (req, res) => {
     res.render('admin/indexADMIN', { 
