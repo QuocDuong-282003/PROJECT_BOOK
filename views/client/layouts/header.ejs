@@ -84,15 +84,9 @@
                             <% } %>   
                         </ul>
                     </div>                                       
-                        <p>Call US :- <a href="#"> +11 900 800 100</a></p>
+                        
                     </div>
-                    <div class="our-link">
-                        <ul>
-                            <li><a href="#">My Account</a></li>
-                            <li><a href="#">Our location</a></li>
-                            <li><a href="#">Contact Us</a></li>
-                        </ul>
-                    </div>
+                   
                 </div>
             </div>
         </div>
@@ -218,14 +212,15 @@
                                             </a>
                                             
                                             <div style="flex-grow: 1; padding-left: 10px;">
-                                                <h6><a href="/products/productdetail/<%= item.bookId._id %>"> <%= item.bookId.title %> </a></h6>
-                                                <div style="display: flex; align-items: center; gap: 5px;">
+                                                <h6><a href="/products/productdetail/<%= item.bookId._id %>" > <%= item.bookId.title %> </a></h6>
+                                                <div class="btn_quantity" style="display: flex; align-items: center; gap: 5px;">
                                                     <input type="button" value="-" id="minus" class="minus" data-id="<%= item.bookId._id %>" style="cursor: pointer;">
-                                                    <input type="number" value="<%= item.quantity %>" size="2%" style="text-align: center;" min="0" max="<%= item.bookId.stock %>">
+                                                    <input type="number" id="quantity" class="quantity" value="<%= item.quantity %>" size="2%" style="text-align: center;" min="0" max="<%= item.bookId.stock %>">
                                                     <input type="button" value="+" id="plus" class="plus" data-id="<%= item.bookId._id %>" style="cursor: pointer;">
+                                                    <input type="hidden" class="bookId" value="<%= item.bookId._id %>">
                                                 </div>
-                                                <% prices = item.price*item.quantity %>
-                                                <p><span class="price"> <%= prices.toFixed(2) %> VNĐ</span></p>
+                                 
+                                                <p><span class="price"> <%= item.price.toFixed(2) %> VNĐ</span></p>
                                             </div>
                                             <form action="/cart/remove"method="POST" style="padding-top: 7%;">
                                                 <input type="hidden" name="bookId" value="<%= item.bookId._id %>">
@@ -239,8 +234,9 @@
                                 
                             <% }); %>
                                     <li class="total">
+                                        <span style="font-size: 150%;"><strong>Total</strong>: <%= cart.totalPrice %> VNĐ</span>
                                         <a href="/cart" class="btn btn-default hvr-hover btn-cart">VIEW CART</a>
-                                        <span class="float-right"><strong>Total</strong>: <%= cart.totalPrice %></span>
+                                        
                                     </li>
                                 </ul>
                         <% }else{%>
@@ -287,5 +283,38 @@
     </div>
 
     <!-- End Top Search -->
+
+    <script>
+        document.querySelectorAll(".plus").forEach(button => {
+        button.addEventListener("click", async function () {
+            try {
+            const row = this.closest(".btn_quantity");
+            const quantityInput = row.querySelector(".quantity");
+            let quantity = parseInt(quantityInput.value, 10) || 0;
+            quantityInput.value = quantity + 1;
+
+            const bookIdInput = row.querySelector(".bookId").value; // Lấy giá trị bookId từ input ẩn
+
+            const response = await fetch('/cart/increase', {
+                method: "POST",
+                headers: { "Content-Type": "application/json" },
+                body: JSON.stringify({ bookId: bookIdInput })
+            });
+
+            if (!response.ok) {
+                throw new Error(`Lỗi HTTP: ${response.status}`);
+            }
+
+            const result = await response.json();
+            console.log("Kết quả API:", result);
+            } catch (error) {
+            console.error("Lỗi khi gọi API:", error);
+            }
+        });
+        });
+
+
+
+    </script>
 
 

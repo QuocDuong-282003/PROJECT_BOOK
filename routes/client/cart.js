@@ -1,6 +1,6 @@
 const express = require("express");
 const router = express.Router();
-const { getCartByUserId ,addBookToCart,removeBookFromCart} = require("../../controller/Client/cart.controller");
+const { getCartByUserId ,addBookToCart,removeBookFromCart, increaseQuantity} = require("../../controller/Client/cart.controller");
 
 router.get("/", async (req, res) => {
   try {
@@ -50,6 +50,26 @@ router.post("/remove", async (req, res) => {
   } catch (error) {
     console.error("Lỗi khi xóa sách khỏi giỏ hàng:", error);
     return res.status(500).json({ message: "Lỗi server" });
+  }
+});
+router.post("/increase", async (req, res) => {
+  try {
+    console.log("🔥 API được gọi");
+    console.log("Dữ liệu nhận được:", req.body); // Kiểm tra dữ liệu gửi lên
+
+    const userId = req.session?.user?.id;
+    const bookId = req.body.bookId;
+
+    if (!userId || !bookId) {
+      console.log("Thiếu userId hoặc bookId");
+      return res.status(400).json({ error: "Thiếu userId hoặc bookId" });
+    }
+
+    await increaseQuantity(userId, bookId);
+    res.json({ success: true, message: "Số lượng đã tăng" });
+  } catch (error) {
+    console.error("Lỗi server:", error);
+    res.status(500).json({ error: "Lỗi server" });
   }
 });
 

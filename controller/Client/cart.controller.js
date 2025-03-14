@@ -1,5 +1,6 @@
 const Cart = require('../../models/Cart');
 const Book = require('../../models/Book');
+const { findById, findByIdAndUpdate } = require('../../models/Order');
 
 const getCartByUserId = async (userId) => {
     try {
@@ -85,4 +86,50 @@ const removeBookFromCart = async (userId, bookId) => {
         console.error("Lỗi khi xóa sách khỏi giỏ hàng:", error);
     }
 }
-module.exports = { getCartByUserId , addBookToCart , removeBookFromCart};
+const clearCart = async (userId) => {
+    try {
+        const cartClear = await Cart.findOneAndDelete({ userId });
+
+        if (!cartClear) {
+            console.log(`Không tìm thấy giỏ hàng của userId: ${userId}`);
+            return null;
+        }
+
+        console.log(`Đã xóa giỏ hàng của userId: ${userId}`);
+        return cartClear;
+    } catch (error) {
+        console.error('Lỗi khi xóa dữ liệu:', error.message);
+        return null;
+    }
+};
+const increaseQuantity = async (userId, bookId) => {
+    try {
+        // Tìm giỏ hàng theo userId
+        const cart = await Cart.findOne({userId});
+        if (!cart) {
+            console.log(`❌ Không tìm thấy giỏ hàng của userId: ${userId}`);
+            return null;
+        }
+
+        // Tìm item có bookId trong giỏ hàng
+        const itemIndex = cart.items.findIndex(item => item.bookId.toString() === bookId);
+        if (itemIndex === -1) {
+            console.log(`❌ Không tìm thấy sản phẩm có bookId: ${bookId}`);
+            return null;
+        }
+
+        // Tăng số lượng sản phẩm
+        cart.items[itemIndex].quantity += 1;
+        console.log(`📌 Số lượng mới: ${cart.items[itemIndex].quantity}`);
+
+        // Lưu lại thay đổi
+        await cart.save();
+
+        console.log("✅ Cập nhật số lượng thành công");
+        return cart;
+    } catch (error) {
+        console.error("🔥 Lỗi khi cập nhật số lượng:", error);
+    }
+};
+
+module.exports = { getCartByUserId , addBookToCart , removeBookFromCart, clearCart, increaseQuantity};
