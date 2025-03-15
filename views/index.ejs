@@ -130,10 +130,14 @@
                                     <a class="cart" href="#">Add to Cart</a>
                                 </div>
                             </div>
-                            <div class="why-text">
-                                <h4><%= product.title %></h4>
-                                <h5><%= product.price %> VNĐ</h5>
-                            </div>
+                            <a href="/products/productdetail/<%= product._id %>">
+                                <div class="why-text">
+                                    <h4><%= product.title %></h4>
+                                    <h5><%= product.price %> VNĐ</h5>
+                                </div>
+                            </a>
+                            
+
                         </div>
                     </div>
                 <% }); %>

@@ -16,4 +16,5 @@ const connectDB = async () => {
         process.exit(1);
     }
 };
-module.exports = connectDB; // Export connectDB để sử dụng trong các file khác
+
+module.exports = connectDB;

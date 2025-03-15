@@ -10,13 +10,64 @@ const cors = require('cors');
 const User = require('./models/User');
 const bcrypt = require('bcrypt');
 
-const app = express();
+const session = require('express-session'); //thông báo đăng ký tài khoản thành công
 
+const bodyParser = require('body-parser');
+const methodOverride = require('method-override');
+const { scheduleDeleteExpiredDiscounts } = require('./controller/admin/discountController');
+
+//
+var indexRouter = require('./routes/client/index');
+var indexADMIN = require('./routes/admin/indexADMIN');
+var cartRouter = require('./routes/client/cart');
+var authRouter = require('./routes/client/auth');
+const Cart = require('./models/Cart');
+const app = express();
+//
+app.use(methodOverride('_method'));
+app.use(cors());
+
+//config port
+const PORT = process.env.PORT || 3000;
 // Kết nối MongoDB
 connectDB();
 
+// Middleware xử lý session
+app.use(session({
+    secret: 'your_secret_key', // Thay bằng một chuỗi bí mật
+    resave: false,
+    saveUninitialized: true,
+    cookie: { secure: false } // Đặt true nếu dùng HTTPS
+}));
+
+app.use(async (req, res, next) => {
+    res.locals.user = req.session.user || null; // Nếu chưa đăng nhập, user sẽ là null
+    res.locals.cart = { items: [] }; // Giỏ hàng mặc định là rỗng
+    res.locals.count = 0; // Số lượng mặc định là 0
+    if (req.session.user) {
+        try {
+            const cart = await Cart.findOne({ userId: req.session.user.id }).populate("items.bookId");
+            res.locals.cart = cart || { items: [] };  // Nếu không có giỏ hàng, gán mảng rỗng
+            res.locals.count = res.locals.cart.items.length;
+        } catch (error) {
+            console.error("Lỗi khi lấy giỏ hàng:", error);
+            res.locals.cart = { items: [] };
+            res.locals.count = 0;
+        }
+    } else {
+        res.locals.cart = { items: [] }; // Nếu chưa đăng nhập, gán giỏ hàng rỗng
+    }
+    
+    next();
+});
 
 
+
+//
+scheduleDeleteExpiredDiscounts();
+
+
+app.use('/', indexRouter);
 
 // Middleware để xử lý JSON và dữ liệu từ form
 app.use(express.static('public'));
@@ -25,17 +76,16 @@ app.set('view engine', 'ejs');
 app.use(express.json());
 app.use(express.urlencoded({ extended: true }));
 app.use(cookieParser());
+app.use(bodyParser.urlencoded({ extended: true }));
+app.use(bodyParser.json());
 
-// Config port
-const PORT = process.env.PORT || 3000;
 
 // Client routes
-var indexRouter = require('./routes/client/index');
 var usersRouter = require('./routes/client/users');
 var productsRouter = require('./routes/client/products');
 var productdetail = require('./routes/client/productdetail');
 var cartRouter = require('./routes/client/cart');
-
+var vnpayRouter = require('./routes/client/checkout');
 // Admin routes
 var authsRouter = require('./routes/admin/auth');
 var userRouter = require('./routes/admin/users');
@@ -43,28 +93,32 @@ var categoryRouter = require('./routes/admin/category');
 var bookRouter = require('./routes/admin/book');
 var publisherRoutes = require("./routes/admin/publisher");
 var commentRouter = require('./routes/admin/comment');
-var indexADMIN = require('./routes/admin/indexADMIN');
-//var discountRouter = require('./routes/admin/discount');
+var indexADMIN1 = require('./routes/admin/indexADMIN');
+var discountRouter = require('./routes/admin/discount');
 
 // Client routes
-app.use('/client/', indexRouter);
 app.use('/users', usersRouter);
 app.use('/products', productsRouter);
-app.use('/product-detail', productdetail);
+app.use('/products',productdetail)
 app.use('/cart', cartRouter);
+app.use('/admin', indexADMIN);
+app.use('/auth', authRouter);
+app.use('/checkout', vnpayRouter);
+
+
 
 const { checkAdmin } = require('./controller/admin/auth.controller');
 
-app.use('/admin/auth', authsRouter);
-app.use('/admin', checkAdmin, indexADMIN);
-app.use('/admin/users', checkAdmin, userRouter);
+app.use('/admin/auth',authsRouter);
+app.use('/admin',checkAdmin, indexADMIN1);
+app.use('/admin/users', checkAdmin,userRouter);
 app.use('/admin/category', checkAdmin, categoryRouter);
-app.use('/admin/comment', checkAdmin, commentRouter);
+app.use('/admin/comment',checkAdmin,  commentRouter);
 app.use('/admin/books', checkAdmin, bookRouter);
-//app.use('/admin/discount', checkAdmin, discountRouter);
-app.use('/admin/publishers', checkAdmin, publisherRoutes);
+app.use('/admin/discount',checkAdmin,  discountRouter);
+app.use('/admin/publishers',checkAdmin,  publisherRoutes);
 
-// Start server
+
+
 app.listen(PORT, () => console.log(`🚀 Server running on port http://localhost:${PORT}`));
-
 module.exports = app;

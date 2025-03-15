@@ -24202,10 +24202,11 @@ div.dtk-focus-alt table.dataTable tbody th.focus {
 
 /* image varient End */
 /**====== Authentication css end ======**/
-.title-containerƠ {
-    display: inline-block;
-    white-space: nowrap; 
-}
+
+.title-container {
+    padding-bottom: 2%;
+    
+
 .search-container {
     /* Giữ các phần tử trên cùng một hàng */
     float: right;
