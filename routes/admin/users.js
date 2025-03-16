@@ -17,11 +17,8 @@ router.post('/:id/reset-password', userController.resetPassword);
 // Route để lấy danh sách người dùng
 router.get('/', userController.getAllUsers);
 
-// Route để tìm kiếm người dùng
+//tìm kiếm người dùng
 router.get('/search', userController.searchUsers);
-
-// Route để lấy thông tin chi tiết người dùng
-router.get('/:id', userController.getUserById);
 
 // Route để lấy đơn hàng của người dùng
 router.get('/:id/orders', userController.getUserOrders);

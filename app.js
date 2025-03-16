@@ -8,7 +8,7 @@ const connectDB = require('./config/db');
 const cookieParser = require('cookie-parser');
 const cors = require('cors');
 const User = require('./models/User');
-// const bcrypt = require('bcrypt');
+const bcrypt = require('bcrypt');
 
 const session = require('express-session'); //thông báo đăng ký tài khoản thành công
 
@@ -18,7 +18,7 @@ const { scheduleDeleteExpiredDiscounts } = require('./controller/admin/discountC
 
 //
 var indexRouter = require('./routes/client/index');
-var indexADMIN = require('./routes/admin/indexADMIN');
+// var indexADMIN1 = require('./routes/admin/indexADMIN');
 var cartRouter = require('./routes/client/cart');
 var authRouter = require('./routes/client/auth');
 const Cart = require('./models/Cart');
@@ -34,7 +34,7 @@ connectDB();
 
 // Middleware xử lý session
 app.use(session({
-    secret: 'your_secret_key', // Thay bằng một chuỗi bí mật
+    secret: process.env.JWT_SECRET, // Thay bằng một chuỗi bí mật
     resave: false,
     saveUninitialized: true,
     cookie: { secure: false } // Đặt true nếu dùng HTTPS
@@ -93,7 +93,7 @@ var categoryRouter = require('./routes/admin/category');
 var bookRouter = require('./routes/admin/book');
 var publisherRoutes = require("./routes/admin/publisher");
 var commentRouter = require('./routes/admin/comment');
-var indexADMIN1 = require('./routes/admin/indexADMIN');
+var indexADMIN = require('./routes/admin/indexADMIN');
 var discountRouter = require('./routes/admin/discount');
 
 // Client routes
@@ -101,7 +101,7 @@ app.use('/users', usersRouter);
 app.use('/products', productsRouter);
 app.use('/products',productdetail)
 app.use('/cart', cartRouter);
-app.use('/admin', indexADMIN);
+// app.use('/admin', indexADMIN1);
 app.use('/auth', authRouter);
 app.use('/checkout', vnpayRouter);
 
@@ -110,7 +110,7 @@ app.use('/checkout', vnpayRouter);
 const { checkAdmin } = require('./controller/admin/auth.controller');
 
 app.use('/admin/auth',authsRouter);
-app.use('/admin',checkAdmin, indexADMIN1);
+app.use('/admin',checkAdmin, indexADMIN);
 app.use('/admin/users', checkAdmin,userRouter);
 app.use('/admin/category', checkAdmin, categoryRouter);
 app.use('/admin/comment',checkAdmin,  commentRouter);

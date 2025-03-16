@@ -56,73 +56,84 @@
             </thead>
             <tbody>
               <% users.forEach((user, index) => { %>
-              <tr data-id="<%= user._id %>">
-                <td class="text-center"><%= index + 1 %></td>
-                <td class="text-center"><%= user.name %></td>
-                <td class="text-center"><%= user.email %></td>
-                <td class="text-center"><%= user.phone %></td>
-                <td class="text-center"><%= user.address %></td>
-                <td class="text-center"><span class="badge <%= user.isActive ? 'badge-success' : 'badge-danger' %>"><%= user.isActive ? 'Active' : 'Inactive' %></span></td>
-                <td class="text-center"><%= user.role %></td>
-                <td class="text-center">
-                  <!-- Nút chỉnh sửa -->
-                  <button type="button" class="btn btn-info btn-sm" data-toggle="modal" data-target="#editUserModal-<%= user._id %>">
-                    <i class="feather icon-edit"></i>
-                  </button>
-
-                  <!-- Nút xóa (vô hiệu hóa nếu là admin) -->
-                  <% if (user.role === 'admin') { %>
-                    <button class="btn btn-danger btn-sm" disabled style="background-color: red; color: white;">
-                      <i class="feather icon-trash-2"></i>
-                    </button>
-                  <% } else { %>
-                    <form action="/admin/users/<%= user._id %>/delete" method="POST" style="display:inline;">
-                      <input type="hidden" name="_method" value="DELETE">
-                      <button type="submit" class="btn btn-danger btn-sm" onclick="return confirm('Bạn có chắc chắn muốn xóa người dùng này?');">
-                        <i class="feather icon-trash-2"></i>
-                      </button>
-                    </form>
-                  <% } %>
-
-                  <!-- Nút reset mật khẩu (vô hiệu hóa nếu là admin) -->
-                  <% if (user.role === 'admin') { %>
-                    <button class="btn btn-warning btn-sm" disabled style="background-color: red; color: white;">
-                      <i class="feather icon-refresh-ccw"></i>
-                    </button>
-                  <% } else { %>
-                    <form action="/admin/users/<%= user._id %>/reset-password" method="POST" style="display:inline;">
-                      <input type="hidden" name="_method" value="PUT">
-                      <button type="submit" class="btn btn-warning btn-sm" onclick="return confirm('Bạn có chắc chắn muốn reset mật khẩu người dùng này?');">
-                        <i class="feather icon-refresh-ccw"></i>
-                      </button>
-                    </form>
-                  <% } %>
-
-                  <!-- Nút xem đơn hàng -->
-                  <button type="button" class="btn btn-primary btn-sm" data-toggle="modal" data-target="#ordersUserModal-<%= user._id %>">
-                    <i class="feather icon-shopping-cart"></i> Xem đơn hàng
-                  </button>
-                </td>
-              </tr>
+                  <tr data-id="<%= user._id %>">
+                      <td class="text-center"><%= index + 1 %></td>
+                      <td class="text-center"><%= user.name %></td>
+                      <td class="text-center"><%= user.email %></td>
+                      <td class="text-center"><%= user.phone %></td>
+                      <td class="text-center"><%= user.address %></td>
+                      <td class="text-center">
+                          <span class="badge <%= user.isActive ? 'badge-success' : 'badge-danger' %>">
+                              <%= user.isActive ? 'Active' : 'Inactive' %>
+                          </span>
+                      </td>
+                      <td class="text-center"><%= user.role %></td>
+                      <td class="text-center">
+                          <!-- Nút chỉnh sửa -->
+                          <% if (user.role !== 'admin') { %>
+                              <button type="button" class="btn btn-info btn-sm" data-toggle="modal" data-target="#editUserModal-<%= user._id %>">
+                                  <i class="feather icon-edit"></i>
+                              </button>
+                          <% } else { %>
+                              <button type="button" class="btn btn-info btn-sm" disabled>
+                                  <i class="feather icon-edit"></i>
+                              </button>
+                          <% } %>
+          
+                          <!-- Nút xóa (vô hiệu hóa nếu là admin) -->
+                          <% if (user.role === 'admin') { %>
+                              <button class="btn btn-danger btn-sm" disabled>
+                                  <i class="feather icon-trash-2"></i>
+                              </button>
+                          <% } else { %>
+                              <form action="/admin/users/<%= user._id %>/delete" method="POST" style="display:inline;">
+                                  <input type="hidden" name="_method" value="DELETE">
+                                  <button type="submit" class="btn btn-danger btn-sm" onclick="return confirm('Bạn có chắc chắn muốn xóa người dùng này?');">
+                                      <i class="feather icon-trash-2"></i>
+                                  </button>
+                              </form>
+                          <% } %>
+          
+                          <!-- Nút reset mật khẩu (vô hiệu hóa nếu là admin) -->
+                          <% if (user.role === 'admin') { %>
+                              <button class="btn btn-warning btn-sm" disabled>
+                                  <i class="feather icon-refresh-ccw"></i>
+                              </button>
+                          <% } else { %>
+                              <form action="/admin/users/<%= user._id %>/reset-password" method="POST" style="display:inline;">
+                                  <input type="hidden" name="_method" value="PUT">
+                                  <button type="submit" class="btn btn-warning btn-sm" onclick="return confirm('Bạn có chắc chắn muốn reset mật khẩu người dùng này?');">
+                                      <i class="feather icon-refresh-ccw"></i>
+                                  </button>
+                              </form>
+                          <% } %>
+          
+                          <!-- Nút xem đơn hàng -->
+                          <button type="button" class="btn btn-primary btn-sm" data-toggle="modal" data-target="#ordersUserModal-<%= user._id %>">
+                              <i class="feather icon-shopping-cart"></i> Xem đơn hàng
+                          </button>    
+                      </td>
+                  </tr>
               <% }) %>
-            </tbody>
+          </tbody>
           </table>
         </div>
 
         <!-- PHÂN TRANG -->
         <nav>
           <ul class="pagination">
-            <% for(let i = 1; i <= totalPages; i++) { %>
-            <li class="page-item <%= i === currentPage ? 'active' : '' %>">
-              <a class="page-link" href="/admin/users?page=<%= i %>"><%= i %></a>
-            </li>
-            <% } %>
+              <% for(let i = 1; i <= totalPages; i++) { %>
+                  <li class="page-item <%= i === currentPage ? 'active' : '' %>">
+                      <a class="page-link" href="/admin/users/search?query=<%= query || '' %>&page=<%= i %>"><%= i %></a>
+                  </li>
+              <% } %>
           </ul>
         </nav>
       </div>
     </div>
   </div>
 </div>
+
 
 <!-- Modal thêm người dùng -->
 <div class="modal fade" id="addUserModal" tabindex="-1" role="dialog">
@@ -170,6 +181,8 @@
     </div>
   </div>
 </div>
+
+
 
 <% users.forEach((user) => { %>
   <!-- Modal chỉnh sửa người dùng -->
@@ -288,7 +301,30 @@
       </div>
     </div>
   </div>
-<% }) %>
-
+  <div class="modal fade" id="userDetailModal-<%= user._id %>" tabindex="-1" role="dialog" aria-labelledby="userDetailModalLabel" aria-hidden="true">
+    <div class="modal-dialog" role="document">
+      <div class="modal-content">
+        <div class="modal-header">
+          <h5 class="modal-title" id="userDetailModalLabel">Thông tin chi tiết</h5>
+          <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+            <span aria-hidden="true">&times;</span>
+          </button>
+        </div>
+        <div class="modal-body">
+          <p><strong>Tên:</strong> <%= user.name %></p>
+          <p><strong>Email:</strong> <%= user.email %></p>
+          <p><strong>Số điện thoại:</strong> <%= user.phone %></p>
+          <p><strong>Địa chỉ:</strong> <%= user.address %></p>
+          <p><strong>Vai trò:</strong> <%= user.role %></p>
+          <p><strong>Trạng thái:</strong> <%= user.isActive ? 'Active' : 'Inactive' %></p>
+        </div>
+        <div class="modal-footer">
+          <button type="button" class="btn btn-secondary" data-dismiss="modal">Đóng</button>
+        </div>
+      </div>
+    </div>
+  </div>
+ <% }) %>
+  
 <%- include('../layouts/footer') %>
 <%- include('../layouts/script') %>

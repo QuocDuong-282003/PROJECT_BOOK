@@ -13,6 +13,7 @@ const userSchema = new mongoose.Schema({
     isActive: { type: Boolean, default: true },
     isAdmin: { type: Boolean, default: false },
     resetPasswordToken: String
+    
 }, { timestamps: true });
 
 // Hash password trước khi lưu
