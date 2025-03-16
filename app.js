@@ -8,7 +8,7 @@ const connectDB = require('./config/db');
 const cookieParser = require('cookie-parser');
 const cors = require('cors');
 const User = require('./models/User');
-const bcrypt = require('bcrypt');
+// const bcrypt = require('bcrypt');
 
 const session = require('express-session'); //thông báo đăng ký tài khoản thành công
 

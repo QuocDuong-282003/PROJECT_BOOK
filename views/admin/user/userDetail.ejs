@@ -1,0 +1,28 @@
+<%- include('../layouts/style') %>
+<%- include('../layouts/head') %>
+<%- include('../layouts/menu-list', { path: 'users', title: 'Chi tiết Người dùng' }) %>
+
+<div class="col-xl-12 col-md-12">
+  <div class="card">
+    <div class="card-header">
+      <h5>Thông tin chi tiết người dùng</h5>
+    </div>
+    <div class="card-body">
+      <div class="row">
+        <div class="col-md-6">
+          <p><strong>Tên:</strong> <%= user.name %></p>
+          <p><strong>Email:</strong> <%= user.email %></p>
+          <p><strong>Số điện thoại:</strong> <%= user.phone %></p>
+        </div>
+        <div class="col-md-6">
+          <p><strong>Địa chỉ:</strong> <%= user.address %></p>
+          <p><strong>Vai trò:</strong> <%= user.role %></p>
+          <p><strong>Trạng thái:</strong> <%= user.isActive ? 'Active' : 'Inactive' %></p>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<%- include('../layouts/footer') %>
+<%- include('../layouts/script') %>

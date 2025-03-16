@@ -1,178 +1,120 @@
 <%- include('./layouts/style') %>
 <%- include('./layouts/head') %>
-<%- include('./layouts/menu-list') %>
-
+<%- include('./layouts/menu-list', { path: 'comment', title: 'Quản lý Bình luận' }) %>
 <div class="col-xl-12 col-md-12">
   <div class="card table-card">
     <div class="card-header">
       <div class="title-container">
-        
         <h5>
           <a href="#" onclick="location.reload(); return false;">
             <%= title || 'Quản lý Bình luận' %>
           </a>
         </h5>
         <h5>Tổng số bình luận: <strong id="totalComments"><%= totalComments %></strong></h5>
-        <span class="search-container">
-          <input id="searchComment" class="form-control" type="text" placeholder="Tìm kiếm bình luận...">
-          <button type="button" class="btn btn-primary" id="searchCommentButton">
+        <form action="/admin/comment/search" method="GET" class="search-container">
+          <input type="text" name="query" class="form-control" placeholder="Tìm kiếm bình luận...">
+          <button type="submit" class="btn btn-primary">
             <i class="feather icon-search"></i>
           </button>
-        </span>
-
-  <div class="card-header-right">
-      <div class="btn-group card-option">
+        </form>
+      </div>
+      <div class="card-header-right">
+        <div class="btn-group card-option">
           <button type="button" class="btn dropdown-toggle" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
-              <i class="feather icon-more-horizontal"></i>
+            <i class="feather icon-more-horizontal"></i>
           </button>
           <ul class="list-unstyled card-option dropdown-menu dropdown-menu-right">
-              <li class="dropdown-item full-card"><a href="#!"><span><i class="feather icon-maximize"></i> maximize</span><span style="display:none"><i class="feather icon-minimize"></i> Restore</span></a></li>
-              <li class="dropdown-item minimize-card"><a href="#!"><span><i class="feather icon-minus"></i> collapse</span><span style="display:none"><i class="feather icon-plus"></i> expand</span></a></li>
-              <li class="dropdown-item reload-card"><a href="#!"><i class="feather icon-refresh-cw"></i> reload</a></li>
+            <li class="dropdown-item full-card"><a href="#!"><span><i class="feather icon-maximize"></i> maximize</span><span style="display:none"><i class="feather icon-minimize"></i> Restore</span></a></li>
+            <li class="dropdown-item minimize-card"><a href="#!"><span><i class="feather icon-minus"></i> collapse</span><span style="display:none"><i class="feather icon-plus"></i> expand</span></a></li>
+            <li class="dropdown-item reload-card"><a href="#!"><i class="feather icon-refresh-cw"></i> reload</a></li>
           </ul>
+        </div>
       </div>
-  </div>
-</div>
+    </div>
+    <div class="card-body p-0">
+      <div class="container mt-3">
+        <div class="table-responsive">
+          <table class="table table-hover mb-0" id="commentTable">
+            <thead>
+              <tr>
+                <th class="text-center">STT</th>
+                <th class="text-center">Người dùng</th>
+                <th class="text-center">Sách</th>
+                <th class="text-center">Nội dung</th>
+                <th class="text-center">Ngày bình luận</th>
+                <th class="text-center">Hành động</th>
+              </tr>
+            </thead>
+            <tbody id="commentTableBody">
+              <% comments.forEach((comment, index) => { %>
+                <tr id="comment-<%= comment._id %>">
+                  <td class="text-center"><%= (currentPage - 1) * 10 + index + 1 %></td>
+                  <td class="text-center"><%= comment.user ? comment.user.name : 'Ẩn danh' %></td>
+                  <td class="text-center"><%= comment.book ? comment.book.title : 'Không xác định' %></td>
+                  <td class="text-center comment-content"><%= comment.content %></td>
+                  <td class="text-center"><%= new Date(comment.createdAt).toLocaleString("vi-VN") %></td>
+                  <td class="text-center">
+                    <!-- Nút mở modal chỉnh sửa -->
+                    <button class="btn btn-warning btn-sm" data-toggle="modal" data-target="#editCommentModal-<%= comment._id %>">
+                      <i class="feather icon-edit"></i> Sửa
+                    </button>
+                    <!-- Form xóa bình luận -->
+                    <form action="/admin/comment/delete/<%= comment._id %>" method="POST" style="display:inline;">
+                      <button type="submit" class="btn btn-danger btn-sm" onclick="return confirm('Bạn có chắc chắn muốn xóa bình luận này?');">
+                        <i class="feather icon-trash-2"></i> Xóa
+                      </button>
+                    </form>
+                  </td>
+                </tr>
 
-<div class="card-body p-0">
-  <div class="container mt-3">
-    <div class="table-responsive">
-      <table class="table table-hover mb-0" id="commentTable">
-        <thead>
-          <tr>
-            <th class="text-center">STT</th>
-            <th class="text-center">Người dùng</th>
-            <th class="text-center">Sách</th>
-            <th class="text-center">Nội dung</th>
-            <th class="text-center">Ngày bình luận</th>
-            <th class="text-center">Hành động</th>
-          </tr>
-        </thead>
-        <tbody id="commentTableBody">
-          <% comments.forEach((comment, index) => { %>
-            <tr id="comment-<%= comment._id %>">
-              <td class="text-center"><%= index + 1 %></td>
-              <td class="text-center"><%= comment.user ? comment.user.name : 'Ẩn danh' %></td>
-              <td class="text-center"><%= comment.book ? comment.book.title : 'Không xác định' %></td>
-              <td class="text-center comment-content"><%= comment.content %></td>
-              <td class="text-center"><%= new Date(comment.createdAt).toLocaleString("vi-VN") %></td>
-              <td class="text-center">
-                <button class="btn btn-warning btn-sm edit-btn" data-id="<%= comment._id %>" data-content="<%= comment.content %>">
-                  <i class="feather icon-edit"></i> Sửa
-                </button>
-                <button type="button" class="btn btn-danger btn-sm delete-btn" data-id="<%= comment._id %>">
-                  <i class="feather icon-trash-2"></i> Xóa
-                </button>
-              </td>
-            </tr>
-          <% }); %>
-        </tbody>
-      </table>
+                <!-- Modal chỉnh sửa bình luận -->
+                <div class="modal fade" id="editCommentModal-<%= comment._id %>" tabindex="-1" aria-labelledby="editCommentModalLabel" aria-hidden="true">
+                  <div class="modal-dialog">
+                    <div class="modal-content">
+                      <div class="modal-header">
+                        <h5 class="modal-title" id="editCommentModalLabel">Chỉnh sửa bình luận</h5>
+                        <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                          <span aria-hidden="true">&times;</span>
+                        </button>
+                      </div>
+                      <div class="modal-body">
+                        <form action="/admin/comment/update/<%= comment._id %>" method="POST">
+                          <div class="form-group">
+                            <label for="editCommentContent">Nội dung</label>
+                            <textarea name="content" class="form-control"><%= comment.content %></textarea>
+                          </div>
+                          <div class="modal-footer">
+                            <button type="button" class="btn btn-secondary" data-dismiss="modal">Hủy</button>
+                            <button type="submit" class="btn btn-primary">Lưu</button>
+                          </div>
+                        </form>
+                      </div>
+                    </div>
+                  </div>
+                </div>
+              <% }); %>
+            </tbody>
+          </table>
+        </div>
+      </div>
     </div>
   </div>
 </div>
-</div>
-</div>
 
+<!-- Phân trang -->
 <div class="pagination-container">
-<% if (currentPage > 1) { %>
-<a href="?page=<%= currentPage - 1 %>">Trang trước</a>
-<% } %>
+  <% if (currentPage > 1) { %>
+    <a href="?page=<%= currentPage - 1 %>">Trang trước</a>
+  <% } %>
 
-<% for (let i = 1; i <= totalPages; i++) { %>
-<a href="?page=<%= i %>" class="<%= currentPage === i ? 'active' : '' %>"><%= i %></a>
-<% } %>
+  <% for (let i = 1; i <= totalPages; i++) { %>
+    <a href="?page=<%= i %>" class="<%= currentPage === i ? 'active' : '' %>"><%= i %></a>
+  <% } %>
 
-<% if (currentPage < totalPages) { %>
-<a href="?page=<%= currentPage + 1 %>">Trang sau</a>
-<% } %>
+  <% if (currentPage < totalPages) { %>
+    <a href="?page=<%= currentPage + 1 %>">Trang sau</a>
+  <% } %>
 </div>
 
-<!-- Modal chỉnh sửa bình luận -->
-<div class="modal fade" id="editCommentModal" tabindex="-1" aria-labelledby="editCommentModalLabel" aria-hidden="true">
-<div class="modal-dialog">
-<div class="modal-content">
-  <div class="modal-header">
-    <h5 class="modal-title" id="editCommentModalLabel">Chỉnh sửa bình luận</h5>
-    <button type="button" class="close" data-dismiss="modal" aria-label="Close">
-      <span aria-hidden="true">&times;</span>
-    </button>
-  </div>
-  <div class="modal-body">
-    <input type="hidden" id="editCommentId">
-    <div class="form-group">
-      <label for="editCommentContent">Nội dung</label>
-      <textarea id="editCommentContent" class="form-control"></textarea>
-    </div>
-  </div>
-  <div class="modal-footer">
-    <button type="button" class="btn btn-secondary" data-dismiss="modal">Hủy</button>
-    <button type="button" class="btn btn-primary" id="saveEditComment">Lưu</button>
-  </div>
-</div>
-</div>
-</div>
-<script>
-   
-  document.addEventListener("DOMContentLoaded", () => {
-    document.addEventListener("click", (event) => {
-      if (event.target.classList.contains("edit-btn")) {
-        const commentId = event.target.getAttribute("data-id");
-        const commentContent = event.target.getAttribute("data-content");
-        document.getElementById("editCommentId").value = commentId;
-        document.getElementById("editCommentContent").value = commentContent;
-        $("#editCommentModal").modal("show");
-      }
-
-      if (event.target.classList.contains("delete-btn")) {
-        const commentId = event.target.getAttribute("data-id");
-        if (confirm("Bạn có chắc chắn muốn xóa bình luận này?")) {
-          fetch(`/admin/comment/${commentId}`, { method: "DELETE" })
-            .then(response => response.json())
-            .then(data => {
-              if (data.success) {
-                document.getElementById(`comment-${commentId}`).remove();
-              } else {
-                alert("Lỗi khi xóa bình luận.");
-              }
-            })
-            .catch(err => console.error("Lỗi khi xóa bình luận:", err));
-        }
-      }
-    });
-
-    document.getElementById("searchCommentButton").addEventListener("click", () => {
-      const searchTerm = document.getElementById("searchComment").value.toLowerCase();
-      document.querySelectorAll("#commentTableBody tr").forEach(row => {
-        const content = row.querySelector(".comment-content").innerText.toLowerCase();
-        row.style.display = content.includes(searchTerm) ? "" : "none";
-      });
-    });
-    document.getElementById("saveEditComment").addEventListener("click", () => {
-  const commentId = document.getElementById("editCommentId").value;
-  const updatedContent = document.getElementById("editCommentContent").value;
-
-  if (!confirm("Bạn có chắc chắn muốn lưu thay đổi không?")) return;
-
-  fetch(`/admin/comment/${commentId}`, {
-    method: "PUT",
-    headers: { "Content-Type": "application/json" },
-    body: JSON.stringify({ content: updatedContent })
-  })
-    .then(response => response.json())
-    .then(data => {
-      if (data.success) {
-        // Cập nhật nội dung bình luận trên trang
-        document.querySelector(`#comment-${commentId} .comment-content`).innerText = updatedContent;
-        alert("Cập nhật bình luận thành công!");
-        $("#editCommentModal").modal("hide");
-      } else {
-        alert("Lỗi khi cập nhật bình luận.");
-      }
-    })
-    .catch(err => console.error("Lỗi khi cập nhật bình luận:", err));
-});
-  });
-</script>
 <%- include('./layouts/footer') %>
 <%- include('./layouts/script') %>

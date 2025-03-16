@@ -2,7 +2,7 @@ const User = require('../../models/User');
 const bcrypt = require('bcrypt');
 const jwt = require('jsonwebtoken');
 // const nodemailer = require('nodemailer');
-const crypto = require('crypto');
+// const crypto = require('crypto');
 
 exports.renderLogin = (req, res) => {
     res.render('admin/auth/login', {

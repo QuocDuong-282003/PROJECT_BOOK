@@ -4,14 +4,17 @@ const categoryController = require("../../controller/admin/category.controller")
 
 // Hiển thị danh sách danh mục
 router.get("/", categoryController.getCategories);
+
+// Tìm kiếm danh mục
 router.get("/search", categoryController.searchCategories);
+
 // Thêm danh mục mới
 router.post("/create", categoryController.createCategory);
 
-// Chỉnh sửa danh mục
-router.put("/edit/:id", categoryController.updateCategory);
+// Cập nhật danh mục
+router.post("/update/:id", categoryController.updateCategory);
 
 // Xóa danh mục
-router.delete("/delete/:id", categoryController.deleteCategory);
+router.post("/delete/:id", categoryController.deleteCategory);
 
 module.exports = router;
