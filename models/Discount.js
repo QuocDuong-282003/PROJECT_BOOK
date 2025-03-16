@@ -6,7 +6,8 @@ const discountSchema = new mongoose.Schema({
     value: { type: Number, required: true, min: 0 },
     startDate: { type: Date, required: true },
     endDate: { type: Date, required: true },
-    isActive: { type: Boolean, default: true }
+    isActive: { type: Boolean, default: true },
+    searchCount: { type: Number, default: 0 }
 }, { timestamps: true });
-
+discountSchema.index({ code: "text", description: "text" });
 module.exports = mongoose.model('Discount', discountSchema);

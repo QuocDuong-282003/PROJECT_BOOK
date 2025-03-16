@@ -10,7 +10,7 @@ const bodyParser = require('body-parser');
 const methodOverride = require('method-override');
 const { scheduleDeleteExpiredDiscounts } = require('./controller/admin/discountController');
 
-
+const cookieParser = require('cookie-parser');
 //
 var indexRouter = require('./routes/index');
 var usersRouter = require('./routes/users');
@@ -34,6 +34,7 @@ connectDB();
 //
 scheduleDeleteExpiredDiscounts();
 // Middleware
+app.use(cookieParser());
 app.use(express.json());
 app.use(cors());
 app.use(bodyParser.urlencoded({ extended: true }));
@@ -42,6 +43,8 @@ app.use(express.urlencoded({ extended: true }));
 app.use(express.json());
 
 //
+//
+
 app.use('/', indexRouter);
 app.use('/users', usersRouter);
 app.use('/products', productsRouter);
