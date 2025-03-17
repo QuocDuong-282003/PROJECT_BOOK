@@ -1,0 +1,139 @@
+<%- include('./client/layouts/style') %>
+<%- include('./client/layouts/header') %>
+<div class="all-title-box">
+    <div class="container">
+        <div class="row">
+            <div class="col-lg-12">
+                <h2>Wishlist</h2>
+                <ul class="breadcrumb">
+                    <li class="breadcrumb-item"><a href="#">Shop</a></li>
+                    <li class="breadcrumb-item active">Wishlist</li>
+                </ul>
+            </div>
+        </div>
+    </div>
+</div>
+<!-- End All Title Box -->
+
+<!-- Start Wishlist  -->
+<div class="wishlist-box-main">
+    <div class="container">
+        <div class="row">
+            <div class="col-lg-12">
+                <div class="table-main table-responsive">
+                    <table class="table">
+                        <thead>
+                            <tr>
+                                <th>NO.</th>
+                                <th>Order ID</th>
+                                <th>Data Create </th>
+                                <th>Status</th>
+                                <th>Total Price</th>
+                                <th><a href="">View</a></th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            <% let NO = 1; %> 
+                            <% orders.forEach(order => { %>
+                                <tr>
+                                    <td class="thumbnail-img">
+                                        <%=NO++ %>
+                                    </td>
+                                    <td class="name-pr">
+                                        <%= order.orderId %>
+                                    </td>
+                                    <% function formatDate(date) { %>
+                                        <%= new Date(date).toLocaleString("en-GB", {
+                                            day: "2-digit",
+                                            month: "2-digit",
+                                            year: "numeric",
+                                            hour: "2-digit",
+                                            minute: "2-digit",
+                                            second: "2-digit",
+                                            hour12: false
+                                        }) %>
+                                      <% } %>
+                                      
+                                    <td class="price-pr">
+                                        <p><%= formatDate(order.orderDate )%></p>
+                                    </td>
+                                    <% 
+                                        let status ="";
+                                        if(order.status==0){
+                                            status ="Pending";
+                                        }else if(order.status==1){
+                                            status ="Success";
+                                        }else{
+                                            status ="Cancelled"
+                                        }
+                                    %>
+                                    <td class="quantity-box"><%= status %></td>
+                                    <td class="add-pr">
+                                        <%= order.totalAmount %> VNĐ
+                                    </td>
+                                    <td class="">
+                                        <a href="#">
+                                    View</i>
+                                </a>
+                                    </td>
+                                </tr>
+                            <%}) %>
+                            
+                            <!-- <tr>
+                                <td class="thumbnail-img">
+                                    <a href="#">
+                                <img class="img-fluid" src="images/img-pro-02.jpg" alt="" />
+                            </a>
+                                </td>
+                                <td class="name-pr">
+                                    <a href="#">
+                                Lorem ipsum dolor sit amet
+                            </a>
+                                </td>
+                                <td class="price-pr">
+                                    <p>$ 60.0</p>
+                                </td>
+                                <td class="quantity-box">In Stock</td>
+                                <td class="add-pr">
+                                    <a class="btn hvr-hover" href="#">Add to Cart</a>
+                                </td>
+                                <td class="remove-pr">
+                                    <a href="#">
+                                <i class="fas fa-times"></i>
+                            </a>
+                                </td>
+                            </tr>
+                            <tr>
+                                <td class="thumbnail-img">
+                                    <a href="#">
+                                <img class="img-fluid" src="images/img-pro-03.jpg" alt="" />
+                            </a>
+                                </td>
+                                <td class="name-pr">
+                                    <a href="#">
+                                Lorem ipsum dolor sit amet
+                            </a>
+                                </td>
+                                <td class="price-pr">
+                                    <p>$ 30.0</p>
+                                </td>
+                                <td class="quantity-box">In Stock</td>
+                                <td class="add-pr">
+                                    <a class="btn hvr-hover" href="#">Add to Cart</a>
+                                </td>
+                                <td class="remove-pr">
+                                    <a href="#">
+                                <i class="fas fa-times"></i>
+                            </a>
+                                </td>
+                            </tr> -->
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<%- include('./client/layouts/footer') %>
+<%- include('./client/layouts/script') %>

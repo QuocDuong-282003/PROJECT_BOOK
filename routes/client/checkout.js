@@ -171,7 +171,8 @@ router.get('/vnpay_return', function (req, res, next) {
             updateStatus(vnp_Params['vnp_TxnRef'], -1);
         }
         clearCart(req.session.user.id);
-        res.render('client/success', {code: vnp_Params['vnp_ResponseCode'], title   : 'Thanh toán thành công', message: 'Thanh toán thành công. Mã đơn hàng của bạn là: ' + vnp_Params['vnp_TxnRef']})
+        // res.render('client/success', {code: vnp_Params['vnp_ResponseCode'], title   : 'Thanh toán thành công', message: 'Thanh toán thành công. Mã đơn hàng của bạn là: ' + vnp_Params['vnp_TxnRef']})
+        return res.redirect("/orderlist");
     } else{
         res.render('client/success', {code: '97'})
     }

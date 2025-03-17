@@ -19,7 +19,6 @@ const { scheduleDeleteExpiredDiscounts } = require('./controller/admin/discountC
 //
 var indexRouter = require('./routes/client/index');
 var indexADMIN = require('./routes/admin/indexADMIN');
-var cartRouter = require('./routes/client/cart');
 var authRouter = require('./routes/client/auth');
 const Cart = require('./models/Cart');
 const app = express();
@@ -100,6 +99,7 @@ var productsRouter = require('./routes/client/products');
 var productdetail = require('./routes/client/productdetail');
 var cartRouter = require('./routes/client/cart');
 var vnpayRouter = require('./routes/client/checkout');
+var orderListRouter = require('./routes/client/order-list');
 // Admin routes
 var authsRouter = require('./routes/admin/auth');
 var userRouter = require('./routes/admin/users');
@@ -118,7 +118,7 @@ app.use('/cart', cartRouter);
 app.use('/admin', indexADMIN);
 app.use('/auth', authRouter);
 app.use('/checkout', vnpayRouter);
-
+app.use('/orderlist',orderListRouter);
 
 
 const { checkAdmin } = require('./controller/admin/auth.controller');
