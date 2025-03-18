@@ -40,7 +40,7 @@ exports.createBook = async (req, res) => {
             author,
             categoryId,
             publisherId,
-            price,
+            price: parseFloat(price), // Giá tiền được nhập dưới dạng nghìn đồng
             stock,
             description,
             coverImage: req.file ? `/uploads/${req.file.filename}` : "/uploads/default.jpg"
@@ -53,7 +53,6 @@ exports.createBook = async (req, res) => {
     }
 };
 
-// Cập nhật sách
 exports.updateBook = async (req, res) => {
     try {
         const { title, author, categoryId, publisherId, price, stock, description } = req.body;
@@ -62,7 +61,7 @@ exports.updateBook = async (req, res) => {
             author,
             categoryId,
             publisherId,
-            price,
+            price: parseFloat(price), // Giá tiền được nhập dưới dạng nghìn đồng
             stock,
             description,
             coverImage: req.file ? `/uploads/${req.file.filename}` : req.body.oldCoverImage
@@ -74,7 +73,6 @@ exports.updateBook = async (req, res) => {
         res.status(500).send("Lỗi server khi cập nhật sách.");
     }
 };
-
 // Xóa sách
 exports.deleteBook = async (req, res) => {
     try {

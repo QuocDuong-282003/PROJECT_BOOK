@@ -1,6 +1,7 @@
 <%- include('../layouts/style') %>
 <%- include('../layouts/head') %>
 <%- include('../layouts/menu-list', { path: 'books', title: 'Quản lý Sách' }) %>
+
 <div class="col-xl-12 col-md-12">
     <div class="card table-card">
         <div class="card-header">
@@ -8,10 +9,10 @@
                 <h5><%= title || 'Quản lý Sách' %></h5>
                 <h5>Tổng số sách: <strong><%= totalBooks %></strong></h5>
                 <button type="button" class="btn btn-success" data-toggle="modal" data-target="#addBookModal">
-                    <i class="feather icon-plus"></i>
+                    <i class="feather icon-plus"></i> Thêm Sách
                 </button>
                 <form action="/admin/books/search" method="GET" class="search-container">
-                    <input type="text" name="query" class="form-control" placeholder="Search..">
+                    <input type="text" name="query" class="form-control" placeholder="Tìm kiếm sách...">
                     <button type="submit" class="btn btn-primary">
                         <i class="feather icon-search"></i>
                     </button>
@@ -30,22 +31,22 @@
                 </div>
             </div>
         </div>
-        
+
         <div class="card-body p-0">
             <div class="container mt-3">
                 <div class="table-responsive">
                     <table class="table table-hover mb-0" id="bookTable">
                         <thead>
                             <tr>
-                                <th class="text-center">NO</th>
-                                <th class="text-center">Title</th>
-                                <th class="text-center">Author</th>
-                                <th class="text-center">Category</th>
-                                <th class="text-center">Publisher</th>
-                                <th class="text-center">Price</th>
-                                <th class="text-center">Stock</th>
-                                <th class="text-center">Status</th>
-                                <th class="text-center">Actions</th>
+                                <th class="text-center">STT</th>
+                                <th class="text-center">Tiêu đề</th>
+                                <th class="text-center">Tác giả</th>
+                                <th class="text-center">Danh mục</th>
+                                <th class="text-center">Nhà xuất bản</th>
+                                <th class="text-center">Giá tiền</th>
+                                <th class="text-center">Số lượng</th>
+                                <th class="text-center">Trạng thái</th>
+                                <th class="text-center">Hành động</th>
                             </tr>
                         </thead>
                         <tbody>
@@ -56,18 +57,22 @@
                                     <td class="text-center"><%= book.author %></td>
                                     <td class="text-center"><%= book.categoryId?.name || "Chưa có danh mục" %></td>
                                     <td class="text-center"><%= book.publisherId?.name || "Chưa có NXB" %></td>
-                                    <td class="text-center"><%= book.price %> VNĐ</td>
+                                    <td class="text-center"><%= book.price.toLocaleString('vi-VN') %> VND</td>
                                     <td class="text-center"><%= book.stock %></td>
-                                    <td class="text-center"><%= book.isDeleted ? 'Inactive' : 'Active' %></td>
+                                    <td class="text-center">
+                                        <span class="badge <%= book.isDeleted ? 'badge-danger' : 'badge-success' %>">
+                                            <%= book.isDeleted ? 'Inactive' : 'Active' %>
+                                        </span>
+                                    </td>
                                     <td class="text-center">
                                         <!-- Nút mở modal cập nhật -->
-                                        <button type="button" class="btn btn-info" data-toggle="modal" data-target="#editBookModal-<%= book._id %>">
+                                        <button type="button" class="btn btn-info btn-sm" data-toggle="modal" data-target="#editBookModal-<%= book._id %>">
                                             <i class="feather icon-edit"></i>
                                         </button>
                                         
                                         <!-- Form xóa sách -->
                                         <form action="/admin/books/delete/<%= book._id %>" method="POST" style="display:inline;">
-                                            <button type="submit" class="btn btn-danger" onclick="return confirm('Bạn có chắc chắn muốn xóa sách này?');">
+                                            <button type="submit" class="btn btn-danger btn-sm" onclick="return confirm('Bạn có chắc chắn muốn xóa sách này?');">
                                                 <i class="feather icon-trash-2"></i>
                                             </button>
                                         </form>
@@ -104,15 +109,15 @@
             <div class="modal-body">
                 <form action="/admin/books" method="POST" enctype="multipart/form-data">
                     <div class="form-group">
-                        <label>Title</label>
+                        <label>Tiêu đề</label>
                         <input type="text" class="form-control" name="title" required>
                     </div>
                     <div class="form-group">
-                        <label>Author</label>
+                        <label>Tác giả</label>
                         <input type="text" class="form-control" name="author" required>
                     </div>
                     <div class="form-group">
-                        <label>Category</label>
+                        <label>Danh mục</label>
                         <select class="form-control" name="categoryId" required>
                             <% categories.forEach(category => { %>
                                 <option value="<%= category._id %>"><%= category.name %></option>
@@ -120,7 +125,7 @@
                         </select>
                     </div>
                     <div class="form-group">
-                        <label>Publisher</label>
+                        <label>Nhà xuất bản</label>
                         <select class="form-control" name="publisherId" required>
                             <% publishers.forEach(publisher => { %>
                                 <option value="<%= publisher._id %>"><%= publisher.name %></option>
@@ -128,23 +133,23 @@
                         </select>
                     </div>
                     <div class="form-group">
-                        <label>Description</label>
+                        <label>Mô tả</label>
                         <textarea class="form-control" name="description"></textarea>
                     </div>
                     <div class="form-group">
-                        <label>Price</label>
-                        <input type="number" class="form-control" name="price" required>
+                        <label>Giá tiền (nghìn đồng)</label>
+                        <input type="number" class="form-control" name="price" min="0" required>
                     </div>
                     <div class="form-group">
-                        <label>Stock</label>
+                        <label>Số lượng</label>
                         <input type="number" class="form-control" name="stock" required>
                     </div>
                     <div class="form-group">
-                        <label>Cover Image</label>
+                        <label>Ảnh bìa</label>
                         <input type="file" class="form-control" name="coverImage">
                     </div>
                     <div class="modal-footer">
-                        <button type="button" class="btn btn-secondary" data-dismiss="modal">Close</button>
+                        <button type="button" class="btn btn-secondary" data-dismiss="modal">Đóng</button>
                         <button type="submit" class="btn btn-primary">Thêm Sách</button>
                     </div>
                 </form>
@@ -165,15 +170,15 @@
                 <div class="modal-body">
                     <form action="/admin/books/update/<%= book._id %>" method="POST" enctype="multipart/form-data">
                         <div class="form-group">
-                            <label>Title</label>
+                            <label>Tiêu đề</label>
                             <input type="text" class="form-control" name="title" value="<%= book.title %>" required>
                         </div>
                         <div class="form-group">
-                            <label>Author</label>
+                            <label>Tác giả</label>
                             <input type="text" class="form-control" name="author" value="<%= book.author %>" required>
                         </div>
                         <div class="form-group">
-                            <label>Category</label>
+                            <label>Danh mục</label>
                             <select class="form-control" name="categoryId" required>
                                 <% categories.forEach(category => { %>
                                     <option value="<%= category._id %>" <%= book.categoryId?._id.toString() === category._id.toString() ? 'selected' : '' %>>
@@ -183,7 +188,7 @@
                             </select>
                         </div>
                         <div class="form-group">
-                            <label>Publisher</label>
+                            <label>Nhà xuất bản</label>
                             <select class="form-control" name="publisherId" required>
                                 <% publishers.forEach(publisher => { %>
                                     <option value="<%= publisher._id %>" <%= book.publisherId?._id.toString() === publisher._id.toString() ? 'selected' : '' %>>
@@ -193,24 +198,24 @@
                             </select>
                         </div>
                         <div class="form-group">
-                            <label>Description</label>
+                            <label>Mô tả</label>
                             <textarea class="form-control" name="description"><%= book.description %></textarea>
                         </div>
                         <div class="form-group">
-                            <label>Price</label>
+                            <label>Giá tiền (nghìn đồng)</label>
                             <input type="number" class="form-control" name="price" value="<%= book.price %>" required>
                         </div>
                         <div class="form-group">
-                            <label>Stock</label>
+                            <label>Số lượng</label>
                             <input type="number" class="form-control" name="stock" value="<%= book.stock %>" required>
                         </div>
                         <div class="form-group">
-                            <label>Cover Image</label>
+                            <label>Ảnh bìa</label>
                             <input type="file" class="form-control" name="coverImage">
                             <small>Ảnh hiện tại: <img src="<%= book.coverImage %>" alt="Cover" width="100"></small>
                         </div>
                         <div class="modal-footer">
-                            <button type="button" class="btn btn-secondary" data-dismiss="modal">Close</button>
+                            <button type="button" class="btn btn-secondary" data-dismiss="modal">Đóng</button>
                             <button type="submit" class="btn btn-primary">Cập Nhật</button>
                         </div>
                     </form>
