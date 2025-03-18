@@ -111,7 +111,13 @@
                           <!-- Nút xem đơn hàng -->
                           <button type="button" class="btn btn-primary btn-sm" data-toggle="modal" data-target="#ordersUserModal-<%= user._id %>">
                               <i class="feather icon-shopping-cart"></i> Xem đơn hàng
-                          </button>    
+                          </button>   
+                    
+                            <!-- Nút xem thống kê đăng nhập -->
+                            <!-- <button type="button" class="btn btn-info btn-sm" data-toggle="modal" data-target="#loginStatsModal-<%= user._id %>">
+                                <i class="feather icon-bar-chart-2"></i>
+                            </button> -->
+                        
                       </td>
                   </tr>
               <% }) %>
@@ -301,6 +307,8 @@
       </div>
     </div>
   </div>
+
+
   <div class="modal fade" id="userDetailModal-<%= user._id %>" tabindex="-1" role="dialog" aria-labelledby="userDetailModalLabel" aria-hidden="true">
     <div class="modal-dialog" role="document">
       <div class="modal-content">
@@ -324,6 +332,49 @@
       </div>
     </div>
   </div>
+
+  <!-- <div class="modal fade" id="loginStatsModal-<%= user._id %>" tabindex="-1" role="dialog" aria-labelledby="loginStatsModalLabel" aria-hidden="true">
+    <div class="modal-dialog" role="document">
+      <div class="modal-content">
+        <div class="modal-header">
+          <h5 class="modal-title" id="loginStatsModalLabel">Thống kê đăng nhập của <%= user.name %></h5>
+          <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+            <span aria-hidden="true">&times;</span>
+          </button>
+        </div>
+        <div class="modal-body">
+          <p><strong>Số lần đăng nhập:</strong> <%= user.loginCount %></p>
+          <p><strong>Lần đăng nhập cuối cùng:</strong> <%= user.lastLoginAt ? user.lastLoginAt.toLocaleString() : 'Chưa đăng nhập' %></p>
+          <h5>Lịch sử đăng nhập</h5>
+          <table class="table table-bordered">
+            <thead>
+              <tr>
+                <th>#</th>
+                <th>Thời gian đăng nhập</th>
+              </tr>
+            </thead>
+            <tbody>
+              <% if (user.loginHistory && user.loginHistory.length > 0) { %>
+                <% user.loginHistory.forEach((login, index) => { %>
+                  <tr>
+                    <td><%= index + 1 %></td>
+                    <td><%= login.loginAt.toLocaleString() %></td>
+                  </tr>
+                <% }) %>
+              <% } else { %>
+                <tr>
+                  <td colspan="2" class="text-center">Không có lịch sử đăng nhập.</td>
+                </tr>
+              <% } %>
+            </tbody>
+          </table>
+        </div>
+        <div class="modal-footer">
+          <button type="button" class="btn btn-secondary" data-dismiss="modal">Đóng</button>
+        </div>
+      </div>
+    </div>
+  </div> -->
  <% }) %>
   
 <%- include('../layouts/footer') %>

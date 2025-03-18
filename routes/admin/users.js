@@ -22,5 +22,10 @@ router.get('/search', userController.searchUsers);
 
 // Route để lấy đơn hàng của người dùng
 router.get('/:id/orders', userController.getUserOrders);
+// Route để cập nhật thống kê đăng nhập
+// router.post('/:id/update-login-stats', userController.updateLoginStats);
+
+// // Route để lấy thống kê đăng nhập của người dùng
+// router.get('/:id/login-stats', userController.getUserLoginStats);
 
 module.exports = router;

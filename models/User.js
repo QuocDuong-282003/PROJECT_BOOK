@@ -12,8 +12,13 @@ const userSchema = new mongoose.Schema({
     accessCount: { type: Number, default: 0 },
     isActive: { type: Boolean, default: true },
     isAdmin: { type: Boolean, default: false },
-    resetPasswordToken: String
-    
+    resetPasswordToken: String,
+    orders: [{ type: mongoose.Schema.Types.ObjectId, ref: 'Order' }],
+    loginCount: { type: Number, default: 0 }, // Số lần đăng nhập
+    lastLoginAt: Date, // Thời gian đăng nhập cuối cùng
+    loginHistory: [{
+        loginAt: { type: Date, default: Date.now }, // Lịch sử đăng nhập
+    }],
 }, { timestamps: true });
 
 // Hash password trước khi lưu

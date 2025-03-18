@@ -105,7 +105,7 @@ exports.getAllUsers = async (req, res) => {
 
         // Sắp xếp người dùng: admin hiển thị đầu tiên
         const users = await User.find()
-            .sort({ role: +1 }) // Sắp xếp theo role: admin (-1) sẽ lên đầu
+            .sort({ role: +1 }) // Sắp xếp theo role: admin (+1) sẽ lên đầu
             .skip(skip)
             .limit(limit);
 
@@ -159,7 +159,7 @@ exports.searchUsers = async (req, res) => {
 
 
 
-// Lấy đơn hàng của người dùng
+// // Lấy đơn hàng của người dùng
 exports.getUserOrders = async (req, res) => {
     try {
         const userId = req.params.id;
@@ -172,3 +172,45 @@ exports.getUserOrders = async (req, res) => {
         res.status(500).send('Lỗi server khi lấy đơn hàng của người dùng.');
     }
 };
+// // Cập nhật thống kê đăng nhập
+// exports.updateLoginStats = async (req, res) => {
+//     try {
+//         const userId = req.params.id;
+
+//         // Tìm người dùng theo userId
+//         const user = await User.findById(userId);
+//         if (!user) {
+//             return res.status(404).json({ error: 'Không tìm thấy người dùng.' });
+//         }
+
+//         // Cập nhật thống kê đăng nhập
+//         user.loginCount += 1;
+//         user.lastLoginAt = new Date();
+//         user.loginHistory.push({ loginAt: new Date() });
+//         await user.save();
+
+//         res.status(200).json({ message: 'Cập nhật thống kê đăng nhập thành công.' });
+//     } catch (err) {
+//         res.status(500).json({ error: 'Lỗi server khi cập nhật thống kê đăng nhập.' });
+//     }
+// };
+// // Lấy thống kê đăng nhập của người dùng
+// exports.getUserLoginStats = async (req, res) => {
+//     try {
+//         const userId = req.params.id;
+
+//         // Tìm người dùng theo userId
+//         const user = await User.findById(userId).select('loginCount lastLoginAt loginHistory');
+//         if (!user) {
+//             return res.status(404).json({ error: 'Không tìm thấy người dùng.' });
+//         }
+
+//         res.status(200).json({
+//             loginCount: user.loginCount,
+//             lastLoginAt: user.lastLoginAt,
+//             loginHistory: user.loginHistory,
+//         });
+//     } catch (err) {
+//         res.status(500).json({ error: 'Lỗi server khi lấy thống kê đăng nhập.' });
+//     }
+// };

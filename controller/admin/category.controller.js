@@ -48,7 +48,6 @@ exports.getCategories = async (req, res) => {
         res.status(500).send("Lỗi server khi lấy danh sách danh mục.");
     }
 };
-// Tìm kiếm danh mục
 
 // Tìm kiếm danh mục
 exports.searchCategories = async (req, res) => {
