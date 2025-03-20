@@ -1,0 +1,103 @@
+<%- include('./layouts/style') %>
+<%- include('./layouts/head') %>
+<%- include('./layouts/menu-list') %>
+
+<div class="col-xl-12 col-md-12">
+
+    <div class="card table-card">
+        <div class="card-header">
+            <div class="title-container">
+                <h5><%= title %></h5>
+                <span class="search-container">
+                    <form action="/admin/publishers" method="GET"
+                        class="d-flex">
+                        <input id="Search" class="form-control" type="search"
+                            name="search" placeholder="Search..."
+                            value="<%= typeof searchQuery !== 'undefined' ? searchQuery : '' %>">
+                        <button type="submit" class="btn btn-primary">
+                            <i class="feather icon-search"></i>
+                        </button>
+                    </form>
+                </span>
+            </div>
+
+            <button type="button" class="btn btn-success" data-toggle="modal"
+                data-target="#exampleModalLive"><i
+                    class="feather icon-plus"></i></button>
+        </div>
+        <div class="card-body p-0">
+            <div class="table-responsive">
+                <table class="table table-hover mb-0">
+                    <thead>
+                        <tr>
+                            <th class="text-center">NO</th>
+                            <th class="text-center">Tên Nhà Xuất Bản</th>
+                            <th class="text-center">Quốc Gia</th>
+                            <th class="text-center">Sách</th>
+                            <th class="text-center">Hành Động</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        <% publishers.forEach((publisher, index) => { %>
+                        <tr>
+                            <td class="text-center"><%= index + 1 %></td>
+                            <td class="text-center"><%= publisher.name %></td>
+                            <td class="text-center"><%= publisher.country
+                                %></td>
+                            <td class="text-center">
+                                <% if (publisher.books.length > 0) { %>
+                                <ul>
+                                    <% publisher.books.forEach(book => { %>
+                                    <li><%= book.title %> - <%= book.author
+                                        %></li>
+                                    <% }); %>
+                                </ul>
+                                <% } else { %>
+                                <p>Không có sách</p>
+                                <% } %>
+                            </td>
+                            <td style="text-align: center;">
+                                <button class="btn btn-info editBtn"
+                                    data-id="<%= publisher._id %>"
+                                    data-name="<%= publisher.name %>"
+                                    data-country="<%= publisher.country %>"
+                                    data-books="<%= JSON.stringify(publisher.books) %>"
+                                    data-toggle="modal"
+                                    data-target="#updateModalLive">
+                                    Edit
+                                </button>
+                                <form
+                                    action="/admin/publisher/delete/<%= publisher._id %>?_method=DELETE"
+                                    method="POST" style="display:inline;">
+                                    <button type="submit"
+                                        class="btn btn-danger">
+                                        <i class="feather icon-trash-2"></i>
+                                    </button>
+                                </form>
+                            </td>
+                        </tr>
+                        <% }); %>
+                    </tbody>
+                </table>
+            </div>
+
+            <!-- PHÂN TRANG -->
+            <nav>
+                <ul class="pagination">
+                    <% for(let i = 1; i <= totalPages; i++) { %>
+                    <li
+                        class="page-item <%= i === currentPage ? 'active' : '' %>">
+                        <a class="page-link"
+                            href="/admin/publishers?page=<%= i %>"><%= i %></a>
+                    </li>
+                    <% } %>
+                </ul>
+            </nav>
+        </div>
+    </div>
+</div>
+
+<%- include('./model-insert-publisher') %>
+<%- include('./model-update-publisher') %>
+<%- include('./layouts/footer') %>
+<%- include('./layouts/script') %>

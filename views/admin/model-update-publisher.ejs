@@ -1,0 +1,33 @@
+<!-- Update Modal -->
+<div class="modal fade" id="updateModalLive" tabindex="-1" role="dialog"
+    aria-labelledby="updateModalLiveLabel" aria-hidden="true">
+    <div class="modal-dialog" role="document">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title" id="updateModalLiveLabel">Cập Nhật Nhà
+                    Xuất Bản</h5>
+                <button type="button" class="close" data-dismiss="modal"
+                    aria-label="Close">
+                    <span aria-hidden="true">&times;</span>
+                </button>
+            </div>
+            <div class="modal-body">
+                <form id="updateForm" method="POST">
+                    <input type="hidden" id="publisherId" name="publisherId">
+                    <div class="form-group">
+                        <label for="name">Tên Nhà Xuất Bản</label>
+                        <input type="text" class="form-control" id="name"
+                            name="name" required>
+                    </div>
+                    <div class="form-group">
+                        <label for="country">Quốc Gia</label>
+                        <input type="text" class="form-control" id="country"
+                            name="country">
+                    </div>
+                    <button type="submit" class="btn btn-primary">Cập
+                        Nhật</button>
+                </form>
+            </div>
+        </div>
+    </div>
+</div>
