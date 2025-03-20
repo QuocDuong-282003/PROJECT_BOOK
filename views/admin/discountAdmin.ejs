@@ -9,13 +9,23 @@
             <div class="title-container">
                 <h5><%= title %></h5>
                 <span class="search-container">
-                    <label for="Search">
+                    <!-- <label for="Search">
                         <input id="Search" class="form-control" type="search"
                             placeholder="Search..">
                     </label>
                     <button type="button" class="btn btn-primary">
                         <i class="feather icon-search"></i>
-                    </button>
+                    </button> -->
+                    <form action="/admin/discounts" method="GET" class="d-flex">
+                        <input id="Search" class="form-control" type="search"
+                            name="search"
+                            placeholder="Search..."
+                            value="<%= typeof searchQuery !== 'undefined' ? searchQuery : '' %>">
+
+                        <button type="submit" class="btn btn-primary">
+                            <i class="feather icon-search"></i>
+                        </button>
+                    </form>
 
                 </span>
 
@@ -152,4 +162,8 @@
             });
         });
     });
+    function searchDiscounts() {
+        const searchValue = document.getElementById('Search').value;
+        window.location.href = `/admin/search?search=${encodeURIComponent(searchValue)}`;
+    }
     </script>

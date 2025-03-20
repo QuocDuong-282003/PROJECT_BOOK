@@ -1,4 +1,4 @@
-// controllers/discountController.js
+
 const Discount = require('../../models/Discount');
 const mongoose = require('mongoose');
 const cron = require('node-cron');
@@ -8,16 +8,13 @@ exports.renderDiscountPage = async (req, res, next) => {
     try {
         const perPage = 10; // Số lượng discount trên mỗi trang
         const page = parseInt(req.query.page) || 1; // Lấy số trang từ query, mặc định là 1
-
         // Đếm tổng số discount
         const totalDiscounts = await Discount.countDocuments();
         const totalPages = Math.ceil(totalDiscounts / perPage); // Tính tổng số trang
 
-        // Lấy danh sách discount theo trang
         const discounts = await Discount.find()
-            .skip((page - 1) * perPage)
-            .limit(perPage);
-
+            .skip((page - 1) * perPage) // bỏ qua sl bản ghi 
+            .limit(perPage);// lấy bản ghi tiếp theo
         // Nếu không có discount nào
         if (discounts.length === 0) {
             return res.render('discountAdmin', {
@@ -29,7 +26,6 @@ exports.renderDiscountPage = async (req, res, next) => {
                 totalPages
             });
         }
-
         // Render trang với danh sách discount
         res.render('discountAdmin', {
             title: 'Discounts',
@@ -124,4 +120,39 @@ exports.scheduleDeleteExpiredDiscounts = () => {
         console.log('🕰️ Đang kiểm tra và xóa mã giảm giá hết hạn...');
         await exports.deleteExpiredDiscounts();
     });
+};
+// search
+exports.getDiscounts = async (req, res) => {
+    try {
+        let searchQuery = req.query.search || ''; // Lấy giá trị tìm kiếm từ query string
+        let page = parseInt(req.query.page) || 1; // Lấy số trang từ query string, mặc định là 1
+        let limit = 10; // Số lượng kết quả trên mỗi trang
+        let skip = (page - 1) * limit; // Tính vị trí bỏ qua
+
+        let filter = {}; // Điều kiện tìm kiếm mặc định (lấy tất cả)
+        if (searchQuery) {
+            filter = {
+                code: { $regex: searchQuery, $options: 'i' }
+            };
+        }
+
+        //  tổng số lượng discount để tính tổng số trang
+        const totalDiscounts = await Discount.countDocuments(filter);
+        const totalPages = Math.ceil(totalDiscounts / limit);
+
+        // Truy vấn MongoDB ,tìm kiếm, phân trang
+        const discounts = await Discount.find(filter).skip(skip).limit(limit);
+
+        res.render('discountAdmin', {
+            discounts,
+            searchQuery,
+            currentPage: page,
+            totalPages,
+            title: "Quản lý Mã Giảm Giá",
+            path: "discounts"
+        });
+    } catch (error) {
+        console.error(error);
+        res.status(500).send("Lỗi Server");
+    }
 };

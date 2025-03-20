@@ -17,7 +17,6 @@ const methodOverride = require('method-override');
 const { scheduleDeleteExpiredDiscounts } = require('./controller/admin/discountController');
 
 
-
 //
 var indexRouter = require('./routes/client/index');
 var indexADMIN = require('./routes/admin/indexADMIN');
@@ -76,6 +75,7 @@ scheduleDeleteExpiredDiscounts();
 
 
 // Middleware
+app.use(cookieParser());
 app.use(express.json());
 app.use(bodyParser.urlencoded({ extended: true }));
 app.use(bodyParser.json());
@@ -84,6 +84,8 @@ app.use(express.json());
 
 
 //
+//
+
 app.use('/', indexRouter);
 // ✅ Tạo tài khoản admin mặc định
 const User = require('./models/User');
