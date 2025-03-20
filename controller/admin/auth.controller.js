@@ -75,7 +75,7 @@ exports.checkAdmin = (req, res, next) => {
 
         const decoded = jwt.verify(token, process.env.JWT_SECRET);
 
-        if (!decoded || decoded.role !== 'admin') {
+        if (!decoded || decoded.role !== 1) {
             res.clearCookie('token');
             return res.redirect('/admin/auth/login');
         }
