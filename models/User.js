@@ -14,7 +14,6 @@ const userSchema = new mongoose.Schema({
     isActive: { type: Boolean, default: true },
     isAdmin: { type: Boolean, default: false },
     resetPasswordToken: String,
-    orders: [{ type: mongoose.Schema.Types.ObjectId, ref: 'Order' }],
     loginCount: { type: Number, default: 0 }, // Số lần đăng nhập
     lastLoginAt: Date, // Thời gian đăng nhập cuối cùng
     loginHistory: [{

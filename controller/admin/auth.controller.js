@@ -9,57 +9,41 @@ exports.renderLogin = (req, res) => {
 // Xử lý đăng nhập
 exports.login = async (req, res) => {
     try {
-        const { email, password } = req.body;
-        console.log('Email:', email);
-        console.log('Password từ request:', password);
-       
+        const { email, password } = req.body;  
         // Kiểm tra đuôi email
         if (!email.endsWith('.admin')) {
             return res.render('admin/auth/login', { error: 'Chỉ email có đuôi ".admin" mới được truy cập!' });
         }
-
         // Kiểm tra có admin chưa
-        const existingAdmin = await User.findOne({ role: 'admin' });
-        console.log('Existing admin:', existingAdmin);
-
+        const existingAdmin = await User.findOne({ role: 1 });
         if (!existingAdmin) {
             // Nếu chưa có admin, tạo admin mới
             const newAdmin = await User.create({
                 name: 'Admin',
                 email,
                 password, // Không cần mã hóa thủ công, hook sẽ xử lý
-                role: 'admin',
+                role: 1,
                 isAdmin: true
             });
             console.log('✅ Tài khoản admin đã được tạo:', newAdmin);
         }
-
         // Tìm user trong database
         const user = await User.findOne({ email });
-        console.log('User từ database:', user);
-
         if (!user) {
             return res.render('admin/auth/login', { error: 'Tài khoản không tồn tại!' });
         }
-
         // Kiểm tra mật khẩu
         const isMatch = await user.matchPassword(password);
-        console.log('Kết quả so sánh mật khẩu:', isMatch);
         if (!isMatch) {
             return res.render('admin/auth/login', { error: 'Mật khẩu không đúng!' });
         }
-
-        const admin = await User.findOne({ role: 'admin' });
-        console.log('Mật khẩu trong database:', admin.password);
-
+        const admin = await User.findOne({ role: 1 });
         // Kiểm tra role
-        if (user.role !== 'admin') {
+        if (user.role !== 1) {
             return res.render('admin/auth/login', { error: 'Bạn không có quyền truy cập!' });
         }
-
         // Tạo token JWT
         const token = jwt.sign({ id: user._id, role: user.role }, process.env.JWT_SECRET, { expiresIn: '1h' });
-
         // Lưu token vào cookie
         res.cookie('token', token, {
             httpOnly: true,

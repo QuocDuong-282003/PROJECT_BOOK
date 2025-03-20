@@ -120,10 +120,8 @@ const increaseQuantity = async (userId, bookId) => {
 
         // Tăng số lượng sản phẩm
         cart.items[itemIndex].quantity += 1;
-        cart.totalPrice = parseFloat(
-            cart.items.reduce((total, item) => total + item.quantity * item.price, 0).toFixed(2)
-        );
-        console.log(cart.totalPrice);
+        console.log(`📌 Số lượng mới: ${cart.items[itemIndex].quantity}`);
+
         // Lưu lại thay đổi
         await cart.save();
 
