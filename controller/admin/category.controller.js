@@ -1,9 +1,16 @@
 const Category = require("../../models/Category");
 const Book = require("../../models/Book");
 
-// Hiển thị danh sách danh mục với thống kê số sách
+
+// Hiển thị danh sách danh mục với phân trang
+
 exports.getCategories = async (req, res) => {
     try {
+        const page = parseInt(req.query.page) || 1; // Trang hiện tại, mặc định là 1
+        const limit = 10; // Số danh mục hiển thị trên mỗi trang
+        const skip = (page - 1) * limit; // Vị trí bắt đầu lấy dữ liệu
+
+        // Lấy danh sách danh mục với phân trang
         const categories = await Category.aggregate([
             {
                 $lookup: {
@@ -20,29 +27,43 @@ exports.getCategories = async (req, res) => {
                     bookCount: { $size: "$books" }, // Đếm số sách thuộc mỗi danh mục
                 },
             },
+            { $skip: skip }, // Bỏ qua các bản ghi trước đó
+            { $limit: limit }, // Giới hạn số bản ghi trên mỗi trang
         ]);
-        res.render("admin/category/category", {
+
+        // Đếm tổng số danh mục để tính tổng số trang
+        const totalCategories = await Category.countDocuments();
+        const totalPages = Math.ceil(totalCategories / limit); // Tổng số trang
+
+        // Render view và truyền các biến cần thiết
+        res.render("admin/category/categoriesAdmin", {
             categories,
-            totalCategories: categories.length,
+            totalCategories,
+            totalPages, // Truyền biến totalPages vào view
+            currentPage: page, // Truyền biến currentPage vào view
             path: "categories",
             title: "Quản lý Danh mục",
-            currentPage: 1,
         });
     } catch (err) {
-        res.status(500).json({ message: "Lỗi server khi lấy danh sách danh mục." });
+        res.status(500).send("Lỗi server khi lấy danh sách danh mục.");
     }
 };
 
 // Tìm kiếm danh mục
 exports.searchCategories = async (req, res) => {
     try {
-        const searchQuery = req.query.q; // Lấy từ khóa tìm kiếm từ query string
+        const query = req.query.query; // Lấy từ khóa tìm kiếm từ query string
+        const page = parseInt(req.query.page) || 1; // Trang hiện tại, mặc định là 1
+        const limit = 10; // Số danh mục hiển thị trên mỗi trang
+        const skip = (page - 1) * limit; // Vị trí bắt đầu lấy dữ liệu
+
+        // Tìm kiếm danh mục
         const categories = await Category.aggregate([
             {
                 $match: {
                     $or: [
-                        { name: { $regex: searchQuery, $options: "i" } }, // Tìm kiếm theo tên (không phân biệt hoa thường)
-                        { description: { $regex: searchQuery, $options: "i" } }, // Tìm kiếm theo mô tả
+                        { name: { $regex: query, $options: "i" } }, // Tìm kiếm theo tên (không phân biệt hoa thường)
+                        { description: { $regex: query, $options: "i" } }, // Tìm kiếm theo mô tả
                     ],
                 },
             },
@@ -58,47 +79,57 @@ exports.searchCategories = async (req, res) => {
                 $project: {
                     name: 1,
                     description: 1,
-                    bookCount: { $size: "$books" },
+                    bookCount: { $size: "$books" }, // Đếm số sách thuộc mỗi danh mục
                 },
             },
+            { $skip: skip }, // Bỏ qua các bản ghi trước đó
+            { $limit: limit }, // Giới hạn số bản ghi trên mỗi trang
         ]);
-        res.status(200).json(categories);
+
+        // Đếm tổng số danh mục phù hợp với từ khóa tìm kiếm
+        const totalCategories = await Category.countDocuments({
+            $or: [
+                { name: { $regex: query, $options: "i" } },
+                { description: { $regex: query, $options: "i" } },
+            ],
+        });
+        const totalPages = Math.ceil(totalCategories / limit); // Tổng số trang
+
+        // Render view và truyền các biến cần thiết
+        res.render("admin/category/categoriesAdmin", {
+            categories,
+            totalCategories,
+            totalPages, // Truyền biến totalPages vào view
+            currentPage: page, // Truyền biến currentPage vào view
+            path: "categories",
+            title: "Kết quả tìm kiếm",
+            query, // Truyền từ khóa tìm kiếm vào view
+        });
     } catch (err) {
-        res.status(500).json({ message: "Lỗi server khi tìm kiếm danh mục.", error: err.message });
+        res.status(500).send("Lỗi server khi tìm kiếm danh mục.");
     }
 };
-
 // Thêm danh mục mới
 exports.createCategory = async (req, res) => {
     try {
         const { name, description } = req.body;
-        if (!name) {
-            return res.status(400).json({ message: "Tên danh mục là bắt buộc." });
-        }
         const newCategory = new Category({ name, description });
         await newCategory.save();
-        res.status(201).json({ success: true, message: "Thêm danh mục thành công!" });
+        res.redirect("/admin/category");
     } catch (err) {
-        res.status(500).json({ message: "Lỗi server khi thêm danh mục.", error: err.message });
+        res.status(500).send("Lỗi server khi thêm danh mục.");
     }
 };
 
-// Chỉnh sửa danh mục
+// Cập nhật danh mục
 exports.updateCategory = async (req, res) => {
     try {
         const { name, description } = req.body;
         const categoryId = req.params.id;
-        const updatedCategory = await Category.findByIdAndUpdate(
-            categoryId,
-            { name, description },
-            { new: true }
-        );
-        if (!updatedCategory) {
-            return res.status(404).json({ message: "Không tìm thấy danh mục." });
-        }
-        res.status(200).json({ success: true, message: "Cập nhật danh mục thành công!" });
+        await Category.findByIdAndUpdate(categoryId, { name, description });
+        res.redirect("/admin/category");
     } catch (err) {
-        res.status(500).json({ message: "Lỗi server khi cập nhật danh mục." });
+        res.status(500).send("Lỗi server khi cập nhật danh mục.");
     }
 };
 
@@ -106,12 +137,9 @@ exports.updateCategory = async (req, res) => {
 exports.deleteCategory = async (req, res) => {
     try {
         const categoryId = req.params.id;
-        const deletedCategory = await Category.findByIdAndDelete(categoryId);
-        if (!deletedCategory) {
-            return res.status(404).json({ message: "Không tìm thấy danh mục." });
-        }
-        res.status(200).json({ success: true, message: "Xóa danh mục thành công!" });
+        await Category.findByIdAndDelete(categoryId);
+        res.redirect("/admin/category");
     } catch (err) {
-        res.status(500).json({ message: "Lỗi server khi xóa danh mục." });
+        res.status(500).send("Lỗi server khi xóa danh mục.");
     }
 };

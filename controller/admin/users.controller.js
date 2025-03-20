@@ -1,7 +1,9 @@
+// controllers/admin/users.controller.js
 const User = require('../../models/User');
 const Order = require('../../models/Order');
-const bcrypt = require('bcrypt');
+const bcrypt = require('bcryptjs');
 
+// Thêm người dùng
 exports.addUser = async (req, res) => {
     try {
         const { name, email, phone, address, role, password } = req.body;
@@ -9,7 +11,7 @@ exports.addUser = async (req, res) => {
         // Kiểm tra email đã tồn tại chưa
         const existingUser = await User.findOne({ email });
         if (existingUser) {
-            return res.status(400).json({ success: false, message: 'Email đã tồn tại.' });
+            return res.status(400).send('Email đã tồn tại.');
         }
 
         // Mã hóa mật khẩu
@@ -24,115 +26,17 @@ exports.addUser = async (req, res) => {
             address,
             role,
             password: hashedPassword,
-            isActive: true // Mặc định kích hoạt
+            isActive: true
         });
 
         await newUser.save();
-        res.json({ success: true, message: 'Thêm người dùng thành công.' });
+        res.redirect('/admin/users'); // Chuyển hướng về trang quản lý người dùng
     } catch (err) {
-        res.status(500).json({ success: false, message: 'Lỗi server khi thêm người dùng.', error: err.message });
-    }
-};
-// 📌 Lấy danh sách tất cả người dùng
-exports.getAllUsers = async (req, res) => {
-    try {
-        const page = parseInt(req.query.page) || 1;
-        const limit = 10; // Số lượng user mỗi trang
-        const skip = (page - 1) * limit;
-
-        const users = await User.find().skip(skip).limit(limit);
-        const totalUsers = await User.countDocuments(); // Đếm tổng số user
-        const totalPages = Math.ceil(totalUsers / limit);
-
-        res.render('admin/user/user', {
-            title: 'Quản lý Người dùng',
-            path: 'users',   // Thêm biến path để tránh lỗi
-            users,
-            totalUsers,
-            totalPages,
-            currentPage: page
-        });
-    } catch (error) {
-        console.error("Lỗi khi lấy danh sách người dùng:", error);
-        res.status(500).send("Lỗi server");
+        res.status(500).send('Lỗi server khi thêm người dùng.');
     }
 };
 
-// 📌 Lấy thông tin chi tiết người dùng
-exports.getUserById = async (req, res) => {
-    try {
-        const user = await User.findById(req.params.id).select('-password');
-        if (!user) {
-            return res.status(404).render('admin/error', { message: 'Không tìm thấy người dùng.' });
-        }
-        res.render('admin/user/user', { user }); // ⚡ Render giao diện chi tiết
-    } catch (err) {
-        res.status(500).render('admin/error', { message: 'Lỗi server khi lấy thông tin người dùng.', error: err.message });
-    }
-};
-
-// 📌 Toggle trạng thái hoạt động của người dùng
-exports.toggleUserStatus = async (req, res) => {
-    try {
-        const user = await User.findById(req.params.id);
-        if (!user) {
-            return res.status(404).render('admin/error', { message: 'Không tìm thấy người dùng.' });
-        }
-        user.isActive = !user.isActive;
-        await user.save();
-        res.redirect('/admin/user/user'); // ⚡ Quay về danh sách người dùng
-    } catch (err) {
-        res.status(500).render('admin/error', { message: 'Lỗi server khi cập nhật trạng thái người dùng.', error: err.message });
-    }
-};
-
-// 📌 Tìm kiếm & Lọc danh sách người dùng
-// 📌 Tìm kiếm & Lọc danh sách người dùng
-exports.searchUsers = async (req, res) => {
-    try {
-        const { query } = req.query; // Sửa từ `keyword` thành `query`
-        let filter = {};
-
-        if (query) {
-            filter.$or = [
-                { name: { $regex: query, $options: 'i' } },
-                { email: { $regex: query, $options: 'i' } },
-                { phone: { $regex: query, $options: 'i' } }
-            ];
-        }
-
-        const users = await User.find(filter).select('-password');
-        res.json({ success: true, users }); // Trả về JSON
-    } catch (err) {
-        res.status(500).json({ success: false, message: 'Lỗi server khi tìm kiếm người dùng.', error: err.message });
-    }
-};
-// 📌 Xóa người dùng
-exports.deleteUser = async (req, res) => {
-    try {
-        const userId = req.params.id;
-        const user = await User.findById(userId);
-
-        if (!user) {
-            return res.status(404).json({ success: false, message: 'Không tìm thấy người dùng.' });
-        }
-
-        if (user.role === 'admin') {
-            return res.status(403).json({ success: false, message: 'Không được phép xóa tài khoản admin.' });
-        }
-
-        await User.findByIdAndDelete(userId);
-        res.json({ success: true, message: 'Xóa người dùng thành công!' });
-    } catch (err) {
-        res.status(500).json({
-            success: false,
-            message: 'Lỗi server khi xóa người dùng.',
-            error: err.message
-        });
-    }
-};
-// 📌 Cập nhật thông tin người dùng
-// 📌 Cập nhật thông tin người dùng
+// Cập nhật người dùng
 exports.updateUser = async (req, res) => {
     try {
         const { name, email, phone, address, role, isActive } = req.body;
@@ -145,46 +49,37 @@ exports.updateUser = async (req, res) => {
         );
 
         if (!user) {
-            return res.status(404).json({ success: false, message: 'Không tìm thấy người dùng.' });
+            return res.status(404).send('Không tìm thấy người dùng.');
         }
 
-        res.json({ success: true, message: 'Cập nhật người dùng thành công.', user });
+        res.redirect('/admin/users'); // Chuyển hướng về trang quản lý người dùng
     } catch (err) {
-        res.status(500).json({ success: false, message: 'Lỗi server khi cập nhật người dùng.', error: err.message });
-    }
-};
-// 📌 Phân quyền người dùng (User, Admin)
-exports.updateUserRole = async (req, res) => {
-    try {
-        const { role } = req.body;
-        const user = await User.findByIdAndUpdate(req.params.id, { role }, { new: true });
-
-        if (!user) {
-            return res.status(404).render('admin/error', { message: 'Không tìm thấy người dùng.' });
-        }
-
-        res.redirect('/admin/user/user'); // ⚡ Quay về danh sách người dùng
-    } catch (err) {
-        res.status(500).render('admin/error', { message: 'Lỗi server khi cập nhật quyền người dùng.', error: err.message });
+        res.status(500).send('Lỗi server khi cập nhật người dùng.');
     }
 };
 
-// 📌 Xem lịch sử mua hàng của khách hàng
-exports.getUserOrders = async (req, res) => {
+// Xóa người dùng
+exports.deleteUser = async (req, res) => {
     try {
         const userId = req.params.id;
-        const orders = await Order.find({ userId }).populate('items.productId');
+        const user = await User.findById(userId);
 
-        if (!orders.length) {
-            return res.status(404).json({ success: false, message: 'Người dùng chưa có đơn hàng nào.' });
+        if (!user) {
+            return res.status(404).send('Không tìm thấy người dùng.');
         }
 
-        res.json({ success: true, orders });
+        if (user.role === 'admin') {
+            return res.status(403).send('Không được phép xóa tài khoản admin.');
+        }
+
+        await User.findByIdAndDelete(userId);
+        res.redirect('/admin/users'); // Chuyển hướng về trang quản lý người dùng
     } catch (err) {
-        res.status(500).json({ success: false, message: 'Lỗi server khi lấy lịch sử mua hàng.', error: err.message });
+        res.status(500).send('Lỗi server khi xóa người dùng.');
     }
 };
-// 📌 Đặt lại mật khẩu người dùng
+
+// Reset mật khẩu
 exports.resetPassword = async (req, res) => {
     try {
         const userId = req.params.id;
@@ -193,36 +88,129 @@ exports.resetPassword = async (req, res) => {
 
         const user = await User.findByIdAndUpdate(userId, { password: hashedPassword }, { new: true });
         if (!user) {
-            return res.status(404).json({ success: false, message: 'Không tìm thấy người dùng.' });
+            return res.status(404).send('Không tìm thấy người dùng.');
         }
 
-        res.json({ success: true, message: 'Đặt lại mật khẩu thành công!' });
+        res.redirect('/admin/users'); // Chuyển hướng về trang quản lý người dùng
     } catch (err) {
-        res.status(500).json({
-            success: false,
-            message: 'Lỗi server khi đặt lại mật khẩu.',
-            error: err.message
-        });
+        res.status(500).send('Lỗi server khi đặt lại mật khẩu.');
     }
 };
 
-// 📌 Lấy thống kê người dùng
-exports.getUserStatistics = async (req, res) => {
+exports.getAllUsers = async (req, res) => {
+    try {
+        const page = parseInt(req.query.page) || 1; // Trang hiện tại, mặc định là 1
+        const limit = 10; // Số lượng user mỗi trang
+        const skip = (page - 1) * limit;
+
+        // Sắp xếp người dùng: admin hiển thị đầu tiên
+        const users = await User.find()
+            .sort({ role: +1 }) // Sắp xếp theo role: admin (+1) sẽ lên đầu
+            .skip(skip)
+            .limit(limit);
+
+        const totalUsers = await User.countDocuments(); // Đếm tổng số user
+        const totalPages = Math.ceil(totalUsers / limit);
+
+        res.render('admin/user/user', {
+            title: 'Quản lý Người dùng',
+            users, // Truyền danh sách người dùng đã sắp xếp
+            totalUsers,
+            totalPages,
+            currentPage: page,
+            query: req.query.query || '', // Truyền từ khóa tìm kiếm (nếu có)
+        });
+    } catch (error) {
+        res.status(500).send('Lỗi server khi lấy danh sách người dùng.');
+    }
+};
+exports.searchUsers = async (req, res) => {
+    try {
+        const query = req.query.query || ''; // Lấy từ khóa tìm kiếm từ query string, mặc định là chuỗi rỗng
+        const page = parseInt(req.query.page) || 1; // Trang hiện tại, mặc định là 1
+        const limit = 10; // Số lượng người dùng hiển thị trên mỗi trang
+        const skip = (page - 1) * limit; // Vị trí bắt đầu lấy dữ liệu
+
+        // Tìm kiếm người dùng với từ khóa và phân trang
+        const users = await User.find({ name: { $regex: query, $options: 'i' } })
+            .skip(skip)
+            .limit(limit);
+
+        // Đếm tổng số người dùng phù hợp với từ khóa tìm kiếm
+        const totalUsers = await User.countDocuments({ name: { $regex: query, $options: 'i' } });
+
+        // Tính tổng số trang
+        const totalPages = Math.ceil(totalUsers / limit);
+
+        // Render template và truyền các biến cần thiết
+        res.render('admin/user/user', {
+            title: 'Quản lý Người dùng',
+            users: users,
+            totalUsers: totalUsers,
+            totalPages: totalPages, // Truyền tổng số trang vào template
+            currentPage: page, // Truyền trang hiện tại vào template
+            query: query, // Truyền từ khóa tìm kiếm vào template
+        });
+    } catch (error) {
+        console.error(error);
+        res.status(500).send('Lỗi server');
+    }
+};
+
+
+
+// // Lấy đơn hàng của người dùng
+exports.getUserOrders = async (req, res) => {
     try {
         const userId = req.params.id;
-        const user = await User.findById(userId);
-        const orders = await Order.find({ userId });
-
-        res.json({
-            success: true,
-            user,
-            orders
-        });
+        const user = await User.findById(userId).populate('orders');
+        if (!user) {
+            return res.status(404).send('Không tìm thấy người dùng.');
+        }
+        res.render('admin/orderAdmin', { orders: user.orders });
     } catch (err) {
-        res.status(500).json({
-            success: false,
-            message: 'Lỗi server khi lấy thống kê.',
-            error: err.message
-        });
+        res.status(500).send('Lỗi server khi lấy đơn hàng của người dùng.');
     }
 };
+// // Cập nhật thống kê đăng nhập
+// exports.updateLoginStats = async (req, res) => {
+//     try {
+//         const userId = req.params.id;
+
+//         // Tìm người dùng theo userId
+//         const user = await User.findById(userId);
+//         if (!user) {
+//             return res.status(404).json({ error: 'Không tìm thấy người dùng.' });
+//         }
+
+//         // Cập nhật thống kê đăng nhập
+//         user.loginCount += 1;
+//         user.lastLoginAt = new Date();
+//         user.loginHistory.push({ loginAt: new Date() });
+//         await user.save();
+
+//         res.status(200).json({ message: 'Cập nhật thống kê đăng nhập thành công.' });
+//     } catch (err) {
+//         res.status(500).json({ error: 'Lỗi server khi cập nhật thống kê đăng nhập.' });
+//     }
+// };
+// // Lấy thống kê đăng nhập của người dùng
+// exports.getUserLoginStats = async (req, res) => {
+//     try {
+//         const userId = req.params.id;
+
+//         // Tìm người dùng theo userId
+//         const user = await User.findById(userId).select('loginCount lastLoginAt loginHistory');
+//         if (!user) {
+//             return res.status(404).json({ error: 'Không tìm thấy người dùng.' });
+//         }
+
+//         res.status(200).json({
+//             loginCount: user.loginCount,
+//             lastLoginAt: user.lastLoginAt,
+//             loginHistory: user.loginHistory,
+//         });
+//     } catch (err) {
+//         res.status(500).json({ error: 'Lỗi server khi lấy thống kê đăng nhập.' });
+//     }
+// };

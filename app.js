@@ -7,6 +7,8 @@ const mongoose = require('mongoose');
 const connectDB = require('./config/db');
 const cookieParser = require('cookie-parser');
 const cors = require('cors');
+// const User = require('./models/User');
+
 
 const session = require('express-session'); //thông báo đăng ký tài khoản thành công
 
@@ -29,6 +31,7 @@ app.use(cors());
 app.use(express.static('public'));
 app.set('views', [path.join(__dirname, 'views'), path.join(__dirname, 'views/client'), path.join(__dirname, 'views/admin')]);
 app.set('view engine', 'ejs');
+
 //config port
 const PORT = process.env.PORT || 3000;
 // Kết nối MongoDB
@@ -39,7 +42,7 @@ app.use(express.urlencoded({ extended: true })); //
 
 // Middleware xử lý session
 app.use(session({
-    secret: 'your_secret_key', // Thay bằng một chuỗi bí mật
+    secret: process.env.JWT_SECRET, // Thay bằng một chuỗi bí mật
     resave: false,
     saveUninitialized: true,
     cookie: { secure: false } // Đặt true nếu dùng HTTPS
@@ -71,6 +74,7 @@ app.use(async (req, res, next) => {
 //
 scheduleDeleteExpiredDiscounts();
 
+
 // Middleware
 app.use(express.json());
 app.use(bodyParser.urlencoded({ extended: true }));
@@ -84,6 +88,7 @@ app.use('/', indexRouter);
 // ✅ Tạo tài khoản admin mặc định
 const User = require('./models/User');
 const bcrypt = require('bcrypt');
+
 // Middleware để xử lý JSON và dữ liệu từ form
 app.use(express.static('public'));
 app.set('views', [path.join(__dirname, 'views'), path.join(__dirname, 'views/client'), path.join(__dirname, 'views/admin')]);
@@ -91,6 +96,8 @@ app.set('view engine', 'ejs');
 app.use(express.json());
 app.use(express.urlencoded({ extended: true }));
 app.use(cookieParser());
+app.use(bodyParser.urlencoded({ extended: true }));
+app.use(bodyParser.json());
 
 
 // Client routes
@@ -99,7 +106,9 @@ var productsRouter = require('./routes/client/products');
 var productdetail = require('./routes/client/productdetail');
 var cartRouter = require('./routes/client/cart');
 var vnpayRouter = require('./routes/client/checkout');
+
 var orderListRouter = require('./routes/client/order-list');
+
 // Admin routes
 var authsRouter = require('./routes/admin/auth');
 var userRouter = require('./routes/admin/users');
@@ -115,30 +124,28 @@ app.use('/users', usersRouter);
 app.use('/products', productsRouter);
 app.use('/products',productdetail)
 app.use('/cart', cartRouter);
+
 app.use('/admin', indexADMIN);
 app.use('/auth', authRouter);
 app.use('/checkout', vnpayRouter);
 app.use('/orderlist',orderListRouter);
 
 
+
 const { checkAdmin } = require('./controller/admin/auth.controller');
 
-app.use('/admin/auth', authsRouter);
-app.use('/admin', indexADMIN);
-app.use('/admin/users', userRouter);
-app.use('/admin/category',  categoryRouter);
-app.use('/admin/comment',  commentRouter);
-app.use('/admin/books',  bookRouter);
-app.use('/admin/discount',  discountRouter);
-app.use('/admin/publishers',  publisherRoutes);
-// app.use('/admin', checkAdmin, indexADMIN);
-// app.use('/admin/users', checkAdmin, userRouter);
-// app.use('/admin/category', checkAdmin, categoryRouter);
-// app.use('/admin/comment', checkAdmin, commentRouter);
-// app.use('/admin/books', checkAdmin, bookRouter);
-// app.use('/admin/discount', checkAdmin, discountRouter);
-// app.use('/admin/publishers', checkAdmin, publisherRoutes);
+
+app.use('/admin/auth',authsRouter);
+app.use('/admin',checkAdmin, indexADMIN);
+app.use('/admin/users', checkAdmin,userRouter);
+app.use('/admin/category', checkAdmin, categoryRouter);
+app.use('/admin/comment',checkAdmin,  commentRouter);
+app.use('/admin/books', checkAdmin, bookRouter);
+app.use('/admin/discount',checkAdmin,  discountRouter);
+app.use('/admin/publishers',checkAdmin,  publisherRoutes);
+
 
 
 app.listen(PORT, () => console.log(`🚀 Server running on port http://localhost:${PORT}`));
 module.exports = app;
+

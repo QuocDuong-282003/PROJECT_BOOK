@@ -1,71 +1,98 @@
 const User = require('../../models/User');
-const bcrypt = require('bcrypt');
 const jwt = require('jsonwebtoken');
 
+// Render trang đăng nhập
 exports.renderLogin = (req, res) => {
     res.render("admin/auth/login")
 };
 
-exports.login = async (req, res, next) => {
+// Xử lý đăng nhập
+exports.login = async (req, res) => {
     try {
         const { email, password } = req.body;
-        const adminEmail = process.env.ADMIN_EMAIL; // Lấy email admin từ .env
-
-
-        if (email !== adminEmail) {
-            return res.render('admin/auth/login', { error: 'Bạn không có quyền truy cập!' });
+        console.log('Email:', email);
+        console.log('Password từ request:', password);
+       
+        // Kiểm tra đuôi email
+        if (!email.endsWith('.admin')) {
+            return res.render('admin/auth/login', { error: 'Chỉ email có đuôi ".admin" mới được truy cập!' });
         }
 
+        // Kiểm tra có admin chưa
+        const existingAdmin = await User.findOne({ role: 'admin' });
+        console.log('Existing admin:', existingAdmin);
+
+        if (!existingAdmin) {
+            // Nếu chưa có admin, tạo admin mới
+            const newAdmin = await User.create({
+                name: 'Admin',
+                email,
+                password, // Không cần mã hóa thủ công, hook sẽ xử lý
+                role: 'admin',
+                isAdmin: true
+            });
+            console.log('✅ Tài khoản admin đã được tạo:', newAdmin);
+        }
+
+        // Tìm user trong database
         const user = await User.findOne({ email });
+        console.log('User từ database:', user);
 
         if (!user) {
-            return res.render('admin/auth/login', { error: 'Email không tồn tại!' });
+            return res.render('admin/auth/login', { error: 'Tài khoản không tồn tại!' });
         }
 
-        const isMatch = await bcrypt.compare(password, user.password);
+        // Kiểm tra mật khẩu
+        const isMatch = await user.matchPassword(password);
+        console.log('Kết quả so sánh mật khẩu:', isMatch);
         if (!isMatch) {
             return res.render('admin/auth/login', { error: 'Mật khẩu không đúng!' });
         }
 
-        const token = jwt.sign(
-            { id: user._id, role: user.role },
-            process.env.JWT_SECRET,
-            { expiresIn: '1h' }
-        );
+        const admin = await User.findOne({ role: 'admin' });
+        console.log('Mật khẩu trong database:', admin.password);
 
+        // Kiểm tra role
+        if (user.role !== 'admin') {
+            return res.render('admin/auth/login', { error: 'Bạn không có quyền truy cập!' });
+        }
+
+        // Tạo token JWT
+        const token = jwt.sign({ id: user._id, role: user.role }, process.env.JWT_SECRET, { expiresIn: '1h' });
+
+        // Lưu token vào cookie
         res.cookie('token', token, {
             httpOnly: true,
-            secure: process.env.NODE_ENV === 'production',
             sameSite: 'strict',
-            maxAge: 3600000,
+            maxAge: 3600000
         });
 
-        return res.redirect('/admin'); 
+        // Chuyển hướng về trang admin
+        return res.redirect('/admin');
     } catch (error) {
         console.error('Lỗi đăng nhập:', error);
-        return next(error);
+        res.status(500).send('Lỗi Server');
     }
 };
-
+// Xử lý đăng xuất
 exports.logout = (req, res) => {
-    res.clearCookie('token');  // Xóa cookie token
-    res.redirect('/admin/auth/login');  // Điều hướng về trang đăng nhập
+    res.clearCookie('token');
+    res.redirect('/admin/auth/login');
 };
 
-// 🛑 Chặn truy cập vào tất cả các trang admin nếu chưa đăng nhập
-
+// Middleware kiểm tra quyền admin
 exports.checkAdmin = (req, res, next) => {
     try {
         const token = req.cookies.token;
 
         if (!token) {
-            return res.redirect('/admin/auth/login'); // Chuyển về trang login nếu chưa đăng nhập
+            return res.redirect('/admin/auth/login');
         }
 
         const decoded = jwt.verify(token, process.env.JWT_SECRET);
 
         if (!decoded || decoded.role !== 'admin') {
-            res.clearCookie('token'); // Xóa token nếu không hợp lệ
+            res.clearCookie('token');
             return res.redirect('/admin/auth/login');
         }
 
@@ -77,6 +104,3 @@ exports.checkAdmin = (req, res, next) => {
         return res.redirect('/admin/auth/login');
     }
 };
-
-
-

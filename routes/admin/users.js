@@ -2,19 +2,30 @@ const express = require('express');
 const router = express.Router();
 const userController = require('../../controller/admin/users.controller');
 
-// 🛠️ Định nghĩa các route
+// Route để thêm người dùng
+router.post('/add', userController.addUser);
+
+// Route để cập nhật người dùng
+router.post('/:id/update', userController.updateUser);
+
+// Route để xóa người dùng
+router.post('/:id/delete', userController.deleteUser);
+
+// Route để reset mật khẩu
+router.post('/:id/reset-password', userController.resetPassword);
+
+// Route để lấy danh sách người dùng
 router.get('/', userController.getAllUsers);
 
-router.post('/add', userController.addUser);
+//tìm kiếm người dùng
 router.get('/search', userController.searchUsers);
-router.get('/stats', userController.getUserStatistics);
-router.get('/:id', userController.getUserById);
-router.put('/:id', userController.updateUser);
 
-router.patch('/:id/toggle-status', userController.toggleUserStatus);
-router.delete('/:id', userController.deleteUser);
-router.patch('/:id/reset-password', userController.resetPassword);
-router.patch('/:id/update-role', userController.updateUserRole);
+// Route để lấy đơn hàng của người dùng
 router.get('/:id/orders', userController.getUserOrders);
+// Route để cập nhật thống kê đăng nhập
+// router.post('/:id/update-login-stats', userController.updateLoginStats);
+
+// // Route để lấy thống kê đăng nhập của người dùng
+// router.get('/:id/login-stats', userController.getUserLoginStats);
 
 module.exports = router;
