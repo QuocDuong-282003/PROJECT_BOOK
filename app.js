@@ -7,6 +7,7 @@ const mongoose = require('mongoose');
 const connectDB = require('./config/db');
 const cors = require('cors');
 const session = require('express-session'); //thông báo đăng ký tài khoản thành công
+const flash = require('connect-flash');
 
 //
 var indexRouter = require('./routes/index');
@@ -16,6 +17,7 @@ var indexADMIN = require('./routes/admin/indexADMIN');
 var productdetail = require('./routes/productdetail');
 var cartRouter = require('./routes/cart');
 var authRouter = require('./routes/auth');
+
 const app = express();
 // view engine setup
 app.use(express.static('public'));
@@ -41,7 +43,6 @@ app.use((req, res, next) => {
     res.locals.user = req.session.user || null; // Nếu chưa đăng nhập, user sẽ là null
     next();
 });
-
 //
 app.use('/', indexRouter);
 app.use('/users', usersRouter);
@@ -50,6 +51,7 @@ app.use('/products', productdetail);
 app.use('/cart', cartRouter);
 app.use('/admin', indexADMIN);
 app.use('/auth', authRouter);
+
 
 app.listen(PORT, () => console.log(`🚀 Server running on port http://localhost:${PORT}`));
 module.exports = app;
