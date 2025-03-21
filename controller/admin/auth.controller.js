@@ -60,6 +60,7 @@ exports.login = async (req, res) => {
         if (user.role !== 'admin') {
             return res.render('admin/auth/login', { error: 'Bạn không có quyền truy cập!' });
         }
+     
 
         // Tạo token JWT
         const token = jwt.sign({ id: user._id, role: user.role }, process.env.JWT_SECRET, { expiresIn: '1h' });

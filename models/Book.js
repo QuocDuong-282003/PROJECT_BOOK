@@ -10,8 +10,8 @@ const bookSchema = new mongoose.Schema({
     type: Number,
     required: true,
     min: 0,
-    get: (v) => Math.round(v / 1000), // Chuyển đổi từ đồng sang nghìn đồng khi lấy dữ liệu
-    set: (v) => Math.round(v * 1000), // Chuyển đổi từ nghìn đồng sang đồng khi lưu dữ liệu
+    // get: (v) => Math.round(v / 1000), // Chuyển đổi từ đồng sang nghìn đồng khi lấy dữ liệu
+    // set: (v) => Math.round(v * 1000), // Chuyển đổi từ nghìn đồng sang đồng khi lưu dữ liệu
   },
   stock: { type: Number, required: true, min: 0 },
   description: { type: String },

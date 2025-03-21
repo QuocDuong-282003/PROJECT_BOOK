@@ -4,6 +4,7 @@ const Order = require('../../models/Order');
 const bcrypt = require('bcryptjs');
 
 // Thêm người dùng
+
 exports.addUser = async (req, res) => {
     try {
         const { name, email, phone, address, role, password } = req.body;
@@ -103,8 +104,8 @@ exports.getAllUsers = async (req, res) => {
         const limit = 10; // Số lượng user mỗi trang
         const skip = (page - 1) * limit;
 
-        // Sắp xếp người dùng: admin hiển thị đầu tiên
-        const users = await User.find()
+        // Lấy danh sách người dùng với thông tin đăng nhập
+        const users = await User.find({}, 'name email phone address role isActive loginCount')
             .sort({ role: +1 }) // Sắp xếp theo role: admin (+1) sẽ lên đầu
             .skip(skip)
             .limit(limit);
@@ -172,45 +173,102 @@ exports.getUserOrders = async (req, res) => {
         res.status(500).send('Lỗi server khi lấy đơn hàng của người dùng.');
     }
 };
-// // Cập nhật thống kê đăng nhập
-// exports.updateLoginStats = async (req, res) => {
-//     try {
-//         const userId = req.params.id;
+exports.getLoginStats = async (req, res) => {
+    try {
+        const { day, month, year } = req.query;
 
-//         // Tìm người dùng theo userId
-//         const user = await User.findById(userId);
-//         if (!user) {
-//             return res.status(404).json({ error: 'Không tìm thấy người dùng.' });
-//         }
+        // Lấy tất cả người dùng
+        const users = await User.find();
 
-//         // Cập nhật thống kê đăng nhập
-//         user.loginCount += 1;
-//         user.lastLoginAt = new Date();
-//         user.loginHistory.push({ loginAt: new Date() });
-//         await user.save();
+        // Tính toán thống kê
+        const stats = {
+            totalUsers: users.length, // Tổng số người dùng
+            totalLoggedInUsers: users.filter(user => user.loginCount > 0).length, // Số lượng người dùng đã đăng nhập
+            totalLogins: users.reduce((sum, user) => sum + user.loginCount, 0), // Tổng số lần đăng nhập
+            userLoginStats: users.map(user => ({
+                name: user.name,
+                email: user.email,
+                loginCount: user.loginCount
+            })),
+            chartData: [] // Dữ liệu cho biểu đồ
+        };
 
-//         res.status(200).json({ message: 'Cập nhật thống kê đăng nhập thành công.' });
-//     } catch (err) {
-//         res.status(500).json({ error: 'Lỗi server khi cập nhật thống kê đăng nhập.' });
-//     }
-// };
-// // Lấy thống kê đăng nhập của người dùng
-// exports.getUserLoginStats = async (req, res) => {
-//     try {
-//         const userId = req.params.id;
+        // Tính toán dữ liệu cho biểu đồ
+        if (day) {
+            // Thống kê theo giờ trong ngày
+            for (let i = 0; i < 24; i++) {
+                const hourLogins = users.reduce((sum, user) => {
+                    return sum + user.loginHistory.filter(login => {
+                        const loginDate = new Date(login.loginAt);
+                        return loginDate.getHours() === i &&
+                            (!day || loginDate.getDate() === parseInt(day)) &&
+                            (!month || loginDate.getMonth() + 1 === parseInt(month)) &&
+                            (!year || loginDate.getFullYear() === parseInt(year));
+                    }).length;
+                }, 0);
 
-//         // Tìm người dùng theo userId
-//         const user = await User.findById(userId).select('loginCount lastLoginAt loginHistory');
-//         if (!user) {
-//             return res.status(404).json({ error: 'Không tìm thấy người dùng.' });
-//         }
+                stats.chartData.push({
+                    date: `${i}:00`,
+                    users: users.length,
+                    loggedInUsers: users.filter(user => user.loginCount > 0).length,
+                    logins: hourLogins
+                });
+            }
+        } else if (month) {
+            // Thống kê theo ngày trong tháng
+            const daysInMonth = new Date(year || new Date().getFullYear(), month, 0).getDate();
+            for (let i = 1; i <= daysInMonth; i++) {
+                const dayLogins = users.reduce((sum, user) => {
+                    return sum + user.loginHistory.filter(login => {
+                        const loginDate = new Date(login.loginAt);
+                        return loginDate.getDate() === i &&
+                            (!month || loginDate.getMonth() + 1 === parseInt(month)) &&
+                            (!year || loginDate.getFullYear() === parseInt(year));
+                    }).length;
+                }, 0);
 
-//         res.status(200).json({
-//             loginCount: user.loginCount,
-//             lastLoginAt: user.lastLoginAt,
-//             loginHistory: user.loginHistory,
-//         });
-//     } catch (err) {
-//         res.status(500).json({ error: 'Lỗi server khi lấy thống kê đăng nhập.' });
-//     }
-// };
+                stats.chartData.push({
+                    date: `Ngày ${i}`,
+                    users: users.length,
+                    loggedInUsers: users.filter(user => user.loginCount > 0).length,
+                    logins: dayLogins
+                });
+            }
+        } else if (year) {
+            // Thống kê theo tháng trong năm
+            for (let i = 1; i <= 12; i++) {
+                const monthLogins = users.reduce((sum, user) => {
+                    return sum + user.loginHistory.filter(login => {
+                        const loginDate = new Date(login.loginAt);
+                        return loginDate.getMonth() + 1 === i &&
+                            (!year || loginDate.getFullYear() === parseInt(year));
+                    }).length;
+                }, 0);
+
+                stats.chartData.push({
+                    date: `Tháng ${i}`,
+                    users: users.length,
+                    loggedInUsers: users.filter(user => user.loginCount > 0).length,
+                    logins: monthLogins
+                });
+            }
+        } else {
+            // Thống kê tổng hợp
+            stats.chartData.push({
+                date: 'Tổng hợp',
+                users: stats.totalUsers,
+                loggedInUsers: stats.totalLoggedInUsers,
+                logins: stats.totalLogins
+            });
+        }
+
+        // Kiểm tra nếu không có dữ liệu đăng nhập trong năm được chọn
+        if (year && stats.chartData.every(item => item.logins === 0)) {
+            stats.chartData = []; // Trả về mảng rỗng nếu không có dữ liệu
+        }
+
+        res.status(200).json(stats);
+    } catch (error) {
+        res.status(500).json({ error: 'Lỗi server khi lấy thống kê đăng nhập.' });
+    }
+};

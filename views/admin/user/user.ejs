@@ -51,6 +51,7 @@
                 <th class="text-center">Địa chỉ</th>
                 <th class="text-center">Trạng thái</th>
                 <th class="text-center">Vai trò</th>
+                <th class="text-center">Số lần đăng nhập</th> <!-- Thêm cột mới -->
                 <th class="text-center">Hành động</th>
               </tr>
             </thead>
@@ -68,6 +69,7 @@
                           </span>
                       </td>
                       <td class="text-center"><%= user.role %></td>
+                      <td class="text-center"><%= user.loginCount || 0 %></td> <!-- Hiển thị số lần đăng nhập -->
                       <td class="text-center">
                           <!-- Nút chỉnh sửa -->
                           <% if (user.role !== 'admin') { %>
@@ -107,17 +109,6 @@
                                   </button>
                               </form>
                           <% } %>
-          
-                          <!-- Nút xem đơn hàng
-                          <button type="button" class="btn btn-primary btn-sm" data-toggle="modal" data-target="#ordersUserModal-<%= user._id %>">
-                              <i class="feather icon-shopping-cart"></i> Xem đơn hàng
-                          </button>    -->
-                    
-                            <!-- Nút xem thống kê đăng nhập -->
-                            <!-- <button type="button" class="btn btn-info btn-sm" data-toggle="modal" data-target="#loginStatsModal-<%= user._id %>">
-                                <i class="feather icon-bar-chart-2"></i>
-                            </button> -->
-                        
                       </td>
                   </tr>
               <% }) %>
@@ -139,7 +130,6 @@
     </div>
   </div>
 </div>
-
 
 <!-- Modal thêm người dùng -->
 <div class="modal fade" id="addUserModal" tabindex="-1" role="dialog">

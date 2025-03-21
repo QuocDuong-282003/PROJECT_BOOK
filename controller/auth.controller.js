@@ -51,6 +51,10 @@ exports.login = async (req, res) => {
             email: user.email,
             name: user.name
         };
+        // Cập nhật lịch sử đăng nhập
+        user.loginHistory.push({ loginAt: new Date() }); // Thêm thời gian đăng nhập hiện tại
+        user.loginCount += 1; // Tăng số lần đăng nhập
+        await user.save();
 
         res.redirect('/'); // Chuyển hướng về trang index
     } catch (error) {
