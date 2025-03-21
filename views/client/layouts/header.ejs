@@ -285,34 +285,84 @@
     <!-- End Top Search -->
 
     <script>
+        document.querySelectorAll(".quantity").forEach(input =>{
+                input.addEventListener("change", async function(){
+                    try {
+                        const row = this.closest(".btn_quantity");
+                        const quantityInput = row.querySelector(".quantity");
+                        console.log(quantityInput.value);
+                        const bookIdInput = row.querySelector(".bookId").value;
+                        const response = await fetch('/cart/update',{
+                            method: "PUT",
+                            headers: {"Content-Type":"application/json"},
+                            body: JSON.stringify({bookId:bookIdInput,quantity:quantityInput.value})
+                        });
+                        
+                        if (!response.ok) {
+                            throw new Error(`Lỗi HTTP: ${response.status}`);
+                        }
+                        const result = await response.json();
+                        console.log("Kết quả API:", result);
+                    } catch (error) {
+                        console.error("Lỗi khi gọi API:", error);
+                    }
+                });
+
+        });
         document.querySelectorAll(".plus").forEach(button => {
-        button.addEventListener("click", async function () {
-            try {
-            const row = this.closest(".btn_quantity");
-            const quantityInput = row.querySelector(".quantity");
-            let quantity = parseInt(quantityInput.value, 10) || 0;
-            quantityInput.value = quantity + 1;
+            button.addEventListener("click", async function () {
+                try {
+                    const row = this.closest(".btn_quantity");
+                    const quantityInput = row.querySelector(".quantity");
+                    let quantity = parseInt(quantityInput.value, 10) || 0;
+                    quantityInput.value = quantity + 1;
 
-            const bookIdInput = row.querySelector(".bookId").value; // Lấy giá trị bookId từ input ẩn
+                    const bookIdInput = row.querySelector(".bookId").value; // Lấy giá trị bookId từ input ẩn
 
-            const response = await fetch('/cart/increase', {
-                method: "POST",
-                headers: { "Content-Type": "application/json" },
-                body: JSON.stringify({ bookId: bookIdInput })
+                    const response = await fetch('/cart/update', {
+                        method: "PUT",
+                        headers: { "Content-Type": "application/json" },
+                        body: JSON.stringify({ bookId: bookIdInput,quantity:quantityInput.value })
+                    });
+
+                    if (!response.ok) {
+                        throw new Error(`Lỗi HTTP: ${response.status}`);
+                    }
+
+                    const result = await response.json();
+                    console.log("Kết quả API:", result);
+                } catch (error) {
+                console.error("Lỗi khi gọi API:", error);
+                }
             });
-
-            if (!response.ok) {
-                throw new Error(`Lỗi HTTP: ${response.status}`);
-            }
-
-            const result = await response.json();
-            console.log("Kết quả API:", result);
-            } catch (error) {
-            console.error("Lỗi khi gọi API:", error);
-            }
         });
-        });
+        document.querySelectorAll(".minus").forEach(button => {
+            button.addEventListener("click", async function () {
+                try {
+                    const row = this.closest(".btn_quantity");
+                    const quantityInput = row.querySelector(".quantity");
+                    let quantity = parseInt(quantityInput.value, 10) || 0;
+                    quantityInput.value = quantity - 1;
 
+                    const bookIdInput = row.querySelector(".bookId").value; // Lấy giá trị bookId từ input ẩn
+
+                    const response = await fetch('/cart/update', {
+                        method: "PUT",
+                        headers: { "Content-Type": "application/json" },
+                        body: JSON.stringify({ bookId: bookIdInput,quantity:quantityInput.value })
+                    });
+
+                    if (!response.ok) {
+                        throw new Error(`Lỗi HTTP: ${response.status}`);
+                    }
+
+                    const result = await response.json();
+                    console.log("Kết quả API:", result);
+                } catch (error) {
+                console.error("Lỗi khi gọi API:", error);
+                }
+            });
+        });
 
 
     </script>

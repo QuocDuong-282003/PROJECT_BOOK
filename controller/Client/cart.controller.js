@@ -102,6 +102,27 @@ const clearCart = async (userId) => {
         return null;
     }
 };
+const updateQuantity= async(userId,bookId,quantityUpdate)=>{
+    try {
+        const cart = await Cart.findOne({userId});
+        if (!cart) {
+            console.log(`❌ Không tìm thấy giỏ hàng của userId: ${userId}`);
+            return null;
+        }
+        const itemIndex = cart.items.findIndex(item => item.bookId.toString() === bookId);
+        if (itemIndex === -1) {
+            console.log(`❌ Không tìm thấy sản phẩm có bookId: ${bookId}`);
+            return null;
+        }
+        cart.items[itemIndex].quantity = Number(quantityUpdate);
+        // Lưu lại thay đổi
+        await cart.save();
+        return cart;
+    } catch (error) {
+        console.error("Lỗi khi cập nhật số lượng:", error)
+    }
+
+};
 const increaseQuantity = async (userId, bookId) => {
     try {
         // Tìm giỏ hàng theo userId
@@ -132,4 +153,4 @@ const increaseQuantity = async (userId, bookId) => {
     }
 };
 
-module.exports = { getCartByUserId , addBookToCart , removeBookFromCart, clearCart, increaseQuantity};
+module.exports = { getCartByUserId , addBookToCart , removeBookFromCart, clearCart, increaseQuantity, updateQuantity};
