@@ -23,6 +23,8 @@ router.delete('/discount/delete/:id', discountController.deleteDiscount);
 // discount seach
 router.get("/discounts", discountController.getDiscounts);
 //order
+
+
 router.get('/order', orderController.getAllOrders);
 //publisher
 router.get('/publisher', publisherController.getPublishers);
