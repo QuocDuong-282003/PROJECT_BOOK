@@ -4,41 +4,48 @@ const mongoose = require('mongoose');
 const cron = require('node-cron');
 const Book = require('../../models/Book');
 const Category = require('../../models/Category');
-// exports.getPublishers = async (req, res) => {
-//     try {
-//         const publishers = await Publisher.find();
-//         const categories = await Category.find();
-//         for (let publisher of publishers) {
-//             publisher.books = await Book.find({ publisherId: publisher._id });
-//         }
-//         res.render('publisherAdmin', {
-//             title: 'Publisher',
-//             path: req.path,
-//             publishers,
-//             categories,
-//         });
-//     } catch (error) {
-//         res.status(500).json({ message: 'Error when getting list of publishers', error });
-//     }
-// };
+
 exports.getPublishers = async (req, res) => {
     try {
-        const publishers = await Publisher.find()
-            .populate('categories'); // Populate danh mục từ mối quan hệ
+        const perPage = 10; // Số lượng publisher trên mỗi trang
+        const page = parseInt(req.query.page) || 1; // Lấy số trang từ query, mặc định là 1
+
+        // Lấy tổng số publisher
+        const totalPublisher = await Publisher.countDocuments();
+        const totalPages = Math.ceil(totalPublisher / perPage); // Tính tổng số trang
+
+        // Lấy danh mục trước để tránh lỗi
         const categories = await Category.find();
-        for (let publisher of publishers) {
-            publisher.books = await Book.find({ publisherId: publisher._id });
-        }
+
+        // Lấy danh sách publishers với phân trang
+        const publishers = await Publisher.find()
+            .skip((page - 1) * perPage)
+            .limit(perPage)
+            .populate('categories'); // Populate danh mục từ mối quan hệ
+
+        // Lấy danh sách sách cho từng publisher
+        const publishersWithBooks = await Promise.all(
+            publishers.map(async (publisher) => {
+                const books = await Book.find({ publisherId: publisher._id });
+                return { ...publisher.toObject(), books }; // Chuyển về object để tránh sửa trực tiếp
+            })
+        );
+
         res.render('publisherAdmin', {
             title: 'Publisher',
             path: req.path,
-            publishers,
+            publishers: publishersWithBooks,
             categories,
+            message: publishers.length === 0 ? 'No publishers found.' : '',
+            currentPage: page,
+            totalPages
         });
     } catch (error) {
+        console.error(error);
         res.status(500).json({ message: 'Error when getting list of publishers', error });
     }
 };
+
 
 // Thêm nhà xuất bản
 exports.createPublisher = async (req, res) => {
@@ -69,13 +76,11 @@ exports.createPublisher = async (req, res) => {
         });
         await newPublisher.save();
         res.redirect('/admin/publisher');
-        // return res.status(201).json({ success: true, message: "Nhà xuất bản đã được thêm thành công!" });
     } catch (error) {
         console.error(error);
         return res.status(500).json({ success: false, message: "Có lỗi xảy ra khi lưu nhà xuất bản." });
     }
 };
-
 // Cập nhật thông tin nhà xuất bản
 exports.updatePublisher = async (req, res) => {
     try {
@@ -91,25 +96,82 @@ exports.updatePublisher = async (req, res) => {
         if (!publisher) {
             return res.status(404).json({ message: "Không tìm thấy nhà xuất bản" });
         }
-        // res.json({ success: true, message: "Nhà xuất bản đã được sửa thành công!", publisher });
         res.redirect('/admin/publisher');
     } catch (error) {
         res.status(500).json({ message: "Lỗi khi cập nhật nhà xuất bản", error });
     }
 };
-
-
 // Xóa nhà xuất bản và các sách liên quan
 exports.deletePublisher = async (req, res) => {
     try {
         const publisher = await Publisher.findById(req.params.id);
         if (!publisher) return res.status(404).json({ message: "Không tìm thấy nhà xuất bản" });
-        // Xóa tất cả sách của nhà xuất bản
         await Book.deleteMany({ publisherId: publisher._id });
-        // Xóa nhà xuất bản
         await Publisher.findByIdAndDelete(req.params.id);
         res.redirect('/admin/publisher');
     } catch (error) {
         res.status(500).json({ message: "Lỗi khi xóa nhà xuất bản", error });
+    }
+};
+// search
+exports.getSearchPublishers = async (req, res) => {
+    try {
+        let searchQuery = req.query.search || '';
+        let page = parseInt(req.query.page) || 1;
+        let limit = 10;
+        let skip = (page - 1) * limit;
+        let filter = {};
+        // Lấy danh sách nhà xuất bản theo thứ tự tạo
+        const allPublishers = await Publisher.find().sort({ createdAt: 1 });
+        let searchedPublisher = null;
+        let searchedSTT = null;
+        if (!isNaN(searchQuery) && searchQuery > 0) {
+            let index = parseInt(searchQuery) - 1; // Chuyển STT về index (bắt đầu từ 0)
+            if (index >= 0 && index < allPublishers.length) {
+                searchedPublisher = allPublishers[index];
+                filter = { _id: searchedPublisher._id };
+                searchedSTT = searchQuery; // Lưu STT tìm kiếm
+            } else {
+                const categories = await Category.find();
+                return res.render('publisherAdmin', {
+                    publishers: [],
+                    categories,
+                    searchQuery,
+                    searchedSTT: null,
+                    currentPage: page,
+                    totalPages: 0,
+                    title: "Publisher",
+                    path: "publisher"
+                });
+            }
+        }
+        // Lấy tổng số nhà xuất bản phù hợp
+        const totalPublisher = await Publisher.countDocuments(filter);
+        const totalPages = Math.ceil(totalPublisher / limit);
+
+        // Lấy danh sách nhà xuất bản theo phân trang
+        let publishers = await Publisher.find(filter)
+            .skip(skip)
+            .limit(limit)
+            .populate('categories');
+        const categories = await Category.find();
+
+        // Lấy danh sách sách của từng nhà xuất bản
+        for (let publisher of publishers) {
+            publisher.books = await Book.find({ publisherId: publisher._id });
+        }
+        res.render('publisherAdmin', {
+            publishers,
+            categories,
+            searchQuery,
+            searchedSTT,
+            currentPage: page,
+            totalPages,
+            title: "Publisher",
+            path: "publisher"
+        });
+    } catch (error) {
+        console.error("Lỗi chi tiết:", error);
+        res.status(500).send("Lỗi Server");
     }
 };

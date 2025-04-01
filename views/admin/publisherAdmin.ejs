@@ -42,7 +42,11 @@
                     <tbody>
                         <% publishers.forEach((publisher, index) => { %>
                         <tr>
-                            <td class="text-center"><%= index + 1 %></td>
+                            <!-- <td class="text-center"><%= index + 1 %></td> -->
+                            <td><%= typeof searchedSTT !== 'undefined' &&
+                                searchedSTT ? searchedSTT : (currentPage - 1) *
+                                10 + (index + 1) %></td>
+
                             <td class="text-center"><%= publisher.name %></td>
                             <td class="text-center"><%= publisher.country
                                 %></td>
@@ -94,6 +98,19 @@
                     </tbody>
                 </table>
             </div>
+            <!-- PHÂN TRANG -->
+            <nav>
+                <ul class="pagination">
+                    <% for(let i = 1; i <= totalPages; i++) { %>
+                    <li
+                        class="page-item <%= i === currentPage ? 'active' : '' %>">
+                        <a class="page-link"
+                            href="/admin/publisher?page=<%= i %>"><%= i %></a>
+
+                    </li>
+                    <% } %>
+                </ul>
+            </nav>
         </div>
     </div>
 </div>
@@ -118,8 +135,8 @@
             });
         });
     });
-    // function searchDiscounts() {
-    //     const searchValue = document.getElementById('Search').value;
-    //     window.location.href = `/admin/search?search=${encodeURIComponent(searchValue)}`;
-    // }
+    function searchDiscounts() {
+        const searchValue = document.getElementById('Search').value;
+        window.location.href = `/admin/search?search=${encodeURIComponent(searchValue)}`;
+    }
     </script>

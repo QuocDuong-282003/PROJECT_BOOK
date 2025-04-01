@@ -4,29 +4,6 @@ const Discount = require('../../models/Discount');
 const mongoose = require('mongoose');
 const { ObjectId } = require('mongoose').Types;
 const cron = require('node-cron');
-
-// exports.getAllOrders = async (req, res) => {
-//     try {
-//         const orders = await Order.find();
-//         console.log(orders);  // Kiểm tra dữ liệu trước khi populate
-
-//         const populatedOrders = await Order.find()
-//             .populate('userId', 'name')  // Chỉ lấy tên từ bảng User
-//             .populate('discountId');
-
-//         console.log(populatedOrders);  // Kiểm tra dữ liệu sau khi populate
-
-//         res.render('orderAdmin', {
-//             title: 'Order',
-//             path: req.path,
-//             orders: populatedOrders
-//         });
-//     } catch (error) {
-//         console.error(error);
-//         res.status(500).send('Error when getting list of orders');
-//     }
-// };
-
 // exports.getAllOrders = async (req, res) => {
 //     try {
 //         // Lấy tất cả đơn hàng
@@ -96,17 +73,14 @@ const cron = require('node-cron');
 // };
 exports.getAllOrders = async (req, res) => {
     try {
-
         let orders = await Order.find();
-
         // Kiểm tra nếu userId là string thì chuyển về ObjectId
         orders = orders.map(order => {
-            if (order.userId && typeof order.userId === 'string') {
-                order.userId = new mongoose.Types.ObjectId(order.userId);
+            if (order.userId && typeof order.userId === 'string' && mongoose.Types.ObjectId.isValid(order.userId)) {
+                order.userId = order.userId;
             }
             return order;
         });
-
         // Truy vấn lại với populate
         const populatedOrders = await Order.find()
             .populate({
@@ -115,10 +89,7 @@ exports.getAllOrders = async (req, res) => {
                 model: 'User'
             })
             .populate('discountId'); // Lấy thông tin giảm giá nếu có
-
-        console.log('Orders after population:', populatedOrders);
-
-        // Render trang orderAdmin
+        //  console.log('Orders after population:', populatedOrders);      
         res.render('orderAdmin', {
             title: 'Order',
             path: req.path,
