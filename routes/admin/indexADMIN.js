@@ -43,10 +43,12 @@ router.get('/auth/logout', (req, res) => {
 });
 
 //order
+
+
 router.get('/order', orderController.getAllOrders);
 //publisher
 router.get('/publisher', publisherController.getPublishers);
-router.post('/publisher/create/add', publisherController.createPublisher);
+router.post('/admin/publisher/create/add', publisherController.createPublisher);
 router.delete('/publisher/delete/:id', publisherController.deletePublisher);
 router.post('/publisher/update/:id', publisherController.updatePublisher);
 module.exports = router;
