@@ -69,9 +69,21 @@
                         <% orders.forEach((order, index) => { %>
                         <tr>
                             <td class="text-center"><%= index + 1 %></td>
-                            <td class="text-center"><%= order.userId %></td>
-                            <td class="text-center"><%= order.totalAmount
-                                %></td>
+                            <td class="text-center">
+                                <%= order.userId ?
+                                order.userId.name : 'Unknown User' %>
+                                <!-- Lấy tên người dùng từ populate -->
+                            </td>
+
+                            <td class="text-center">
+                                <%
+                                let formattedAmount = new
+                                Intl.NumberFormat('vi-VN', { style: 'decimal'
+                                }).format(order.totalAmount);
+                                %>
+                                <%= formattedAmount %> VND
+                            </td>
+
                             <td class="text-center"><%= order.status %></td>
                             <td class="text-center"><%= order.paymentMethod
                                 %></td>

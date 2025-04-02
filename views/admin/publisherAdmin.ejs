@@ -3,7 +3,6 @@
 <%- include('./layouts/menu-list') %>
 
 <div class="col-xl-12 col-md-12">
-
     <div class="card table-card">
         <div class="card-header">
             <div class="title-container">
@@ -22,8 +21,9 @@
             </div>
 
             <button type="button" class="btn btn-success" data-toggle="modal"
-                data-target="#exampleModalLive"><i
-                    class="feather icon-plus"></i></button>
+                data-target="#exampleModalLive">
+                <i class="feather icon-plus"></i>
+            </button>
         </div>
         <div class="card-body p-0">
             <div class="table-responsive">
@@ -33,45 +33,63 @@
                             <th class="text-center">NO</th>
                             <th class="text-center">Tên Nhà Xuất Bản</th>
                             <th class="text-center">Quốc Gia</th>
-                            <th class="text-center">Sách</th>
+                            <th class="text-center">Category</th>
+                            <th class="text-center">Ngày Tháng Năm</th>
                             <th class="text-center">Hành Động</th>
+                            <!-- Thêm cột Hành Động -->
                         </tr>
                     </thead>
                     <tbody>
                         <% publishers.forEach((publisher, index) => { %>
                         <tr>
-                            <td class="text-center"><%= index + 1 %></td>
+                            <!-- <td class="text-center"><%= index + 1 %></td> -->
+                            <td><%= typeof searchedSTT !== 'undefined' &&
+                                searchedSTT ? searchedSTT : (currentPage - 1) *
+                                10 + (index + 1) %></td>
+
                             <td class="text-center"><%= publisher.name %></td>
                             <td class="text-center"><%= publisher.country
                                 %></td>
                             <td class="text-center">
-                                <% if (publisher.books.length > 0) { %>
-                                <ul>
-                                    <% publisher.books.forEach(book => { %>
-                                    <li><%= book.title %> - <%= book.author
-                                        %></li>
+                                <% if (publisher.categories &&
+                                publisher.categories.length > 0) { %>
+                                <ul class="list-unstyled">
+                                    <% publisher.categories.forEach(category =>
+                                    { %>
+                                    <li><%= category.name %> </li>
+                                    <!-- Hiển thị tên và mô tả của danh mục -->
                                     <% }); %>
                                 </ul>
                                 <% } else { %>
-                                <p>Không có sách</p>
+                                <p>Không có danh mục</p>
                                 <% } %>
                             </td>
-                            <td style="text-align: center;">
+                            <td class="text-center">
+                                <%= publisher.createdAt ?
+                                publisher.createdAt.toLocaleDateString() :
+                                'Chưa có thông tin' %>
+                            </td>
+                            <td class="text-center">
+                                <!-- Nút Edit -->
                                 <button class="btn btn-info editBtn"
                                     data-id="<%= publisher._id %>"
                                     data-name="<%= publisher.name %>"
                                     data-country="<%= publisher.country %>"
-                                    data-books="<%= JSON.stringify(publisher.books) %>"
+                                    data-categories="<%= JSON.stringify(publisher.categories) %>"
+                                    data-createdAt="<%=publisher.createdAt %>"
                                     data-toggle="modal"
                                     data-target="#updateModalLive">
                                     Edit
                                 </button>
+
+                                <!-- Nút Delete -->
                                 <form
                                     action="/admin/publisher/delete/<%= publisher._id %>?_method=DELETE"
                                     method="POST" style="display:inline;">
                                     <button type="submit"
                                         class="btn btn-danger">
                                         <i class="feather icon-trash-2"></i>
+                                        Delete
                                     </button>
                                 </form>
                             </td>
@@ -80,7 +98,6 @@
                     </tbody>
                 </table>
             </div>
-
             <!-- PHÂN TRANG -->
             <nav>
                 <ul class="pagination">
@@ -88,7 +105,8 @@
                     <li
                         class="page-item <%= i === currentPage ? 'active' : '' %>">
                         <a class="page-link"
-                            href="/admin/publishers?page=<%= i %>"><%= i %></a>
+                            href="/admin/publisher?page=<%= i %>"><%= i %></a>
+
                     </li>
                     <% } %>
                 </ul>
@@ -101,3 +119,24 @@
 <%- include('./model-update-publisher') %>
 <%- include('./layouts/footer') %>
 <%- include('./layouts/script') %>
+<script>
+    document.addEventListener("DOMContentLoaded", function () {
+        document.querySelectorAll(".editBtn").forEach(button => {
+            button.addEventListener("click", function () {
+                document.getElementById("publisherId").value = this.dataset.id;
+                document.getElementById("name").value = this.dataset.name;
+                document.getElementById("country").value = this.dataset.country;
+                document.getElementById("categories").value = this.dataset.categories;
+                document.getElementById("createdAt").value = this.dataset.createdAt;
+               
+    
+                // Cập nhật action của form
+                document.getElementById("updateForm").action = `/admin/publisher/update/${this.dataset.id}`;
+            });
+        });
+    });
+    function searchDiscounts() {
+        const searchValue = document.getElementById('Search').value;
+        window.location.href = `/admin/search?search=${encodeURIComponent(searchValue)}`;
+    }
+    </script>
