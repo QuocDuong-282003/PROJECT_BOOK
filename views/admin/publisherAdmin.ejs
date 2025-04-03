@@ -75,7 +75,6 @@
                                     data-id="<%= publisher._id %>"
                                     data-name="<%= publisher.name %>"
                                     data-country="<%= publisher.country %>"
-                                    data-categories="<%= JSON.stringify(publisher.categories) %>"
                                     data-createdAt="<%=publisher.createdAt %>"
                                     data-toggle="modal"
                                     data-target="#updateModalLive">
@@ -120,21 +119,44 @@
 <%- include('./layouts/footer') %>
 <%- include('./layouts/script') %>
 <script>
-    document.addEventListener("DOMContentLoaded", function () {
-        document.querySelectorAll(".editBtn").forEach(button => {
-            button.addEventListener("click", function () {
-                document.getElementById("publisherId").value = this.dataset.id;
-                document.getElementById("name").value = this.dataset.name;
-                document.getElementById("country").value = this.dataset.country;
-                // document.getElementById("categories").value = this.dataset.categories;
-                document.getElementById("createdAt").value = this.dataset.createdAt;
+    // document.addEventListener("DOMContentLoaded", function () {
+    //     document.querySelectorAll(".editBtn").forEach(button => {
+    //         button.addEventListener("click", function () {
+    //             document.getElementById("publisherId").value = this.dataset.id;
+    //             document.getElementById("name").value = this.dataset.name;
+    //             document.getElementById("country").value = this.dataset.country;
+    //             // document.getElementById("categories").value = this.dataset.categories;
+    //             document.getElementById("createdAt").value = this.dataset.createdAt;
                
     
-                // Cập nhật action của form
-                document.getElementById("updateForm").action = `/admin/publisher/update/${this.dataset.id}`;
-            });
+    //             // Cập nhật action của form
+    //             document.getElementById("updateForm").action = `/admin/publisher/update/${this.dataset.id}`;
+    //         });
+    //     });
+    // });
+    document.addEventListener("DOMContentLoaded", function () {
+    document.querySelectorAll(".editBtn").forEach(button => {
+        button.addEventListener("click", function () {
+            const publisherId = this.dataset.id;
+            const publisherName = this.dataset.name;
+            const publisherCountry = this.dataset.country;
+            const createdAt = this.dataset.createdat; // lấy giá trị createdAt từ data 
+
+            document.getElementById("publisherId").value = publisherId;
+            document.getElementById("name").value = publisherName;
+            document.getElementById("country").value = publisherCountry;
+
+            // Chuyển đổi ngày tạo (createdAt) thành định dạng YYYY-MM-DD
+            const date = new Date(createdAt);
+            const formattedDate = date.toISOString().split('T')[0]; // định dạng YYYY-MM-DD
+            document.getElementById("createdAt").value = formattedDate;
+
+            // Cập nhật action của form
+            document.getElementById("updateForm").action = `/admin/publisher/update/${publisherId}`;
         });
     });
+});
+
     function searchDiscounts() {
         const searchValue = document.getElementById('Search').value;
         window.location.href = `/admin/search?search=${encodeURIComponent(searchValue)}`;
