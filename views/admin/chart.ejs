@@ -1,0 +1,98 @@
+<%- include('./layouts/style') %>
+<%- include('./layouts/head') %>
+<%- include('./layouts/menu-list') %>
+
+<div class="col-xl-12 col-md-12">
+    <div class="card">
+        <div class="card-header">
+            <h5>Thống kê đơn hàng theo ngày</h5>
+        </div>
+        <div class="card-body">
+            <canvas id="dailyChart"></canvas>
+        </div>
+    </div>
+</div>
+
+<div class="col-xl-12 col-md-12">
+    <div class="card">
+        <div class="card-header">
+            <h5>Thống kê đơn hàng theo tháng</h5>
+        </div>
+        <div class="card-body">
+            <canvas id="monthlyChart"></canvas>
+        </div>
+    </div>
+</div>
+
+<%- include('./layouts/footer') %>
+<%- include('./layouts/script') %>
+
+<script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+<script>
+document.addEventListener("DOMContentLoaded", async function () {
+    const dailyCtx = document.getElementById("dailyChart")?.getContext("2d");
+    const monthlyCtx = document.getElementById("monthlyChart")?.getContext("2d");
+
+    if (!dailyCtx || !monthlyCtx) {
+        console.error("Không tìm thấy phần tử canvas!");
+        return;
+    }
+
+    try {
+        const response = await fetch("/admin/stats");
+        const data = await response.json();
+
+        if (!data || !Array.isArray(data)) {
+            console.error("Dữ liệu API không hợp lệ:", data);
+            return;
+        }
+
+        // Phân loại dữ liệu
+        const dailyStats = data.filter(stat => stat._id.length === 10);
+        const monthlyStats = data.filter(stat => stat._id.length === 7);
+
+        const dailyLabels = dailyStats.map(stat => stat._id);
+        const dailyValues = dailyStats.map(stat => stat.totalOrders);
+
+        const monthlyLabels = monthlyStats.map(stat => stat._id);
+        const monthlyValues = monthlyStats.map(stat => stat.totalOrders);
+
+        // Xóa biểu đồ cũ trước khi vẽ mới
+        if (window.dailyChart) window.dailyChart.destroy();
+        if (window.monthlyChart) window.monthlyChart.destroy();
+
+        // Vẽ biểu đồ theo ngày
+        window.dailyChart = new Chart(dailyCtx, {
+            type: "bar",
+            data: {
+                labels: dailyLabels,
+                datasets: [{
+                    label: "Số lượng đơn hàng",
+                    data: dailyValues,
+                    backgroundColor: "rgba(54, 162, 235, 0.6)",
+                    borderColor: "rgba(54, 162, 235, 1)",
+                    borderWidth: 1
+                }]
+            }
+        });
+
+        // Vẽ biểu đồ theo tháng
+        window.monthlyChart = new Chart(monthlyCtx, {
+            type: "line",
+            data: {
+                labels: monthlyLabels,
+                datasets: [{
+                    label: "Số lượng đơn hàng",
+                    data: monthlyValues,
+                    backgroundColor: "rgba(255, 99, 132, 0.6)",
+                    borderColor: "rgba(255, 99, 132, 1)",
+                    borderWidth: 2
+                }]
+            }
+        });
+
+    } catch (error) {
+        console.error("Lỗi khi lấy dữ liệu từ API:", error);
+    }
+});
+</script>

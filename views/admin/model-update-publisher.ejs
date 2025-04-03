@@ -50,19 +50,7 @@
                                     value="<%= publishers.country%>">
                             </div>
                         </div>
-                        <div class="form-group row">
-                            <label
-                                class="col-sm-2 col-form-label">Categories</label>
-                            <div class="col-md-4">
-                                <select class="form-control w-100"
-                                    name="categories" id="categories">
-                                    <% categories.forEach(category => { %>
-                                    <option value="<%= category._id %>"><%=
-                                        category.name %></option>
-                                    <% }); %>
-                                </select>
-                            </div>
-                        </div>
+
                         <div class="form-group row">
                             <label for="createdAt"
                                 class="col-sm-2 col-form-label"> Date</label>

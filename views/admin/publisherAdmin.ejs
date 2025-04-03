@@ -33,7 +33,7 @@
                             <th class="text-center">NO</th>
                             <th class="text-center">Tên Nhà Xuất Bản</th>
                             <th class="text-center">Quốc Gia</th>
-                            <th class="text-center">Category</th>
+                            <!-- <th class="text-center">Category</th> -->
                             <th class="text-center">Ngày Tháng Năm</th>
                             <th class="text-center">Hành Động</th>
                             <!-- Thêm cột Hành Động -->
@@ -50,20 +50,20 @@
                             <td class="text-center"><%= publisher.name %></td>
                             <td class="text-center"><%= publisher.country
                                 %></td>
-                            <td class="text-center">
+                            <!-- <td class="text-center">
                                 <% if (publisher.categories &&
                                 publisher.categories.length > 0) { %>
                                 <ul class="list-unstyled">
                                     <% publisher.categories.forEach(category =>
                                     { %>
                                     <li><%= category.name %> </li>
-                                    <!-- Hiển thị tên và mô tả của danh mục -->
+                                     Hiển thị tên và mô tả của danh mục
                                     <% }); %>
                                 </ul>
                                 <% } else { %>
                                 <p>Không có danh mục</p>
                                 <% } %>
-                            </td>
+                            </td> -->
                             <td class="text-center">
                                 <%= publisher.createdAt ?
                                 publisher.createdAt.toLocaleDateString() :
@@ -126,7 +126,7 @@
                 document.getElementById("publisherId").value = this.dataset.id;
                 document.getElementById("name").value = this.dataset.name;
                 document.getElementById("country").value = this.dataset.country;
-                document.getElementById("categories").value = this.dataset.categories;
+                // document.getElementById("categories").value = this.dataset.categories;
                 document.getElementById("createdAt").value = this.dataset.createdAt;
                
     
@@ -139,4 +139,5 @@
         const searchValue = document.getElementById('Search').value;
         window.location.href = `/admin/search?search=${encodeURIComponent(searchValue)}`;
     }
+    
     </script>
