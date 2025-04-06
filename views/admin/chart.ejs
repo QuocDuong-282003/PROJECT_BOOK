@@ -27,39 +27,34 @@
 <%- include('./layouts/footer') %>
 <%- include('./layouts/script') %>
 
+<!-- Chỉ gọi chart.js một lần -->
 <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+
+<!-- Script của bạn để vẽ biểu đồ -->
 <script>
 document.addEventListener("DOMContentLoaded", async function () {
+    console.log("Hello");
+
+    // Lấy các phần tử canvas
     const dailyCtx = document.getElementById("dailyChart")?.getContext("2d");
     const monthlyCtx = document.getElementById("monthlyChart")?.getContext("2d");
 
+    // Kiểm tra xem các canvas có tồn tại không
     if (!dailyCtx || !monthlyCtx) {
         console.error("Không tìm thấy phần tử canvas!");
         return;
     }
 
     try {
-        const response = await fetch("/admin/stats");
-        const data = await response.json();
+        const dailyLabels = <%- dailyLabels %>;
+        const dailyValues = <%- dailyValues %>;
 
-        if (!data || !Array.isArray(data)) {
-            console.error("Dữ liệu API không hợp lệ:", data);
-            return;
-        }
+        const monthlyLabels = <%- monthlyLabels %>;
+        const monthlyValues = <%- monthlyValues %>;
+        
+        console.log("Ngày: ", dailyLabels);
+        console.log("Giá trị: ", dailyValues);
 
-        // Phân loại dữ liệu
-        const dailyStats = data.filter(stat => stat._id.length === 10);
-        const monthlyStats = data.filter(stat => stat._id.length === 7);
-
-        const dailyLabels = dailyStats.map(stat => stat._id);
-        const dailyValues = dailyStats.map(stat => stat.totalOrders);
-
-        const monthlyLabels = monthlyStats.map(stat => stat._id);
-        const monthlyValues = monthlyStats.map(stat => stat.totalOrders);
-
-        // Xóa biểu đồ cũ trước khi vẽ mới
-        if (window.dailyChart) window.dailyChart.destroy();
-        if (window.monthlyChart) window.monthlyChart.destroy();
 
         // Vẽ biểu đồ theo ngày
         window.dailyChart = new Chart(dailyCtx, {

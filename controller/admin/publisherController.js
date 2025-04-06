@@ -69,13 +69,15 @@ exports.createPublisher = async (req, res) => {
 exports.updatePublisher = async (req, res) => {
     try {
         const { name, country } = req.body;
+        const createdAt = new Date(); //Ghi đè lại ngày tạo
+
         if (!name || !country) {
             return res.status(400).json({ message: "Tên nhà xuất bản và quốc gia là bắt buộc!" });
         }
 
         const publisher = await Publisher.findByIdAndUpdate(
             req.params.id,
-            { name, country },
+            { name, country, createdAt }, // Ghi đè createdAt mỗi lần update
             { new: true }
         );
 
@@ -88,6 +90,7 @@ exports.updatePublisher = async (req, res) => {
         res.status(500).json({ message: "Lỗi khi cập nhật nhà xuất bản", error });
     }
 };
+
 
 // Xóa nhà xuất bản và sách liên quan
 exports.deletePublisher = async (req, res) => {
@@ -126,7 +129,7 @@ exports.getSearchPublishers = async (req, res) => {
             } else {
                 return res.render('publisherAdmin', {
                     publishers: [],
-                    // categories: [], // Không lấy categories
+                    // categories: [], 
                     searchQuery,
                     searchedSTT: null,
                     currentPage: page,
@@ -150,7 +153,7 @@ exports.getSearchPublishers = async (req, res) => {
 
         res.render('publisherAdmin', {
             publishers,
-            // categories: [], // Không lấy categories
+            // categories: [], 
             searchQuery,
             searchedSTT,
             currentPage: page,
