@@ -11,8 +11,7 @@ const getAllBooks = async () => {
 
 const getProductById = async (bookId) => {
     try {
-        console.log("id: ",bookId);
-        return await Book.findById(bookId);
+        return await Book.findById(bookId).populate("categoryId", "name").populate("publisherId", "name");;
     } catch (error) {
         console.error("Lỗi khi lấy sản phẩm:", error);
         return null;
