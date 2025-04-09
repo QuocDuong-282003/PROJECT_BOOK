@@ -1,7 +1,7 @@
 const Order = require('../../models/Order');
 const getOrderByUserId = async (userID) => {
     try {
-        const orders = await Order.find({ userId: userID }).sort({ orderDate: -1 });
+        const orders = await Order.find({ userId: userID }).populate("items.bookId").sort({ orderDate: -1 });
         return orders;
     } catch (error) {
         console.error("Lỗi khi lấy danh sách đơn hàng:", error);
