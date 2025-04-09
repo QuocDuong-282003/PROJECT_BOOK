@@ -37,8 +37,7 @@ const PORT = process.env.PORT || 3000;
 connectDB();
 // Middleware xử lý JSON
 app.use(express.json());
-app.use(express.urlencoded({ extended: true })); //
-
+app.use(express.urlencoded({ extended: true }));
 // Middleware xử lý session
 app.use(session({
     secret: process.env.JWT_SECRET, // Thay bằng một chuỗi bí mật
@@ -67,10 +66,6 @@ app.use(async (req, res, next) => {
 
     next();
 });
-
-
-
-//
 scheduleDeleteExpiredDiscounts();
 
 // Middleware
