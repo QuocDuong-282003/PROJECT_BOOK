@@ -141,16 +141,13 @@
             const publisherName = this.dataset.name;
             const publisherCountry = this.dataset.country;
             const createdAt = this.dataset.createdat; // lấy giá trị createdAt từ data 
-
             document.getElementById("publisherId").value = publisherId;
             document.getElementById("name").value = publisherName;
             document.getElementById("country").value = publisherCountry;
-
             // Chuyển đổi ngày tạo (createdAt) thành định dạng YYYY-MM-DD
             const date = new Date(createdAt);
             const formattedDate = date.toISOString().split('T')[0]; // định dạng YYYY-MM-DD
             document.getElementById("createdAt").value = formattedDate;
-
             // Cập nhật action của form
             document.getElementById("updateForm").action = `/admin/publisher/update/${publisherId}`;
         });
