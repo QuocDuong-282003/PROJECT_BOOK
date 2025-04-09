@@ -2314,7 +2314,7 @@
 }
  .single-product-details ul{
      display: inline-block;
-     width: 100%;
+     width: 30%;
      border: 1px #010101 dashed;
      margin-bottom: 30px;
 }
@@ -2330,7 +2330,7 @@
      color: #ffffff;
 }
  .quantity-box input{
-     width: 100%;
+     width: 230%;
 }
  .price-box-bar{
      margin-bottom: 30px;

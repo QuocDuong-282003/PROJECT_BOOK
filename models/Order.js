@@ -13,7 +13,7 @@ const orderSchema = new mongoose.Schema({
     city: { type: String, required: true },
     totalAmount: { type: Number, required: true },
     orderDate: { type: Date, default: Date.now },
-    status: { type: Number, enum: [0, 1, -1], default: 0 },// 0: pending, 1: delivered, -1: cancelled
+    status: { type: Number, enum: [0, 1, -1], default: 0 }, // 0: pending, 1: delivered, -1: cancelled
     paymentMethod: { type: String, required: true },
     items: [
         {
@@ -33,7 +33,6 @@ const orderSchema = new mongoose.Schema({
             }
         }
     ]
-
 }, { timestamps: true });
 
 module.exports = mongoose.model('Order', orderSchema);
