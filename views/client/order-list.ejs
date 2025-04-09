@@ -29,7 +29,7 @@
                                 <th>Data Create </th>
                                 <th>Status</th>
                                 <th>Total Price</th>
-                                <th><a href="">View</a></th>
+                                <th>View</th>
                             </tr>
                         </thead>
                         <tbody>
@@ -72,61 +72,12 @@
                                         <%= order.totalAmount %> VNĐ
                                     </td>
                                     <td class="">
-                                        <a href="#">
-                                    View</i>
-                                </a>
+                                        <button type="button" class="btn btn-primary btn-sm view-order-btn" data-toggle="modal" data-target="#modelId" data-items='<%- JSON.stringify(order.items) %>' data-orderid="<%= order.orderId %>">
+                                            View
+                                        </button>
                                     </td>
                                 </tr>
                             <%}) %>
-                            
-                            <!-- <tr>
-                                <td class="thumbnail-img">
-                                    <a href="#">
-                                <img class="img-fluid" src="images/img-pro-02.jpg" alt="" />
-                            </a>
-                                </td>
-                                <td class="name-pr">
-                                    <a href="#">
-                                Lorem ipsum dolor sit amet
-                            </a>
-                                </td>
-                                <td class="price-pr">
-                                    <p>$ 60.0</p>
-                                </td>
-                                <td class="quantity-box">In Stock</td>
-                                <td class="add-pr">
-                                    <a class="btn hvr-hover" href="#">Add to Cart</a>
-                                </td>
-                                <td class="remove-pr">
-                                    <a href="#">
-                                <i class="fas fa-times"></i>
-                            </a>
-                                </td>
-                            </tr>
-                            <tr>
-                                <td class="thumbnail-img">
-                                    <a href="#">
-                                <img class="img-fluid" src="images/img-pro-03.jpg" alt="" />
-                            </a>
-                                </td>
-                                <td class="name-pr">
-                                    <a href="#">
-                                Lorem ipsum dolor sit amet
-                            </a>
-                                </td>
-                                <td class="price-pr">
-                                    <p>$ 30.0</p>
-                                </td>
-                                <td class="quantity-box">In Stock</td>
-                                <td class="add-pr">
-                                    <a class="btn hvr-hover" href="#">Add to Cart</a>
-                                </td>
-                                <td class="remove-pr">
-                                    <a href="#">
-                                <i class="fas fa-times"></i>
-                            </a>
-                                </td>
-                            </tr> -->
                         </tbody>
                     </table>
                 </div>
@@ -135,5 +86,73 @@
     </div>
 </div>
 
+<!-- Modal -->
+<div class="modal fade" id="modelId" tabindex="-1" role="dialog" aria-labelledby="modelTitleId" aria-hidden="true">
+    <div class="modal-dialog" role="document">
+      <div class="modal-content">
+        <div class="modal-header">
+          <h5 class="modal-title">Order Detail - <span id="modal-order-id"></span></h5>
+          <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+            <span aria-hidden="true">&times;</span>
+          </button>
+        </div>
+        <div class="modal-body">
+          <div class="odr-box">
+            <div class="title-left">
+              <h3>Order List</h3>
+            </div>
+            <div class="rounded p-2 bg-light" id="modal-items-container">
+              <!-- Nội dung item sẽ được thêm bằng JS -->
+            </div>
+          </div>
+        </div>
+        <div class="modal-footer">
+          <button type="button" class="btn btn-secondary" data-dismiss="modal">Close</button>
+        </div>
+      </div>
+    </div>
+  </div>
+  
 <%- include('./client/layouts/footer') %>
 <%- include('./client/layouts/script') %>
+
+<script>
+    document.addEventListener("DOMContentLoaded", function () {
+      const modalItemsContainer = document.getElementById("modal-items-container");
+      const modalOrderIdSpan = document.getElementById("modal-order-id");
+  
+      document.querySelectorAll(".view-order-btn").forEach((btn) => {
+        btn.addEventListener("click", function () {
+          const items = JSON.parse(this.getAttribute("data-items"));
+          const orderId = this.getAttribute("data-orderid");
+  
+          modalOrderIdSpan.textContent = orderId;
+  
+          if (items.length === 0) {
+            modalItemsContainer.innerHTML = "<p>Không có sản phẩm nào.</p>";
+            return;
+          }
+  
+          // Xóa nội dung cũ
+          modalItemsContainer.innerHTML = "";
+  
+          items.forEach((item) => {
+            const itemHTML = `
+              <div class="media mb-2 border-bottom">
+                <div class="media-body">
+                  <a href="#">${item.bookId}</a>
+                  <div class="small text-muted">
+                    Price: ${item.price} VNĐ
+                    <span class="mx-2">|</span> Qty: ${item.quantity}
+                    <span class="mx-2">|</span> Subtotal: ${(item.price * item.quantity)} VNĐ
+                  </div>
+                </div>
+              </div>
+            `;
+            modalItemsContainer.innerHTML += itemHTML;
+          });
+        });
+      });
+    });
+  </script>
+  

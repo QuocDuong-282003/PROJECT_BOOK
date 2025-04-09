@@ -11,7 +11,7 @@ const axios = require('axios');
 const request = require('request');
 const moment = require('moment');
 const {clearCart} = require('../../controller/Client/cart.controller');
-const {addOrder, updateStatus} = require('../../controller/Client/order.controller');
+const {getOrderByUserId,addOrder, updateStatus} = require('../../controller/Client/order.controller');
 const { title } = require('process');
 
 router.get('/', async function(req, res, next) {
@@ -106,6 +106,7 @@ router.post('/create_payment_url', async function (req, res, next) {
     let returnUrl = config.get('vnp_ReturnUrl');
     let orderId = moment(date).format('DDHHmmss');
     let amount = Math.round(parseFloat(req.body.amount)); // Đảm bảo số nguyên
+   
     // let bankCode = req.body.bankCode;
     let locale = 'vn';
     let currCode = 'VND';
@@ -133,8 +134,9 @@ router.post('/create_payment_url', async function (req, res, next) {
     let signed = hmac.update(new Buffer(signData, 'utf-8')).digest("hex"); 
     vnp_Params['vnp_SecureHash'] = signed;
     vnpUrl += '?' + querystring.stringify(vnp_Params, { encode: false });
-    console.log(orderId);
-    await addOrder(orderId,req.session.user.id, req.body.firstName, req.body.lastName, req.body.address, req.body.ward, req.body.district, req.body.city, amount, date, 0, 'VNPAY');
+    const itemsAdd = JSON.parse(req.body.items)
+    
+    await addOrder(orderId, req.session.user.id, req.body.firstName, req.body.lastName, req.body.address, req.body.ward, req.body.district, req.body.city, amount, date, 0, 'VNPAY', itemsAdd);
     res.redirect(vnpUrl)
 });
 
