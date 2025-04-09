@@ -84,7 +84,12 @@
                                 <%= formattedAmount %> VND
                             </td>
 
-                            <td class="text-center"><%= order.status %></td>
+                            <td class="text-center">
+                                <%= order.status === 0 ? 'Pending' :
+                                (order.status === 1 ? 'Delivered' : 'Cancelled')
+                                %>
+                            </td>
+
                             <td class="text-center"><%= order.paymentMethod
                                 %></td>
                             <td class="text-center"><%=

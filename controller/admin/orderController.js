@@ -1,9 +1,8 @@
-const Order = require('../../models/Order');
-const User = require('../../models/User');
-const Discount = require('../../models/Discount');
 const mongoose = require('mongoose');
-const { ObjectId } = require('mongoose').Types;
-const cron = require('node-cron');
+const Order = require('../../models/Order');
+const User = require('../../models/User'); // Import model User
+
+// Hàm lấy tất cả đơn hàng
 // exports.getAllOrders = async (req, res) => {
 //     try {
 //         // Lấy tất cả đơn hàng
@@ -11,92 +10,58 @@ const cron = require('node-cron');
 
 //         console.log('Orders before conversion:', orders);
 
-//         // Chuyển đổi userId từ string sang ObjectId nếu cần
+//         // Kiểm tra và ép kiểu `userId` nếu cần
 //         orders = orders.map(order => {
-//             if (order.userId && typeof order.userId === 'string') {
-//                 order.userId = convertToObjectId(order.userId);
+//             if (order.userId && !(order.userId instanceof mongoose.Types.ObjectId)) {
+//                 order.userId = new mongoose.Types.ObjectId(order.userId);
 //             }
 //             return order;
 //         });
+//         // Cập nhật lại nếu `userId` bị sai kiểu (Không bắt buộc)
+//         await Promise.all(orders.map(order =>
+//             Order.updateOne({ _id: order._id }, { userId: order.userId })
+//         ));
 
-//         // Cập nhật lại trong database nếu cần thiết (tuỳ chọn)
-//         await Promise.all(orders.map(order => Order.updateOne({ _id: order._id }, { userId: order.userId })));
-
-//         // Truy vấn lại với populate để lấy `name` từ `User`
+//         // Truy vấn lại và populate userId
 //         const populatedOrders = await Order.find()
-//             .populate({
-//                 path: 'userId',
-//                 select: 'name'
-//             })
-//             .populate('discountId'); // Populate thêm discountId nếu cần
+//             .populate({ path: 'userId', select: 'name' }) // Populate lấy 'name' từ User
+//             .populate('discountId') // Populate giảm giá nếu có
+//             .exec();
+
 //         console.log('Orders after population:', populatedOrders);
-//         // Render trang orderAdmin và truyền dữ liệu vào view
+
+//         // Render trang orderAdmin
 //         res.render('orderAdmin', {
 //             title: 'Order',
 //             path: req.path,
 //             orders: populatedOrders
 //         });
+
 //     } catch (error) {
 //         console.error('Error fetching orders:', error);
 //         res.status(500).send('Error when getting list of orders');
 //     }
 // };
-// controllers/orderController.js
-// exports.getAllOrders = async (req, res) => {
-//     try {
-//         // Lấy tất cả các đơn hàng
-//         const orders = await Order.find();
-
-//         // Lặp qua các đơn hàng để thêm tên người dùng
-//         for (let order of orders) {
-//             // Tìm người dùng từ bảng User dựa trên userId
-//             const user = await User.findOne({ _id: order.userId });
-
-//             // Nếu tìm thấy người dùng, thêm tên vào mỗi đơn hàng
-//             if (user) {
-//                 order.userName = user.name;
-//             } else {
-//                 order.userName = 'Unknown User'; // Nếu không có người dùng
-//             }
-//         }
-
-//         // Render ra view với các đơn hàng và tên người dùng
-//         res.render('orderAdmin', {
-//             title: 'Orders',
-//             path: req.path,
-//             orders
-//         });
-//     } catch (error) {
-//         console.error(error);
-//         res.status(500).send('Error when getting list of orders');
-//     }
-// };
 exports.getAllOrders = async (req, res) => {
     try {
-        let orders = await Order.find();
-        // Kiểm tra nếu userId là string thì chuyển về ObjectId
-        orders = orders.map(order => {
-            if (order.userId && typeof order.userId === 'string' && mongoose.Types.ObjectId.isValid(order.userId)) {
-                order.userId = order.userId;
-            }
-            return order;
+        // Kiểm tra xem có đơn hàng nào có `userId` không
+        const orders = await Order.find().populate({
+            path: 'userId',
+            select: 'name ' // Lấy thêm email & phone nếu cần
         });
-        // Truy vấn lại với populate
-        const populatedOrders = await Order.find()
-            .populate({
-                path: 'userId',
-                select: 'name email', // Chỉ lấy name và email của User
-                model: 'User'
-            })
-            .populate('discountId'); // Lấy thông tin giảm giá nếu có
-        //  console.log('Orders after population:', populatedOrders);      
+        console.log('Populated Orders:', orders);
+        if (!orders || orders.length === 0) {
+            return res.status(404).send('Không có đơn hàng nào.');
+        }
+
         res.render('orderAdmin', {
             title: 'Order',
             path: req.path,
-            orders: populatedOrders
+            orders
         });
+
     } catch (error) {
-        console.error(error);
-        res.status(500).send('Error when getting list of orders');
+        console.error('Error fetching orders:', error);
+        res.status(500).send('Error khi lấy danh sách đơn hàng');
     }
 };

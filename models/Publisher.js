@@ -5,6 +5,7 @@ const publisherSchema = new mongoose.Schema({
     country: { type: String },
     books: [{ type: mongoose.Schema.Types.ObjectId, ref: "Book" }], // Liên kết với sách
     createdAt: { type: Date, default: Date.now },
+    updatedAt: { type: Date },
     categories: [{ type: mongoose.Schema.Types.ObjectId, ref: 'Category' }] // Trường này sẽ chứa các ID của danh mục
 
 
