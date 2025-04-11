@@ -1,7 +1,7 @@
 const Book = require('../../models/Book');
 const Category = require('../../models/Category');
 const Publisher = require('../../models/Publisher');
-
+const Discount = require('../../models/Discount');
 // Lấy danh sách sách
 exports.getBooks = async (req, res) => {
     try {
@@ -10,18 +10,35 @@ exports.getBooks = async (req, res) => {
         const skip = (page - 1) * limit;
 
         const books = await Book.find().populate('categoryId publisherId').skip(skip).limit(limit);
+        for (const book of books) {
+            if (book.note && book.note.includes("Mã:")) {
+                const match = book.note.match(/Mã:.*?(?:Phần trăm|Cố định) - ([\d.]+)(%|đ)/);
+                if (match) {
+                    const value = parseFloat(match[1]);
+                    const type = match[2];
+                    book.hasDiscount = true;
+                    book.originalPrice = book.price;
+
+                    if (type === '%') {
+                        book.discountedPrice = book.price * (1 - value / 100);
+                    } else {
+                        book.discountedPrice = book.price - value;
+                    }
+                }
+            }
+        }
         const totalBooks = await Book.countDocuments();
         const totalPages = Math.ceil(totalBooks / limit);
-
         const categories = await Category.find();
         const publishers = await Publisher.find();
-
+        const discounts = await Discount.find();
         res.render('admin/book/productsAdmin', {
             title: 'Quản lý Sách',
             path: 'books', // Thêm biến path
             books,
             categories,
             publishers,
+            discounts,
             totalBooks,
             totalPages,
             currentPage: page
@@ -107,5 +124,31 @@ exports.searchBooks = async (req, res) => {
     } catch (err) {
         console.error("Lỗi khi tìm kiếm sách:", err);
         res.status(500).send("Lỗi server khi tìm kiếm sách.");
+    }
+};
+//
+exports.assignDiscountToBook = async (req, res) => {
+    const { bookId, discountId } = req.body;
+
+    try {
+        const discount = await Discount.findById(discountId);
+        if (!discount) {
+            return res.status(404).send('Discount not found');
+        }
+
+        // Tạo chuỗi ghi chú từ discount
+        const note = `Mã: ${discount.code} - ${discount.description} - ${discount.discountType === 'percent' ? 'Phần trăm' : 'Cố định'
+            } - ${discount.discountType === 'percent' ? discount.value + '%' : discount.value + 'đ'
+            }`;
+
+        // Cập nhật note vào sách
+        await Book.findByIdAndUpdate(bookId, {
+            note: note
+        });
+
+        res.redirect('/admin/books'); // hoặc trang bạn muốn chuyển hướng tới
+    } catch (error) {
+        console.error('Lỗi khi gán giảm giá:', error);
+        res.status(500).send('Failed to assign discount');
     }
 };

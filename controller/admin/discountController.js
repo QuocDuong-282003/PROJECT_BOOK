@@ -2,7 +2,7 @@
 const Discount = require('../../models/Discount');
 const mongoose = require('mongoose');
 const cron = require('node-cron');
-
+const Book = require('../../models/Book');
 
 exports.renderDiscountPage = async (req, res, next) => {
     try {
@@ -11,7 +11,7 @@ exports.renderDiscountPage = async (req, res, next) => {
         // Đếm tổng số discount
         const totalDiscounts = await Discount.countDocuments();
         const totalPages = Math.ceil(totalDiscounts / perPage); // Tính tổng số trang
-
+        const books = await Book.find().lean();
         const discounts = await Discount.find()
             .skip((page - 1) * perPage) // bỏ qua sl bản ghi 
             .limit(perPage);// lấy bản ghi tiếp theo
@@ -23,7 +23,8 @@ exports.renderDiscountPage = async (req, res, next) => {
                 discounts,
                 message: 'No discounts found.',
                 currentPage: page,
-                totalPages
+                totalPages: '',
+                books,
             });
         }
         // Render trang với danh sách discount
@@ -33,7 +34,8 @@ exports.renderDiscountPage = async (req, res, next) => {
             discounts,
             currentPage: page,
             totalPages,
-            message: ''
+            message: '',
+            books,
         });
     } catch (err) {
         next(err);
@@ -156,3 +158,4 @@ exports.getDiscounts = async (req, res) => {
         res.status(500).send("Lỗi Server");
     }
 };
+//
