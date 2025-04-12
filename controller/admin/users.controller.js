@@ -266,7 +266,6 @@ exports.getLoginStats = async (req, res) => {
         if (year && stats.chartData.every(item => item.logins === 0)) {
             stats.chartData = []; // Trả về mảng rỗng nếu không có dữ liệu
         }
-
         res.status(200).json(stats);
     } catch (error) {
         res.status(500).json({ error: 'Lỗi server khi lấy thống kê đăng nhập.' });

@@ -3,36 +3,45 @@
 <%- include('./layouts/menu-list') %>
 
 <div class="container">
-    <h1>Chào mừng đến với trang quản trị</h1>
-    <p>Đây là trang quản trị admin. Bạn có quyền truy cập đầy đủ vào hệ thống.</p>
-
     <div class="stats-section">
         <h2>Thống kê đăng nhập</h2>
         <div class="filter-form">
-            <label for="day">Ngày:</label>
-            <select id="day">
-                <option value="">Tất cả</option>
-                <% for (let i = 1; i <= 31; i++) { %>
-                    <option value="<%= i %>"><%= i %></option>
-                <% } %>
-            </select>
+            <input type="date" name="inputDate" id="inputDate">
+            <input type="hidden" name="day" id="day">
+            <input type="hidden" name="month" id="month">
+            <input type="hidden" name="year" id="year">
 
-            <label for="month">Tháng:</label>
-            <select id="month">
-                <option value="">Tất cả</option>
-                <% for (let i = 1; i <= 12; i++) { %>
-                    <option value="<%= i %>"><%= i %></option>
-                <% } %>
-            </select>
+            <script>
+                const input = document.getElementById("inputDate");
+                const dayInput = document.getElementById("day");
+                const monthInput = document.getElementById("month");
+                const yearInput = document.getElementById("year");
 
-            <label for="year">Năm:</label>
-            <select id="year">
-                <option value="">Tất cả</option>
-                <% const currentYear = new Date().getFullYear(); %>
-                <% for (let i = currentYear; i >= currentYear - 5; i--) { %>
-                    <option value="<%= i %>"><%= i %></option>
-                <% } %>
-            </select>
+                // Lấy ngày hiện tại và thiết lập giá trị vào các trường
+                const today = new Date();
+                const day = String(today.getDate()).padStart(2, '0');  // Đảm bảo ngày có 2 chữ số
+                const month = String(today.getMonth() + 1).padStart(2, '0');  // Tháng bắt đầu từ 0
+                const year = today.getFullYear();
+
+                // Thiết lập giá trị vào các trường input
+                input.value = `${year}-${month}-${day}`;
+                dayInput.value = day;
+                monthInput.value = month;
+                yearInput.value = year;
+
+                // Lắng nghe sự kiện thay đổi của inputDate
+                input.addEventListener("change", function () {
+                    let date = input.value; 
+                    // Tách ngày, tháng, năm
+                    let [year, month, day] = date.split("-");
+                    dayInput.value = day;
+                    monthInput.value = month;
+                    yearInput.value = year; 
+                });
+            </script>
+
+
+            
 
             <button id="applyFilter">Áp dụng</button>
         </div>
@@ -252,23 +261,17 @@
     });
 
     // Lắng nghe sự kiện khi nhấn nút "Xem thống kê"
+        // Lắng nghe sự kiện khi nhấn nút "Xem thống kê"
     document.getElementById('toggleStatsButton').addEventListener('click', function () {
         const tableSection = document.getElementById('userStatsTable');
         const searchSection = document.getElementById('searchSection');
         const paginationSection = document.getElementById('paginationSection');
 
-        // Ẩn/hiện bảng, ô tìm kiếm và phân trang
-        if (tableSection.style.display === 'none') {
-            tableSection.style.display = 'block';
-            searchSection.style.display = 'block';
-            paginationSection.style.display = 'block';
-            this.textContent = 'Ẩn thống kê';
-        } else {
-            tableSection.style.display = 'none';
-            searchSection.style.display = 'none';
-            paginationSection.style.display = 'none';
-            this.textContent = 'Xem thống kê';
-        }
+        // Toggle hiển thị/ẩn bảng và ô tìm kiếm
+        const isVisible = tableSection.style.display === 'block';
+        tableSection.style.display = isVisible ? 'none' : 'block';
+        searchSection.style.display = isVisible ? 'none' : 'block';
+        paginationSection.style.display = isVisible ? 'none' : 'block';
     });
 
     // Lắng nghe sự kiện khi nhấn nút "Tìm"
