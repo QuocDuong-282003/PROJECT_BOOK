@@ -215,7 +215,7 @@
                                                 <h6><a href="/products/productdetail/<%= item.bookId._id %>" > <%= item.bookId.title %> </a></h6>
                                                 <div class="btn_quantity" style="display: flex; align-items: center; gap: 5px;">
                                                     <input type="button" value="-" id="minus" class="minus" data-id="<%= item.bookId._id %>" style="cursor: pointer;">
-                                                    <input type="number" id="quantity" class="quantity" value="<%= item.quantity %>" size="2%" style="text-align: center;" min="0" max="<%= item.bookId.stock %>">
+                                                    <input type="number" id="quantity" class="quantity" value="<%= item.quantity %>" size="2%" style="text-align: center;" min="1" max="<%= item.bookId.stock %>">
                                                     <input type="button" value="+" id="plus" class="plus" data-id="<%= item.bookId._id %>" style="cursor: pointer;">
                                                     <input type="hidden" class="bookId" value="<%= item.bookId._id %>">
                                                 </div>

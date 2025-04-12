@@ -70,7 +70,7 @@
                         <tr>
                             <td class="text-center"><%= index + 1 %></td>
                             <td class="text-center">
-                                <%= order.userId && order.userId.name ?
+                                <%= order.userId ?
                                 order.userId.name : 'Unknown User' %>
                                 <!-- Lấy tên người dùng từ populate -->
                             </td>
@@ -84,7 +84,12 @@
                                 <%= formattedAmount %> VND
                             </td>
 
-                            <td class="text-center"><%= order.status %></td>
+                            <td class="text-center">
+                                <%= order.status === 0 ? 'Pending' :
+                                (order.status === 1 ? 'Delivered' : 'Cancelled')
+                                %>
+                            </td>
+
                             <td class="text-center"><%= order.paymentMethod
                                 %></td>
                             <td class="text-center"><%=

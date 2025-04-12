@@ -193,6 +193,8 @@
                                             <div class="media-body"> <a href="detail.html"> <%= item.bookId.title %></a>
                                                 <div class="small text-muted">Price: <%= item.bookId.price.toFixed(2) %> VNĐ<span class="mx-2">|</span> Qty: <%= item.quantity %> <span class="mx-2">|</span> Subtotal: $80.00</div>
                                             </div>
+                                           
+                                            
                                         </div>
                                     <% }); %>     
                                 </div>
@@ -232,6 +234,7 @@
                         <div class="col-12 d-flex justify-content-end shopping-box">
                             
                                 <% amount = cart.totalPrice%>
+                                <input type="hidden" name="items" id="items">
                                 <input type="hidden" name="amount" value="<%= amount %>">
                                 <button type="submit" class="btn hvr-hover" style="color: white;">Place Order</button>
                         
@@ -313,4 +316,19 @@
         }
     });
 </script>
-    
+
+<script type="application/json" id="itemsData">
+    <%- JSON.stringify(cart.items.map(item => ({
+        bookId: item.bookId._id,
+        quantity: item.quantity,
+        price: item.bookId.price
+    }))) %>
+</script>
+
+<script>
+    const rawJson = document.getElementById('itemsData').textContent;
+    const items = JSON.parse(rawJson);
+    document.getElementById("items").value = JSON.stringify(items);
+</script>
+
+

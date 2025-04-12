@@ -1,6 +1,15 @@
 const Order = require('../../models/Order');
-
-const addOrder = async (orderId,userId,firstName,lastName, address,ward,district,city,totalAmount,orderDate,status,paymentMethod) => {
+const getOrderByUserId = async (userID) => {
+    try {
+        const orders = await Order.find({ userId: userID }).populate("items.bookId").sort({ orderDate: -1 });
+        return orders;
+    } catch (error) {
+        console.error("Lỗi khi lấy danh sách đơn hàng:", error);
+        return null;
+        
+    }
+};
+const addOrder = async (orderId,userId,firstName,lastName, address,ward,district,city,totalAmount,orderDate,status,paymentMethod,items) => {
     try {
         const order =await Order.create({
             orderId,
@@ -14,7 +23,8 @@ const addOrder = async (orderId,userId,firstName,lastName, address,ward,district
             totalAmount,
             orderDate,
             status,
-            paymentMethod
+            paymentMethod,
+            items
         });
         return order;
     } catch (error) {
@@ -31,4 +41,4 @@ const updateStatus = async (orderID, newStatus) => {
         return null;
     }
 };
-module.exports = {addOrder,updateStatus};
+module.exports = {getOrderByUserId,addOrder,updateStatus};

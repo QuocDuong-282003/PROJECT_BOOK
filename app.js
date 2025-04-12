@@ -107,7 +107,7 @@ var productsRouter = require('./routes/client/products');
 var productdetail = require('./routes/client/productdetail');
 var cartRouter = require('./routes/client/cart');
 var vnpayRouter = require('./routes/client/checkout');
-
+var cmtRouter = require('./routes/client/comment');
 var orderListRouter = require('./routes/client/order-list');
 
 // Admin routes
@@ -125,7 +125,7 @@ app.use('/users', usersRouter);
 app.use('/products', productsRouter);
 app.use('/products',productdetail)
 app.use('/cart', cartRouter);
-
+app.use('/comment', cmtRouter);
 app.use('/admin', indexADMIN);
 app.use('/auth', authRouter);
 app.use('/checkout', vnpayRouter);
