@@ -25,18 +25,14 @@ router.delete('/discount/delete/:id', discountController.deleteDiscount);
 
 // discount seach
 router.get("/discounts", discountController.getDiscounts);
-
-
-// const { checkAdmin } = require('../../controller/admin/auth.controller');
-
-// router.use(checkAdmin); // ✅ Chặn truy cập admin nếu chưa đăng nhập
+//
 
 router.get('/', (req, res) => {
-    res.render('admin/indexADMIN', { 
-        title: "", 
-        user: req.user, 
-        path: "admin"
-    });
+  res.render('admin/indexADMIN', {
+    title: "",
+    user: req.user,
+    path: "admin"
+  });
 });
 router.get('/auth/logout', (req, res) => {
   res.clearCookie('token');

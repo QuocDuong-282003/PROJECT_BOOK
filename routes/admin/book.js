@@ -26,4 +26,6 @@ router.post('/delete/:id', bookController.deleteBook);
 // Route tìm kiếm sách
 router.get('/search', bookController.searchBooks);
 
+//
+router.post('/assign/addProduct', bookController.assignDiscountToBook);
 module.exports = router;

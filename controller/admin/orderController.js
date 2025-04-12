@@ -49,11 +49,10 @@ exports.getAllOrders = async (req, res) => {
             path: 'userId',
             select: 'name ' // Lấy thêm email & phone nếu cần
         });
-        console.log('Populated Orders:', orders);
+        // console.log('Populated Orders:', orders);
         if (!orders || orders.length === 0) {
             return res.status(404).send('Không có đơn hàng nào.');
         }
-
         res.render('orderAdmin', {
             title: 'Order',
             path: req.path,

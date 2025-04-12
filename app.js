@@ -37,8 +37,7 @@ const PORT = process.env.PORT || 3000;
 connectDB();
 // Middleware xử lý JSON
 app.use(express.json());
-app.use(express.urlencoded({ extended: true })); //
-
+app.use(express.urlencoded({ extended: true }));
 // Middleware xử lý session
 app.use(session({
     secret: process.env.JWT_SECRET, // Thay bằng một chuỗi bí mật
@@ -64,13 +63,9 @@ app.use(async (req, res, next) => {
     } else {
         res.locals.cart = { items: [] }; // Nếu chưa đăng nhập, gán giỏ hàng rỗng
     }
-    
+
     next();
 });
-
-
-
-//
 scheduleDeleteExpiredDiscounts();
 // Middleware
 app.use(cookieParser());
@@ -123,27 +118,27 @@ var discountRouter = require('./routes/admin/discount');
 // Client routes
 app.use('/users', usersRouter);
 app.use('/products', productsRouter);
-app.use('/products',productdetail)
+app.use('/products', productdetail)
 app.use('/cart', cartRouter);
 app.use('/comment', cmtRouter);
 app.use('/admin', indexADMIN);
 app.use('/auth', authRouter);
 app.use('/checkout', vnpayRouter);
-app.use('/orderlist',orderListRouter);
+app.use('/orderlist', orderListRouter);
 
 
 
 const { checkAdmin } = require('./controller/admin/auth.controller');
 
 
-app.use('/admin/auth',authsRouter);
-app.use('/admin',checkAdmin, indexADMIN);
-app.use('/admin/users', checkAdmin,userRouter);
+app.use('/admin/auth', authsRouter);
+app.use('/admin', checkAdmin, indexADMIN);
+app.use('/admin/users', checkAdmin, userRouter);
 app.use('/admin/category', checkAdmin, categoryRouter);
-app.use('/admin/comment',checkAdmin,  commentRouter);
+app.use('/admin/comment', checkAdmin, commentRouter);
 app.use('/admin/books', checkAdmin, bookRouter);
-app.use('/admin/discount',checkAdmin,  discountRouter);
-app.use('/admin/publishers',checkAdmin,  publisherRoutes);
+app.use('/admin/discount', checkAdmin, discountRouter);
+app.use('/admin/publishers', checkAdmin, publisherRoutes);
 
 
 

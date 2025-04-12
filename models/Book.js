@@ -13,7 +13,8 @@ const bookSchema = new mongoose.Schema({
   stock: { type: Number, required: true, min: 0 },
   description: { type: String },
   coverImage: { type: String },
-  averageRating: { type: Number, default: 0 }
+  averageRating: { type: Number, default: 0 },
+  note: { type: String, default: '' }
 }, {
   timestamps: true,
   toJSON: { getters: true }, // Đảm bảo getters được áp dụng khi chuyển đổi sang JSON
