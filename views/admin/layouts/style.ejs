@@ -8,3 +8,112 @@
 <%# if (rtltheme === 'true') { %>
   <link rel="stylesheet" href="/assets/css/layout-rtl.css">
 
+  <style>
+    /* Reset CSS cơ bản */
+    * {
+        margin: 0;
+        padding: 0;
+        box-sizing: border-box;
+        font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+    }
+
+    /* Container chính */
+    .container {
+        max-width: 1200px;
+        margin: 0 auto;
+        padding: 20px;
+    }
+
+    /* Tiêu đề trang */
+    h1 {
+        font-size: 2.5rem;
+        color: #333;
+        margin-bottom: 20px;
+        text-align: center;
+    }
+
+    /* Đoạn văn bản mô tả */
+    p {
+        font-size: 1.1rem;
+        color: #666;
+        text-align: center;
+        margin-bottom: 40px;
+    }
+
+    /* Phần thống kê đăng nhập */
+    .stats-section {
+        background: #f9f9f9;
+        padding: 20px;
+        border-radius: 10px;
+        box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+    }
+
+    .stats-section h2 {
+        font-size: 1.8rem;
+        color: #444;
+        margin-bottom: 20px;
+        text-align: center;
+    }
+
+    /* Form lọc dữ liệu */
+    .filter-form {
+        display: flex;
+        flex-wrap: wrap;
+        gap: 10px;
+        justify-content: center;
+        margin-bottom: 20px;
+    }
+
+    .filter-form label {
+        font-size: 1rem;
+        color: #555;
+        align-self: center;
+    }
+
+    .filter-form select {
+        padding: 8px 12px;
+        border: 1px solid #ddd;
+        border-radius: 5px;
+        font-size: 1rem;
+        color: #333;
+        background: #fff;
+        cursor: pointer;
+    }
+
+    .filter-form select:hover {
+        border-color: #aaa;
+    }
+
+    .filter-form button {
+        padding: 8px 20px;
+        background: #007bff;
+        color: #fff;
+        border: none;
+        border-radius: 5px;
+        font-size: 1rem;
+        cursor: pointer;
+        transition: background 0.3s ease;
+    }
+
+    .filter-form button:hover {
+        background: #0056b3;
+    }
+
+    /* Biểu đồ */
+    .chart-container {
+        margin-top: 20px;
+        background: #fff;
+        padding: 20px;
+        border-radius: 10px;
+        box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+    }
+
+    /* Footer */
+    footer {
+        margin-top: 40px;
+        text-align: center;
+        font-size: 0.9rem;
+        color: #777;
+    }
+    
+</style>
