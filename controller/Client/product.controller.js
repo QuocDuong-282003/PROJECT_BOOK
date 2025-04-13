@@ -30,6 +30,15 @@ const getProductByCategory = async (_idCategory) => {
     }
 };
 
+const findProductByName = async (name) => {
+    try {
+        const products = await Book.find({ title: { $regex: name, $options: "i" } });
+        return products; 
+    } catch (error) {
+        console.error("Lỗi khi tìm sản phẩm theo tên:", error);
+        return [];
+    }
+};
 
 // Đảm bảo export đúng
-module.exports = { getAllBooks, getProductById , getProductByCategory};
+module.exports = { getAllBooks, getProductById , getProductByCategory, findProductByName};

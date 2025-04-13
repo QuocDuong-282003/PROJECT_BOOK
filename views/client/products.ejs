@@ -10,8 +10,8 @@
                 <div class="col-xl-3 col-lg-3 col-sm-12 col-xs-12 sidebar-shop-left">
                     <div class="product-categori">
                         <div class="search-product">
-                            <form action="#">
-                                <input class="form-control" placeholder="Search here..." type="text">
+                            <form action="/products/search" method="GET">
+                                <input class="form-control" placeholder="Search here..." type="text" name="name" >
                                 <button type="submit"> <i class="fa fa-search"></i> </button>
                             </form>
                         </div>
@@ -33,10 +33,10 @@
                                         </div>
                                     </div>
                                 </div> -->
-                                    <a href="/products/" class="list-group-item list-group-item-action"> All <small class="text-muted">(150) </small></a>
+                                    <a href="/products/" class="list-group-item list-group-item-action"> All </a>
                                 <% AllCategories.forEach( category => { %>
                           
-                                    <a href="/products/category=<%=category._id%>" class="list-group-item list-group-item-action"> <%= category.name %>  <small class="text-muted">(150) </small></a>
+                                    <a href="/products/category=<%=category._id%>" class="list-group-item list-group-item-action"> <%= category.name %> </a>
                                 <%}) %>
                                 
                             </div>

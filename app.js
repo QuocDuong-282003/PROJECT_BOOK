@@ -121,7 +121,6 @@ app.use('/products', productsRouter);
 app.use('/products', productdetail)
 app.use('/cart', cartRouter);
 app.use('/comment', cmtRouter);
-app.use('/admin', indexADMIN);
 app.use('/auth', authRouter);
 app.use('/checkout', vnpayRouter);
 app.use('/orderlist', orderListRouter);
