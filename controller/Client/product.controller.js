@@ -40,5 +40,15 @@ const findProductByName = async (name) => {
     }
 };
 
+const sortByPrice = async (sortType) => {
+    try {
+        const products = await Book.find().sort({ price: sortType });
+        return products; 
+    } catch (error) {
+        console.error("Lỗi khi tìm sản phẩm theo tên:", error);
+        return [];
+    }
+};  
+
 // Đảm bảo export đúng
-module.exports = { getAllBooks, getProductById , getProductByCategory, findProductByName};
+module.exports = { getAllBooks, getProductById , getProductByCategory, findProductByName, sortByPrice};
