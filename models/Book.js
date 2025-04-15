@@ -11,6 +11,7 @@ const bookSchema = new mongoose.Schema({
     min: 0,
   },
   stock: { type: Number, required: true, min: 0 },
+  selling: { type: Number, default: 0 },
   description: { type: String },
   coverImage: { type: String },
   averageRating: { type: Number, default: 0 },

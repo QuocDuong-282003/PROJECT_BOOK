@@ -11,7 +11,7 @@ const axios = require('axios');
 const request = require('request');
 const moment = require('moment');
 const {clearCart} = require('../../controller/Client/cart.controller');
-const {getOrderByUserId,addOrder, updateStatus} = require('../../controller/Client/order.controller');
+const {getOrderByUserId,addOrder, updateStatus, updateBook} = require('../../controller/Client/order.controller');
 const { title } = require('process');
 
 router.get('/', async function(req, res, next) {
@@ -137,6 +137,7 @@ router.post('/create_payment_url', async function (req, res, next) {
     const itemsAdd = JSON.parse(req.body.items)
     
     await addOrder(orderId, req.session.user.id, req.body.firstName, req.body.lastName, req.body.address, req.body.ward, req.body.district, req.body.city, amount, date, 0, 'VNPAY', itemsAdd);
+    await updateBook(itemsAdd);
     res.redirect(vnpUrl)
 });
 

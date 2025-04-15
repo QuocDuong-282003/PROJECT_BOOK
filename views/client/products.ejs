@@ -131,33 +131,14 @@
                             <div class="col-12 col-sm-8 text-center text-sm-left">
                                 <div class="toolbar-sorter-right">
                                     <span>Sort by </span>
-<select id="basic" class="form-control">
-    <option value="1">Popularity</option>
-    <option value="2">High Price → High Price</option>
-    <option value="3">Low Price → High Price</option>
-    <option value="4">Best Selling</option>
-</select>
-
-<script>
-    document.addEventListener("DOMContentLoaded", function () {
-        console.log('script chạy');
-        const select = document.querySelector('#basic');
-        console.log('select là:', select);
-
-        // Listen for a change in the select element
-        select.addEventListener('change', function() {
-            const selectedValue = select.value;
-            console.log('Selected value:', selectedValue);
-        });
-    });
-</script>
-
-                                      
-                                    
-                                    
-                                    
-                                    
-                                    
+                                    <select id="basic" class="selectpicker show-tick form-control" data-placeholder="$ USD" onchange="getComboA(this)" name="sort">
+                                        <option data-display="Select">Nothing</option>
+                                        <option value="1">Popularity</option>
+                                        <option value="2">High Price → Low Price</option>
+                                        <option value="3">Low Price → High Price</option>
+                                        <option value="4">Best Selling</option>
+                                    </select>
+                                                                             
                                 </div>
                                 <p>Showing all 4 results</p>
                             </div>
@@ -176,7 +157,7 @@
                         <div class="row product-categorie-box">
                             <div class="tab-content">
                                 <div role="tabpanel" class="tab-pane fade show active" id="grid-view">
-                                    <div class="row">
+                                    <div class="row" id="products-list">
                                         <% Products.forEach(product => { %>
                                             <div class="col-sm-6 col-md-6 col-lg-4 col-xl-4">
                                                 <div class="products-single fix">
@@ -227,3 +208,60 @@
     <%- include('./client/layouts/footer') %>
     <%- include('./client/layouts/script') %>
 </body>
+<script>
+    function getComboA(selectObject) {
+        var value = selectObject.value;
+        fetch('/products/sort?value=' + value)
+            .then(response => {
+                if (!response.ok) {
+                    throw new Error('Network response was not ok ' + response.statusText);
+                }
+                return response.json(); // đọc JSON 1 lần duy nhất
+            })
+            .then(data => {
+                const products = data.Products
+                // TODO: cập nhật giao diện tại đây nếu cần
+                const productsList = document.getElementById('products-list');
+                productsList.innerHTML = ''; // Xóa nội dung hiện tại
+                products.forEach(product =>{
+                    const productHTML = `
+                                            <div class="col-sm-6 col-md-6 col-lg-4 col-xl-4">
+                                                <div class="products-single fix">
+                                                    <div class="box-img-hover">
+                                                        <div class="type-lb">
+                                                            <p class="sale">Sale</p>
+                                                        </div>
+                                                        <img src="images/img-pro-01.jpg" class="img-fluid" alt="Image">
+                                                        <div class="mask-icon">
+                                                            <ul>
+                                                                <li><a href="#" data-toggle="tooltip" data-placement="right" title="View"><i class="fas fa-eye"></i></a></li>
+                                                                <li><a href="#" data-toggle="tooltip" data-placement="right" title="Compare"><i class="fas fa-sync-alt"></i></a></li>
+                                                                <li><a href="#" data-toggle="tooltip" data-placement="right" title="Add to Wishlist"><i class="far fa-heart"></i></a></li>
+                                                            </ul>
+                                                            <!-- Form thêm vào giỏ hàng -->
+                                                             
+                                                            <form action="/cart/add" method="POST">
+                                                                <button type="submit" class="cart">Add to Cart</button>
+                                                                <input type="hidden" name="quantity" value="1" >
+                                                                <input type="hidden" name="bookId" value="${product._id}">
+                                                            </form>
+                                                        </div>
+                                                    </div>
+                                                    <a href="/products/productdetail/${product._id}">
+                                                        <div class="why-text">
+                                                            <h4>${product.title}</h4>
+                                                            <h5>${product.price}</h5>
+                                                        </div>
+                                                    </a>
+                                                </div>
+                                            </div>                        
+                    `;
+                    productsList.innerHTML += productHTML; // Thêm sản phẩm vào danh sách
+                });
+            })
+            .catch(error => {
+                console.error('Lỗi khi fetch dữ liệu:', error);
+            });
+    }
+
+</script>    
