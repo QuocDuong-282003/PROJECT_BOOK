@@ -4,11 +4,12 @@ const bookSchema = new mongoose.Schema({
   author: { type: String, required: true },
   categoryId: { type: mongoose.Schema.Types.ObjectId, ref: 'Category' },
   publisherId: { type: mongoose.Schema.Types.ObjectId, ref: 'Publisher' },
-  discountId: { type: mongoose.Schema.Types.ObjectId, ref: 'Discount' },
+  discountId: { type: mongoose.Schema.Types.ObjectId, ref: 'Discount' ,default: null},
   price: {
     type: Number,
     required: true,
     min: 0,
+
   },
   stock: { type: Number, required: true, min: 0 },
   selling: { type: Number, default: 0 },

@@ -170,7 +170,10 @@
                                 </li>
                             </ul>
                         </li>
-                        <li class="nav-item"><a class="nav-link" href="service.html">Our Service</a></li>
+                        <% if (user) { %>
+                            <li class="nav-item"><a class="nav-link" href="/orderlist">Order List</a></li>
+                        <% } %>
+                        
                         <li class="nav-item"><a class="nav-link" href="contact-us.html">Contact Us</a></li>
                     </ul>
                 </div>
@@ -220,7 +223,7 @@
                                                     <input type="hidden" class="bookId" value="<%= item.bookId._id %>">
                                                 </div>
                                  
-                                                <p><span class="price"> <%= item.price.toFixed(2) %> VNĐ</span></p>
+                                                <p><span class="price"> <%= item.price.toLocaleString('vi-VN') %> VNĐ</span></p>
                                             </div>
                                             <form action="/cart/remove"method="POST" style="padding-top: 7%;">
                                                 <input type="hidden" name="bookId" value="<%= item.bookId._id %>">
@@ -234,7 +237,7 @@
                                 
                             <% }); %>
                                     <li class="total">
-                                        <span style="font-size: 150%;"><strong>Total</strong>: <%= cart.totalPrice %> VNĐ</span>
+                                        <span style="font-size: 150%;"><strong>Total</strong>: <%= cart.totalPrice.toLocaleString('vi-VN') %> VNĐ</span>
                                         <a href="/cart" class="btn btn-default hvr-hover btn-cart">VIEW CART</a>
                                         
                                     </li>

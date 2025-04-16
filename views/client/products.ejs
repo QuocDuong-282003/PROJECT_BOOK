@@ -184,7 +184,7 @@
                                                     <a href="/products/productdetail/<%= product._id %>">
                                                         <div class="why-text">
                                                             <h4><%= product.title %></h4>
-                                                            <h5><%= product.price %></h5>
+                                                            <h5><%= product.price.toLocaleString('vi-VN')%> VNĐ</h5>
                                                         </div>
                                                     </a>
                                                 </div>
@@ -250,7 +250,7 @@
                                                     <a href="/products/productdetail/${product._id}">
                                                         <div class="why-text">
                                                             <h4>${product.title}</h4>
-                                                            <h5>${product.price}</h5>
+                                                            <h5>${product.price.toLocaleString('vi-VN')} VNĐ</h5>
                                                         </div>
                                                     </a>
                                                 </div>
