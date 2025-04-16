@@ -30,6 +30,7 @@
                                 <th>Status</th>
                                 <th>Total Price</th>
                                 <th>View</th>
+                                <th>Feedback</th>
                             </tr>
                         </thead>
                         <tbody>
@@ -69,11 +70,16 @@
                                     %>
                                     <td class="quantity-box"><%= status %></td>
                                     <td class="add-pr">
-                                        <%= order.totalAmount %> VNĐ
+                                        <%= order.totalAmount.toLocaleString('vi-VN') %> VNĐ
                                     </td>
                                     <td class="">
-                                        <button type="button" class="btn btn-primary btn-sm view-order-btn" data-toggle="modal" data-target="#modelId" data-items='<%- JSON.stringify(order.items) %>' data-orderid="<%= order.orderId %>">
+                                        <button type="button" class="btn btn-primary btn-sm view-order-btn" data-toggle="modal" data-target="#modelId" data-items="<%- encodeURIComponent(JSON.stringify(order)) %>" data-orderid="<%= order.orderId %>">
                                             View
+                                        </button>
+                                    </td>
+                                    <td>
+                                        <button type="button" class="btn btn-success btn-sm view-fback-btn" data-toggle="modal" data-target="#modelVote" data-items="<%- encodeURIComponent(JSON.stringify(order)) %>" data-orderid="<%= order.orderId %>">
+                                            Feedback
                                         </button>
                                     </td>
                                 </tr>
@@ -112,7 +118,59 @@
       </div>
     </div>
   </div>
-  
+  <div class="modal fade" id="modelVote" tabindex="-1" role="dialog" aria-labelledby="modelTitleId" aria-hidden="true">
+    <div class="modal-dialog" role="document">
+      <div class="modal-content">
+        <div class="modal-header">
+          <div class="title-left">
+            <h3>FeedBack</h3>
+          </div>
+          <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+            <span aria-hidden="true">&times;</span>
+          </button>
+        </div>
+        <div class="modal-body">
+          <div class="vote-box">
+            <div class="rounded p-2 bg-light" >
+              <!-- Nội dung item sẽ được thêm bằng JS -->
+              <form action="/comment/add" method="post">
+                <div class="card">
+                  <div class="row">   
+                      <div class="col-2"> 
+                          <img src="https://i.imgur.com/xELPaag.jpg" width="70" class="rounded-circle mt-2">          
+                      </div>                  
+                      <div class="col-10">                   
+                          <div class="comment-box ml-2">
+                              <div id="modal-fback-container"></div>
+                              <input type="hidden" name="orderId" id="orderId" value="${orderId}"> 
+                              <input type="hidden" name="userId" id="userId" value="<%= user.id %>">
+                              <h4 style="font-weight: bold;"><%= user.name %></h4>             
+                              <div class="rating"> 
+                                  <input type="radio" name="rating" value="5" id="5"><label for="5">☆</label>
+                                  <input type="radio" name="rating" value="4" id="4"><label for="4">☆</label> 
+                                  <input type="radio" name="rating" value="3" id="3"><label for="3">☆</label>
+                                  <input type="radio" name="rating" value="2" id="2"><label for="2">☆</label>
+                                  <input type="radio" name="rating" value="1" id="1"><label for="1">☆</label>
+                              </div>                         
+                              <div class="comment-area">                               
+                                  <textarea class="form-control" placeholder="what is your view?" rows="4" name="content"></textarea>                           
+                              </div>                                                                                             
+                          </div>                   
+                      </div>                
+                </div>
+                 
+            </div>
+            </div>
+          </div>
+        </div>
+        <div class="modal-footer">
+          <button type="button" class="btn btn-secondary" data-dismiss="modal">Close</button>
+          <button type="submit" class="btn btn-primary">Send </button>   
+        </div>
+      </form> 
+      </div>
+    </div>
+  </div> 
 <%- include('./client/layouts/footer') %>
 <%- include('./client/layouts/script') %>
 
@@ -120,31 +178,59 @@
     document.addEventListener("DOMContentLoaded", function () {
       const modalItemsContainer = document.getElementById("modal-items-container");
       const modalOrderIdSpan = document.getElementById("modal-order-id");
-  
+      const modalFbackContainer = document.getElementById("modal-fback-container");
+      document.querySelectorAll(".view-fback-btn").forEach((btn)=>{
+        btn.addEventListener("click", function () {
+          const jsonStr = decodeURIComponent(this.getAttribute("data-items"));
+          const order = JSON.parse(jsonStr);
+          const orderId = this.getAttribute("data-orderid");
+          
+          if (order.length === 0) {
+            modalFbackContainer.innerHTML = "<p>Không có sản phẩm nào.</p>";
+            return;
+          }
+          document.querySelector("#orderId").value = orderId;
+          modalFbackContainer.innerHTML = "";
+          order.items.forEach((item) => {
+            const voteHTML = `                              
+                              <input type="hidden" name="bookId" id="bookId" value="${item.bookId.id}">                                              
+            `;
+            modalFbackContainer.innerHTML += voteHTML;
+          });
+          
+
+        });
+      })
       document.querySelectorAll(".view-order-btn").forEach((btn) => {
         btn.addEventListener("click", function () {
-          const items = JSON.parse(this.getAttribute("data-items"));
+          const jsonStr = decodeURIComponent(this.getAttribute("data-items"));
+          const order = JSON.parse(jsonStr);
           const orderId = this.getAttribute("data-orderid");
-  
           modalOrderIdSpan.textContent = orderId;
-  
-          if (items.length === 0) {
+          if (order.length === 0) {
             modalItemsContainer.innerHTML = "<p>Không có sản phẩm nào.</p>";
             return;
           }
-  
           // Xóa nội dung cũ
           modalItemsContainer.innerHTML = "";
-  
-          items.forEach((item) => {
+          const infoHTML = `
+            <div class="media mb-2 border-bottom">
+              <div class="media-body">
+                <h5 class="mt-0">Name: ${(order.lastName+" "+order.firstName)}</h5>
+                <h5 class="mt-0">Address: ${(order.address+", "+order.ward+", "+order.district+", "+order.city)}</h5>
+              </div>
+            </div>
+          `;
+          modalItemsContainer.innerHTML += infoHTML;
+          order.items.forEach((item) => {
             const itemHTML = `
               <div class="media mb-2 border-bottom">
                 <div class="media-body">
                   <a href="#">${item.bookId.title}</a>
                   <div class="small text-muted">
-                    Price: ${item.price} VNĐ
+                    Price: ${item.price.toLocaleString('vi-VN')} VNĐ
                     <span class="mx-2">|</span> Qty: ${item.quantity}
-                    <span class="mx-2">|</span> Subtotal: ${(item.price * item.quantity)} VNĐ
+                    <span class="mx-2">|</span> Subtotal: ${(item.price * item.quantity).toLocaleString('vi-VN')} VNĐ
                   </div>
                 </div>
               </div>

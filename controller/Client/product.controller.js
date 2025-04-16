@@ -58,5 +58,22 @@ const sortBySelling = async (sortType) => {
         return [];
     }
 }
+const updateRating = async (bookId, rating) => {
+    try {
+        const product = await Book.findById(bookId);
+        if (!product) {
+            console.error("Sản phẩm không tồn tại");
+            return null;
+        }
+        product.averageRating = ((product.averageRating*product.totalVotes)+rating) / (product.totalVotes+1); 
+        product.averageRating = product.averageRating.toFixed(1); 
+        product.totalVotes += 1; 
+        await product.save();
+    } catch (error) {
+        console.error("Lỗi khi cập nhật rating:", error);
+        return null;
+        
+    }
+}
 // Đảm bảo export đúng
-module.exports = { getAllBooks, getProductById , getProductByCategory, findProductByName, sortByPrice, sortBySelling };
+module.exports = { getAllBooks, getProductById , getProductByCategory, findProductByName, sortByPrice, sortBySelling ,updateRating};

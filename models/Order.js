@@ -15,6 +15,7 @@ const orderSchema = new mongoose.Schema({
     orderDate: { type: Date, default: Date.now },
     status: { type: Number, enum: [0, 1, -1], default: 0 },// 0: pending, 1: delivered, -1: cancelled
     paymentMethod: { type: String, required: true },
+    isFeedback: { type: Boolean, default: false },
     items: [
         {
             bookId: {
