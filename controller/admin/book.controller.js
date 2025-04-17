@@ -287,18 +287,30 @@ exports.assignDiscountToBook = async (req, res) => {
         if (!discount) {
             return res.status(404).send('Discount not found');
         }
-
         // Tạo chuỗi ghi chú từ discount
         const note = `Mã: ${discount.code} - ${discount.description} - ${discount.discountType === 'percent' ? 'Phần trăm' : 'Cố định'
             } - ${discount.discountType === 'percent' ? discount.value + '%' : discount.value + 'đ'
             }`;
 
-        // Cập nhật note vào sách
-        await Book.findByIdAndUpdate(bookId, {
-            note: note
-        });
+        // Cập nhật sách với note và discountId, trả về bản ghi đã cập nhật
+        const updatedBook = await Book.findByIdAndUpdate(
+            bookId,
+            {
+                note: note,
+                discountId: discountId,
+            },
+            { new: true } // đảm bảo trả về bản ghi sau khi cập nhật
+        );
 
-        res.redirect('/admin/books'); // hoặc trang bạn muốn chuyển hướng tới
+        // Kiểm tra xem discountId đã được gán thành công chưa
+        if (updatedBook && updatedBook.discountId && updatedBook.discountId.toString() === discountId) {
+            console.log('Gán giảm giá thành công');
+        } else {
+            console.log('Gán giảm giá thất bại');
+        }
+
+
+        res.redirect('/admin/books');
     } catch (error) {
         console.error('Lỗi khi gán giảm giá:', error);
         res.status(500).send('Failed to assign discount');
