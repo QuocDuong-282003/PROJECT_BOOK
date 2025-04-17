@@ -8,4 +8,5 @@ const getAllPublishers = async () => {
         return [];
     }
 };
+
 module.exports = {getAllPublishers};

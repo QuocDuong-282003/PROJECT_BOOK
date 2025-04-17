@@ -93,44 +93,23 @@ exports.getBooks = async (req, res) => {
 // };
 // Xóa sách
 exports.createBook = async (req, res) => {
-    // try {
-    //     const { title, author, categoryId, publisherId, price, stock, description } = req.body;
-
-    //     // Nếu có ảnh gửi lên, convert buffer -> base64 string
-    //     let coverImageBase64 = "";
-    //     if (req.file) {
-    //         const mimeType = req.file.mimetype; // ví dụ image/jpeg
-    //         coverImageBase64 = `data:${mimeType};base64,${req.file.buffer.toString("base64")}`;
-    //     }
-
-    //     const newBook = new Book({
-    //         title,
-    //         author,
-    //         categoryId,
-    //         publisherId,
-    //         price: parseFloat(price),
-    //         stock,
-    //         description,
-    //         coverImage: coverImageBase64 || "", // lưu base64
-    //     });
-
-    //     await newBook.save();
-    //     res.redirect('/admin/books');
-    // } catch (err) {
-    //     console.error("Lỗi khi thêm sách:", err);
-    //     res.status(500).send("Lỗi server khi thêm sách.");
-    // }
     try {
         const { title, author, categoryId, publisherId, price, stock, description } = req.body;
 
         // Nếu có ảnh gửi lên, convert buffer -> base64 string
+        // coverImage vẫn ở req.files['coverImage'][0]
         let coverImageBase64 = "";
-        if (req.file) {
-            const mimeType = req.file.mimetype; // ví dụ image/jpeg
-            coverImageBase64 = `data:${mimeType};base64,${req.file.buffer.toString("base64")}`;
-        } else {
-            coverImageBase64 = ""; // Nếu không có ảnh, giữ trống
+        if (req.files && req.files['coverImage']) {
+            const file = req.files['coverImage'][0];
+            const mimeType = file.mimetype;
+            coverImageBase64 = `data:${mimeType};base64,${file.buffer.toString("base64")}`;
         }
+
+        // ảnh phụ
+        const imageFiles = req.files['Image'] || [];
+        const imagesBase64 = imageFiles.map(file => {
+            return `data:${file.mimetype};base64,${file.buffer.toString("base64")}`;
+        });
 
 
         const newBook = new Book({
@@ -142,6 +121,7 @@ exports.createBook = async (req, res) => {
             stock,
             description,
             coverImage: coverImageBase64 || "", // lưu base64
+            images: imagesBase64, 
         });
 
         await newBook.save();

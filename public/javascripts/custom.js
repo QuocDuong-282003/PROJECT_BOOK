@@ -190,18 +190,42 @@
 	   Slider Range
 	   ................................................. */
 
-	$(function() {
+	   $(function () {
+		// Lấy query string từ URL
+		const urlParams = new URLSearchParams(window.location.search);
+		// Lấy giá trị priceMin và priceMax, chuyển thành số, hoặc gán mặc định
+		let filterMin = Number(urlParams.get('priceMin')) || 0;
+		let filterMax = Number(urlParams.get('priceMax')) || 500000;
+	
+		// Đảm bảo giá trị nằm trong khoảng min/max của slider
+		filterMin = Math.max(0, Math.min(filterMin, 500000));
+		filterMax = Math.max(0, Math.min(filterMax, 500000));
+	
+		// Khởi tạo slider
 		$("#slider-range").slider({
 			range: true,
 			min: 0,
 			max: 500000,
-			values: [0, 500000],
-			slide: function(event, ui) {
-				$("#amount").val(ui.values[0]+ "VNĐ"+ " - "+ ui.values[1]+"VNĐ");
+			values: [filterMin, filterMax], // Sử dụng giá trị từ URL
+			slide: function (event, ui) {
+				// Cập nhật giá trị hiển thị trong #amount
+				$("#amount").val(
+					ui.values[0].toLocaleString('vi-VN') + " VNĐ - " +
+					ui.values[1].toLocaleString('vi-VN') + " VNĐ"
+				);
+				// Cập nhật giá trị trong input ẩn
+				$("#priceMin").val(ui.values[0]);
+				$("#priceMax").val(ui.values[1]);
 			}
 		});
-		$("#amount").val($("#slider-range").slider("values", 0) +
-			"VNĐ - " + $("#slider-range").slider("values", 1) + "VNĐ");
+	
+		// Cập nhật giá trị ban đầu cho #amount và input ẩn
+		$("#amount").val(
+			filterMin.toLocaleString('vi-VN') + " VNĐ - " +
+			filterMax.toLocaleString('vi-VN') + " VNĐ"
+		);
+		$("#priceMin").val(filterMin);
+		$("#priceMax").val(filterMax);
 	});
 
 	/* ..............................................

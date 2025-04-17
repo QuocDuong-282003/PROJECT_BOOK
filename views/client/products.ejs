@@ -15,24 +15,28 @@
                                 <button type="submit"> <i class="fa fa-search"></i> </button>
                             </form>
                         </div>
+                        <div class="filter-price-left">
+                            <div class="title-left">
+                                <h3>Price</h3>
+                            </div>
+                            <form action="/products/filter" method="get">
+                                <div class="price-box-slider">
+                                    <div id="slider-range"></div>
+                                    <input type="hidden" id="priceMin" name="priceMin" value="0">
+                                    <input type="hidden" id="priceMax" name="priceMax" value="10000000">  
+                                    <p>
+                                        <input type="text" id="amount" readonly style="border:0; color:#fbb714; font-weight:bold;">
+                                        <button class="btn hvr-hover" type="submit">Filter</button>
+                                    </p>
+                                </div>
+                            </form>
+                            
+                        </div>
                         <div class="filter-sidebar-left">
                             <div class="title-left">
                                 <h3>Categories</h3>
                             </div>
                             <div class="list-group list-group-collapse list-group-sm list-group-tree" id="list-group-men" data-children=".sub-men">
-                                <!-- <div class="list-group-collapse sub-men">
-                                    <a class="list-group-item list-group-item-action" href="#sub-men1" data-toggle="collapse" aria-expanded="true" aria-controls="sub-men1">Clothing <small class="text-muted">(100)</small>
-								</a>
-                                    <div class="collapse show" id="sub-men1" data-parent="#list-group-men">
-                                        <div class="list-group">
-                                            <a href="#" class="list-group-item list-group-item-action">T-Shirts <small class="text-muted">(50)</small></a>
-                                            <a href="#" class="list-group-item list-group-item-action">Polo T-Shirts <small class="text-muted">(10)</small></a>
-                                            <a href="#" class="list-group-item list-group-item-action">Round Neck T-Shirts <small class="text-muted">(10)</small></a>
-                                            <a href="#" class="list-group-item list-group-item-action">V Neck T-Shirts <small class="text-muted">(10)</small></a>
-                                            <a href="#" class="list-group-item list-group-item-action">Hooded T-Shirts <small class="text-muted">(20)</small></a>
-                                        </div>
-                                    </div>
-                                </div> -->
                                     <a href="/products/" class="list-group-item list-group-item-action"> All </a>
                                 <% AllCategories.forEach( category => { %>
                           
@@ -41,86 +45,18 @@
                                 
                             </div>
                         </div>
-                        <div class="filter-price-left">
-                            <div class="title-left">
-                                <h3>Price</h3>
-                            </div>
-                            <div class="price-box-slider">
-                                <div id="slider-range"></div>
-                                <p>
-                                    <input type="text" id="amount" readonly style="border:0; color:#fbb714; font-weight:bold;">
-                                    <button class="btn hvr-hover" type="submit">Filter</button>
-                                </p>
-                            </div>
-                        </div>
+                        
                         <div class="filter-brand-left">
                             <div class="title-left">
-                                <h3>Brand</h3>
+                                <h3>Publisher</h3>
                             </div>
-                            <div class="brand-box">
-                                <ul>
-                                    <li>
-                                        <div class="radio radio-danger">
-                                            <input name="survey" id="Radios1" value="Yes" type="radio">
-                                            <label for="Radios1"> Supreme </label>
-                                        </div>
-                                    </li>
-                                    <li>
-                                        <div class="radio radio-danger">
-                                            <input name="survey" id="Radios2" value="No" type="radio">
-                                            <label for="Radios2"> A Bathing Ape </label>
-                                        </div>
-                                    </li>
-                                    <li>
-                                        <div class="radio radio-danger">
-                                            <input name="survey" id="Radios3" value="declater" type="radio">
-                                            <label for="Radios3"> The Hundreds </label>
-                                        </div>
-                                    </li>
-                                    <li>
-                                        <div class="radio radio-danger">
-                                            <input name="survey" id="Radios4" value="declater" type="radio">
-                                            <label for="Radios4"> Alife </label>
-                                        </div>
-                                    </li>
-                                    <li>
-                                        <div class="radio radio-danger">
-                                            <input name="survey" id="Radios5" value="declater" type="radio">
-                                            <label for="Radios5"> Neighborhood </label>
-                                        </div>
-                                    </li>
-                                    <li>
-                                        <div class="radio radio-danger">
-                                            <input name="survey" id="Radios6" value="declater" type="radio">
-                                            <label for="Radios6"> CLOT </label>
-                                        </div>
-                                    </li>
-                                    <li>
-                                        <div class="radio radio-danger">
-                                            <input name="survey" id="Radios7" value="declater" type="radio">
-                                            <label for="Radios7"> Acapulco Gold </label>
-                                        </div>
-                                    </li>
-                                    <li>
-                                        <div class="radio radio-danger">
-                                            <input name="survey" id="Radios8" value="declater" type="radio">
-                                            <label for="Radios8"> UNDFTD </label>
-                                        </div>
-                                    </li>
-                                    <li>
-                                        <div class="radio radio-danger">
-                                            <input name="survey" id="Radios9" value="declater" type="radio">
-                                            <label for="Radios9"> Mighty Healthy </label>
-                                        </div>
-                                    </li>
-                                    <li>
-                                        <div class="radio radio-danger">
-                                            <input name="survey" id="Radios10" value="declater" type="radio">
-                                            <label for="Radios10"> Fiberops </label>
-                                        </div>
-                                    </li>
-                                </ul>
-                            </div>
+                            <div class="list-group list-group-collapse list-group-sm list-group-tree" id="list-group-men" data-children=".sub-men">
+                                <a href="/products/" class="list-group-item list-group-item-action"> All </a>
+                            <% AllPublishers.forEach( publisher => { %>
+                                <a href="/products/publisher=<%=publisher._id%>" class="list-group-item list-group-item-action"> <%= publisher.name %> </a>
+                            <%}) %>
+                            
+                        </div>
                         </div>
 
                     </div>
@@ -163,9 +99,12 @@
                                                 <div class="products-single fix">
                                                     <div class="box-img-hover">
                                                         <div class="type-lb">
-                                                            <p class="sale">Sale</p>
+                                                            <% if (product.hasDiscount) { %>
+                                                                <p class="sale">Sale</p>
+                                                            <% } %>
+                                                            
                                                         </div>
-                                                        <img src="images/img-pro-01.jpg" class="img-fluid" alt="Image">
+                                                        <img src="<%= product.coverImage %>" class="img-fluid" alt="Image">
                                                         <div class="mask-icon">
                                                             <ul>
                                                                 <li><a href="#" data-toggle="tooltip" data-placement="right" title="View"><i class="fas fa-eye"></i></a></li>
@@ -184,7 +123,28 @@
                                                     <a href="/products/productdetail/<%= product._id %>">
                                                         <div class="why-text">
                                                             <h4><%= product.title %></h4>
-                                                            <h5><%= product.price.toLocaleString('vi-VN')%> VNĐ</h5>
+                                                            <% if (product.hasDiscount) { %>
+                                                                <h5>
+                                                                    <span
+                                                                        style="text-decoration: line-through; color: gray;">
+                                                                        <%=
+                                                                        product
+                                                                        .originalPrice.toLocaleString('vi-VN')
+                                                                        %> VNĐ
+                                                                    </span>
+                                                                    <span
+                                                                        style="color: red; font-weight: bold;">
+                                                                        <%=
+                                                                        product
+                                                                        .discountedPrice.toLocaleString('vi-VN')
+                                                                        %> VNĐ
+                                                                    </span>
+                                                                </h5>
+                                                                <% } else { %>
+                                                                <h5><%=
+                                                                    product.price.toLocaleString('vi-VN') %>
+                                                                    VNĐ</h5>
+                                                                <% } %>
                                                         </div>
                                                     </a>
                                                 </div>

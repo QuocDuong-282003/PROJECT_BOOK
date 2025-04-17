@@ -17,6 +17,7 @@ const bookSchema = new mongoose.Schema({
   selling: { type: Number, default: 0 },
   description: { type: String },
   coverImage: { type: String, ref: 'Image' },
+  images: [{ type: String, ref: 'Image' }],
   averageRating: { type: Number, default: 0 },
   totalVotes: { type: Number, default: 0 },
   note: { type: String, default: '' }

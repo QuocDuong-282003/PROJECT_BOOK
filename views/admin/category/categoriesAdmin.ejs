@@ -48,7 +48,8 @@
                         <tr>
                             <td class="text-center"><%= (currentPage - 1) * 10 + index + 1 %></td>
                             <td class="text-center"><%= category.name %></td>
-                            <td class="text-center"><%= category.description || "Không có mô tả" %></td>
+                            <td class="text-center"><textarea class="form-control" name="description" rows="5" cols="50" wrap="hard" readonly disabled style="background-color: white; resize: none;"><%= category.description || "Không có mô tả" %></textarea>
+                            </td>
                             <td class="text-center"><%= category.bookCount || 0 %></td>
                             <td class="text-center">
                                 <!-- Nút mở modal chỉnh sửa -->

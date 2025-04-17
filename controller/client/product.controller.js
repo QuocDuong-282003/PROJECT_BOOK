@@ -35,7 +35,8 @@ const getAllBooks = async () => {
 
 const getProductById = async (bookId) => {
     try {
-        return await Book.findById(bookId).populate("categoryId", "name").populate("publisherId", "name");;
+        const book = await Book.findById(bookId).populate("categoryId", "name").populate("publisherId", "name");
+        return applyDiscountInfoToBooks([book])[0]; // Chuyển đổi sang object và lấy phần tử đầu tiên;
     } catch (error) {
         console.error("Lỗi khi lấy sản phẩm:", error);
         return null;
@@ -47,17 +48,24 @@ const getProductById = async (bookId) => {
 const getProductByCategory = async (_idCategory) => {
     try {
         const products = await Book.find({ categoryId: _idCategory });
-        return products;
+        return applyDiscountInfoToBooks(products); // Áp dụng thông tin giảm giá cho sản phẩm
     } catch (error) {
         console.error("Lỗi khi lấy sản phẩm theo danh mục:", error);
         return [];
     }
 };
-
+const getProductByPublisher = async (_idPublisher)=>{
+    try {
+        const products = await Book.find({ publisherId: _idPublisher});
+        return applyDiscountInfoToBooks(products); // Áp dụng thông tin giảm giá cho sản phẩm
+    } catch (error) {
+        
+    }
+};
 const findProductByName = async (name) => {
     try {
         const products = await Book.find({ title: { $regex: name, $options: "i" } });
-        return products; 
+        return applyDiscountInfoToBooks(products) ; 
     } catch (error) {
         console.error("Lỗi khi tìm sản phẩm theo tên:", error);
         return [];
@@ -67,7 +75,7 @@ const findProductByName = async (name) => {
 const sortByPrice = async (sortType) => {
     try {
         const products = await Book.find().sort({ price: sortType });
-        return products; 
+        return applyDiscountInfoToBooks(products); // Áp dụng thông tin giảm giá cho sản phẩm
     } catch (error) {
         console.error("Lỗi khi tìm sản phẩm theo tên:", error);
         return [];
@@ -76,7 +84,16 @@ const sortByPrice = async (sortType) => {
 const sortBySelling = async (sortType) => {
     try {
         const products = await Book.find().sort({ selling: sortType });
-        return products; 
+        return applyDiscountInfoToBooks(products); // Áp dụng thông tin giảm giá cho sản phẩm
+    } catch (error) {
+        console.error("Lỗi khi tìm sản phẩm theo tên:", error);
+        return [];
+    }
+}
+const getProductByFilter = async (filterFrom,filterTo) => {
+    try {
+        const products = await Book.find({price: {$gte: filterFrom,$lte: filterTo}}).sort({ price: 1 }) // Tăng dần
+        return applyDiscountInfoToBooks(products); 
     } catch (error) {
         console.error("Lỗi khi tìm sản phẩm theo tên:", error);
         return [];
@@ -100,5 +117,5 @@ const updateRating = async (bookId, rating) => {
     }
 }
 // Đảm bảo export đúng
-module.exports = { getAllBooks, getProductById , getProductByCategory, findProductByName, sortByPrice, sortBySelling ,updateRating, applyDiscountInfoToBooks};
+module.exports = { getAllBooks, getProductById , getProductByCategory, findProductByName, sortByPrice, sortBySelling ,updateRating, applyDiscountInfoToBooks, getProductByPublisher, getProductByFilter};
 
