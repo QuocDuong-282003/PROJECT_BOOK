@@ -3,6 +3,8 @@ const Category = require('../../models/Category');
 const Publisher = require('../../models/Publisher');
 const Discount = require('../../models/Discount');
 const Image = require("../../models/Image");
+const path = require('path');
+const fs = require('fs');
 // Lấy danh sách sách
 exports.getBooks = async (req, res) => {
     try {
@@ -233,27 +235,51 @@ exports.updateBook = async (req, res) => {
     }
 };
 
+// exports.deleteBook = async (req, res) => {
+//     try {
+//         const book = await Book.findById(req.params.id);
+//         if (!book) return res.status(404).send("Không tìm thấy sách");
+
+//         // Xoá ảnh
+//         if (book.coverImage && book.coverImage !== '/uploads/default.jpg') {
+//             const imagePath = path.join(__dirname, '../../public', book.coverImage);
+//             if (fs.existsSync(imagePath)) {
+//                 fs.unlinkSync(imagePath);
+//             }
+//         }
+
+//         await Book.findByIdAndDelete(req.params.id);
+//         res.redirect('/admin/books');
+//     } catch (err) {
+//         console.error("Lỗi khi xóa sách:", err);
+//         res.status(500).send("Lỗi server khi xóa sách.");
+//     }
+// };
 exports.deleteBook = async (req, res) => {
     try {
         const book = await Book.findById(req.params.id);
         if (!book) return res.status(404).send("Không tìm thấy sách");
-
-        // Xoá ảnh
+        console.log('Book found for deletion:', book.title);
+        // Xoá ảnh cover nếu không phải ảnh mặc định
         if (book.coverImage && book.coverImage !== '/uploads/default.jpg') {
             const imagePath = path.join(__dirname, '../../public', book.coverImage);
+            console.log('Image path to delete:', imagePath);
             if (fs.existsSync(imagePath)) {
-                fs.unlinkSync(imagePath);
+                console.log('File exists, deleting it...');
+                fs.unlinkSync(imagePath);  // Xoá ảnh
+            } else {
+                console.log('File does not exist, skipping deletion');
             }
         }
-
+        // Xoá sách khỏi cơ sở dữ liệu
         await Book.findByIdAndDelete(req.params.id);
+        console.log(`Book with ID ${req.params.id} has been deleted.`);
         res.redirect('/admin/books');
     } catch (err) {
         console.error("Lỗi khi xóa sách:", err);
         res.status(500).send("Lỗi server khi xóa sách.");
     }
 };
-
 exports.searchBooks = async (req, res) => {
     try {
         const query = req.query.query;
