@@ -2,23 +2,25 @@ const express = require('express');
 const router = express.Router();
 const bookController = require('../../controller/admin/book.controller');
 const multer = require('multer');
+const Middleware = require('../../config/Middleware');
+const uploadImages = require('../../config/uploadImages');
 
-// Cấu hình Multer để lưu file ảnh
-const storage = multer.diskStorage({
-    destination: (req, file, cb) => cb(null, 'public/uploads/'),
-    filename: (req, file, cb) => cb(null, Date.now() + "-" + file.originalname)
-});
-
-const upload = multer({ storage });
-
+const handleMulter = async (req, res, next) => {
+    uploadImages(req, res, async function (err) {
+        if (err) {
+            return res.status(400).send('Lỗi upload ảnh: ' + err.message);
+        }
+        next();  // Tiếp tục tới controller
+    });
+};
 // Route hiển thị danh sách sách
 router.get('/', bookController.getBooks);
 
 // Route thêm sách
-router.post('/', upload.single('coverImage'), bookController.createBook);
+router.post('/', handleMulter, bookController.createBook);
 
 // Route cập nhật sách
-router.post('/update/:id', upload.single('coverImage'), bookController.updateBook);
+router.post('/update/:id', handleMulter, bookController.updateBook);
 
 // Route xóa sách
 router.post('/delete/:id', bookController.deleteBook);

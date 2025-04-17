@@ -2,6 +2,7 @@ const Book = require('../../models/Book');
 const Category = require('../../models/Category');
 const Publisher = require('../../models/Publisher');
 const Discount = require('../../models/Discount');
+const Image = require("../../models/Image");
 // Lấy danh sách sách
 exports.getBooks = async (req, res) => {
     try {
@@ -49,19 +50,100 @@ exports.getBooks = async (req, res) => {
     }
 };
 // Thêm sách
+// exports.createBook = async (req, res) => {
+//     try {
+//         const { title, author, categoryId, publisherId, price, stock, description } = req.body;
+//         const newBook = new Book({
+//             title,
+//             author,
+//             categoryId,
+//             publisherId,
+//             price: parseFloat(price), // Giá tiền được nhập dưới dạng nghìn đồng
+//             stock,
+//             description,
+//             coverImage: req.file ? `/uploads/${req.file.filename}` : "/uploads/default.jpg"
+//         });
+//         await newBook.save();
+//         res.redirect('/admin/books');
+//     } catch (err) {
+//         console.error("Lỗi khi thêm sách:", err);
+//         res.status(500).send("Lỗi server khi thêm sách.");
+//     }
+// };
+
+// exports.updateBook = async (req, res) => {
+//     try {
+//         const { title, author, categoryId, publisherId, price, stock, description } = req.body;
+//         const updateData = {
+//             title,
+//             author,
+//             categoryId,
+//             publisherId,
+//             price: parseFloat(price), // Giá tiền được nhập dưới dạng nghìn đồng
+//             stock,
+//             description,
+//             coverImage: req.file ? `/uploads/${req.file.filename}` : req.body.oldCoverImage
+//         };
+//         await Book.findByIdAndUpdate(req.params.id, updateData);
+//         res.redirect('/admin/books');
+//     } catch (err) {
+//         console.error("Lỗi khi cập nhật sách:", err);
+//         res.status(500).send("Lỗi server khi cập nhật sách.");
+//     }
+// };
+// Xóa sách
 exports.createBook = async (req, res) => {
+    // try {
+    //     const { title, author, categoryId, publisherId, price, stock, description } = req.body;
+
+    //     // Nếu có ảnh gửi lên, convert buffer -> base64 string
+    //     let coverImageBase64 = "";
+    //     if (req.file) {
+    //         const mimeType = req.file.mimetype; // ví dụ image/jpeg
+    //         coverImageBase64 = `data:${mimeType};base64,${req.file.buffer.toString("base64")}`;
+    //     }
+
+    //     const newBook = new Book({
+    //         title,
+    //         author,
+    //         categoryId,
+    //         publisherId,
+    //         price: parseFloat(price),
+    //         stock,
+    //         description,
+    //         coverImage: coverImageBase64 || "", // lưu base64
+    //     });
+
+    //     await newBook.save();
+    //     res.redirect('/admin/books');
+    // } catch (err) {
+    //     console.error("Lỗi khi thêm sách:", err);
+    //     res.status(500).send("Lỗi server khi thêm sách.");
+    // }
     try {
         const { title, author, categoryId, publisherId, price, stock, description } = req.body;
+
+        // Nếu có ảnh gửi lên, convert buffer -> base64 string
+        let coverImageBase64 = "";
+        if (req.file) {
+            const mimeType = req.file.mimetype; // ví dụ image/jpeg
+            coverImageBase64 = `data:${mimeType};base64,${req.file.buffer.toString("base64")}`;
+        } else {
+            coverImageBase64 = ""; // Nếu không có ảnh, giữ trống
+        }
+
+
         const newBook = new Book({
             title,
             author,
             categoryId,
             publisherId,
-            price: parseFloat(price), // Giá tiền được nhập dưới dạng nghìn đồng
+            price: parseFloat(price),
             stock,
             description,
-            coverImage: req.file ? `/uploads/${req.file.filename}` : "/uploads/default.jpg"
+            coverImage: coverImageBase64 || "", // lưu base64
         });
+
         await newBook.save();
         res.redirect('/admin/books');
     } catch (err) {
@@ -70,29 +152,100 @@ exports.createBook = async (req, res) => {
     }
 };
 
+// exports.updateBook = async (req, res) => {
+//     try {
+//         const { title, author, categoryId, publisherId, price, stock, description, oldCoverImage } = req.body;
+
+//         const book = await Book.findById(req.params.id);
+//         if (!book) return res.status(404).send("Sách không tồn tại!");
+
+//         let newCover = oldCoverImage;
+//         if (req.file) {
+//             // Xoá ảnh cũ nếu không phải mặc định
+//             if (book.coverImage && book.coverImage !== '/uploads/default.jpg') {
+//                 const imagePath = path.join(__dirname, '../../public', book.coverImage);
+//                 if (fs.existsSync(imagePath)) {
+//                     fs.unlinkSync(imagePath);
+//                 }
+//             }
+//             newCover = `/uploads/${req.file.filename}`;
+//         }
+
+//         await Book.findByIdAndUpdate(req.params.id, {
+//             title,
+//             author,
+//             categoryId,
+//             publisherId,
+//             price: parseFloat(price),
+//             stock,
+//             description,
+//             coverImage: newCover
+//         });
+
+//         res.redirect('/admin/books');
+//     } catch (err) {
+//         console.error("Lỗi khi cập nhật sách:", err);
+//         res.status(500).send("Lỗi server khi cập nhật sách.");
+//     }
+// };
+
+// exports.deleteBook = async (req, res) => {
+//     try {
+//         await Book.findByIdAndDelete(req.params.id);
+//         res.redirect('/admin/books');
+//     } catch (err) {
+//         console.error("Lỗi khi xóa sách:", err);
+//         res.status(500).send("Lỗi server khi xóa sách.");
+//     }
+// };
+
+// Tìm kiếm sách
 exports.updateBook = async (req, res) => {
     try {
-        const { title, author, categoryId, publisherId, price, stock, description } = req.body;
-        const updateData = {
+        const { title, author, categoryId, publisherId, price, stock, description, oldCoverImage } = req.body;
+
+        const book = await Book.findById(req.params.id);
+        if (!book) return res.status(404).send("Sách không tồn tại!");
+
+        let newCoverImage = oldCoverImage;
+
+        if (req.file) {
+            // Nếu có ảnh mới thì convert buffer sang base64
+            const mimeType = req.file.mimetype;
+            newCoverImage = `data:${mimeType};base64,${req.file.buffer.toString("base64")}`;
+        }
+
+        await Book.findByIdAndUpdate(req.params.id, {
             title,
             author,
             categoryId,
             publisherId,
-            price: parseFloat(price), // Giá tiền được nhập dưới dạng nghìn đồng
+            price: parseFloat(price),
             stock,
             description,
-            coverImage: req.file ? `/uploads/${req.file.filename}` : req.body.oldCoverImage
-        };
-        await Book.findByIdAndUpdate(req.params.id, updateData);
+            coverImage: newCoverImage,
+        });
+
         res.redirect('/admin/books');
     } catch (err) {
         console.error("Lỗi khi cập nhật sách:", err);
         res.status(500).send("Lỗi server khi cập nhật sách.");
     }
 };
-// Xóa sách
+
 exports.deleteBook = async (req, res) => {
     try {
+        const book = await Book.findById(req.params.id);
+        if (!book) return res.status(404).send("Không tìm thấy sách");
+
+        // Xoá ảnh
+        if (book.coverImage && book.coverImage !== '/uploads/default.jpg') {
+            const imagePath = path.join(__dirname, '../../public', book.coverImage);
+            if (fs.existsSync(imagePath)) {
+                fs.unlinkSync(imagePath);
+            }
+        }
+
         await Book.findByIdAndDelete(req.params.id);
         res.redirect('/admin/books');
     } catch (err) {
@@ -101,7 +254,6 @@ exports.deleteBook = async (req, res) => {
     }
 };
 
-// Tìm kiếm sách
 exports.searchBooks = async (req, res) => {
     try {
         const query = req.query.query;

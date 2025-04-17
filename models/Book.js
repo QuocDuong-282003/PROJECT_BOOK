@@ -1,4 +1,6 @@
 const mongoose = require('mongoose');
+
+
 const bookSchema = new mongoose.Schema({
   title: { type: String, required: true },
   author: { type: String, required: true },
@@ -14,10 +16,11 @@ const bookSchema = new mongoose.Schema({
   stock: { type: Number, required: true, min: 0 },
   selling: { type: Number, default: 0 },
   description: { type: String },
-  coverImage: { type: String },
+  coverImage: { type: String, ref: 'Image' },
   averageRating: { type: Number, default: 0 },
   totalVotes: { type: Number, default: 0 },
   note: { type: String, default: '' }
+
 }, {
   timestamps: true,
   toJSON: { getters: true }, // Đảm bảo getters được áp dụng khi chuyển đổi sang JSON
