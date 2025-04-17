@@ -111,15 +111,15 @@ exports.deleteExpiredDiscounts = async () => {
     try {
         const now = new Date();
         const result = await Discount.deleteMany({ endDate: { $lt: now } }); // Xóa mã hết hạn
-        console.log(`🕰️ Đã xóa ${result.deletedCount} mã giảm giá hết hạn.`);
+        console.log(` Đã xóa ${result.deletedCount} mã giảm giá hết hạn.`);
     } catch (err) {
-        console.error('❌ Lỗi khi xóa mã giảm giá hết hạn:', err.message);
+        console.error(' Lỗi khi xóa mã giảm giá hết hạn:', err.message);
     }
 };
 // Chạy tự động lúc 0:00 mỗi ngày
 exports.scheduleDeleteExpiredDiscounts = () => {
     cron.schedule('0 0 * * *', async () => {
-        console.log('🕰️ Đang kiểm tra và xóa mã giảm giá hết hạn...');
+        console.log(' Đang kiểm tra và xóa mã giảm giá hết hạn...');
         await exports.deleteExpiredDiscounts();
     });
 };

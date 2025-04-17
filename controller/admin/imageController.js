@@ -68,4 +68,3 @@ exports.getImagesByBookId = async (req, res) => {
         res.status(500).json({ message: "Lỗi server." });
     }
 };
-// --- END OF FILE imageController.js ---

@@ -114,7 +114,7 @@ exports.getDailyStats = async (req, res) => {
         });
         //res.json(dailyStats);
     } catch (error) {
-        console.error("❌ Lỗi lấy thống kê theo ngày:", error);
+        console.error(" Lỗi lấy thống kê theo ngày:", error);
         res.status(500).json({ message: "Lỗi server" });
     }
 };
@@ -148,7 +148,7 @@ exports.getMonthlyStats = async (req, res) => {
         });
         // res.json(monthlyStats);
     } catch (error) {
-        console.error("❌ Lỗi lấy thống kê theo tháng:", error);
+        console.error(" Lỗi lấy thống kê theo tháng:", error);
         res.status(500).json({ message: "Lỗi server" });
     }
 };

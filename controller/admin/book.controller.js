@@ -279,40 +279,93 @@ exports.searchBooks = async (req, res) => {
     }
 };
 //
+// exports.assignDiscountToBook = async (req, res) => {
+//     const { bookId, discountId } = req.body;
+
+//     try {
+//         const discount = await Discount.findById(discountId);
+//         if (!discount) {
+//             return res.status(404).send('Discount not found');
+//         }
+//         // Tạo chuỗi ghi chú từ discount
+//         const note = `Mã: ${discount.code} - ${discount.description} - ${discount.discountType === 'percent' ? 'Phần trăm' : 'Cố định'
+//             } - ${discount.discountType === 'percent' ? discount.value + '%' : discount.value + 'đ'
+//             }`;
+
+//         // Cập nhật sách với note và discountId, trả về bản ghi đã cập nhật
+//         const updatedBook = await Book.findByIdAndUpdate(
+//             bookId,
+//             {
+//                 note: note,
+//                 discountId: discountId,
+//             },
+//             { new: true } // đảm bảo trả về bản ghi sau khi cập nhật
+//         );
+
+//         // Kiểm tra xem discountId đã được gán thành công chưa
+//         if (updatedBook && updatedBook.discountId && updatedBook.discountId.toString() === discountId) {
+//             console.log('Gán giảm giá thành công');
+//         } else {
+//             console.log('Gán giảm giá thất bại');
+//         }
+
+
+//         res.redirect('/admin/books');
+//     } catch (error) {
+//         console.error('Lỗi khi gán giảm giá:', error);
+//         res.status(500).send('Failed to assign discount');
+//     }
+// };
 exports.assignDiscountToBook = async (req, res) => {
-    const { bookId, discountId } = req.body;
-
+    const { bookId, discountId, action } = req.body;
     try {
-        const discount = await Discount.findById(discountId);
-        if (!discount) {
-            return res.status(404).send('Discount not found');
+        if (!bookId) {
+            return res.status(400).send('Thiếu bookId');
         }
-        // Tạo chuỗi ghi chú từ discount
-        const note = `Mã: ${discount.code} - ${discount.description} - ${discount.discountType === 'percent' ? 'Phần trăm' : 'Cố định'
-            } - ${discount.discountType === 'percent' ? discount.value + '%' : discount.value + 'đ'
-            }`;
+        if (action === 'assign') {
+            // Gán mã giảm giá
+            const discount = await Discount.findById(discountId);
+            if (!discount) {
+                return res.status(404).send('Không tìm thấy mã giảm giá');
+            }
+            const note = `Mã: ${discount.code} - ${discount.description} - ${discount.discountType === 'percent' ? 'Phần trăm' : 'Cố định'
+                } - ${discount.discountType === 'percent' ? discount.value + '%' : discount.value + 'đ'
+                }`;
 
-        // Cập nhật sách với note và discountId, trả về bản ghi đã cập nhật
-        const updatedBook = await Book.findByIdAndUpdate(
-            bookId,
-            {
-                note: note,
-                discountId: discountId,
-            },
-            { new: true } // đảm bảo trả về bản ghi sau khi cập nhật
-        );
-
-        // Kiểm tra xem discountId đã được gán thành công chưa
-        if (updatedBook && updatedBook.discountId && updatedBook.discountId.toString() === discountId) {
-            console.log('Gán giảm giá thành công');
+            const updatedBook = await Book.findByIdAndUpdate(
+                bookId,
+                {
+                    note: note,
+                    discountId: discountId,
+                },
+                { new: true }
+            );
+            if (updatedBook && updatedBook.discountId.toString() === discountId) {
+                console.log('Gán giảm giá thành công');
+            } else {
+                console.log(' Gán giảm giá thất bại');
+            }
+        } else if (action === 'cancel') {
+            // Huỷ mã giảm giá
+            const updatedBook = await Book.findByIdAndUpdate(
+                bookId,
+                {
+                    note: null,
+                    discountId: null
+                },
+                { new: true }
+            );
+            if (updatedBook) {
+                console.log(` Đã huỷ giảm giá cho sách: ${updatedBook.title}`);
+            } else {
+                console.log(' Không tìm thấy sách để huỷ');
+            }
         } else {
-            console.log('Gán giảm giá thất bại');
+            return res.status(400).send('Hành động không hợp lệ');
         }
-
-
         res.redirect('/admin/books');
     } catch (error) {
-        console.error('Lỗi khi gán giảm giá:', error);
-        res.status(500).send('Failed to assign discount');
+        console.error(' Lỗi xử lý mã giảm giá:', error);
+        res.status(500).send('Lỗi server');
     }
 };
