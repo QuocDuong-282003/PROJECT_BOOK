@@ -3,16 +3,16 @@ var router = express.Router();
 const {getAllBooks, getProductByCategory, findProductByName, sortByPrice, sortBySelling}= require('../../controller/Client/product.controller');
 const {getAllCategories} = require('../../controller/Client/category.controller');
 
-router.get('/', async function (req, res, next) {
-  const books = await getAllBooks();
+router.get('/', async function(req, res, next) {
+  const Products = await getAllBooks();
   const AllCategories = await getAllCategories();
-  res.render('client/index', { title: 'Products', books, AllCategories });
+  res.render('client/products', { title: 'Products' ,Products, AllCategories});
 });
-router.get('/category=:_idCategory', async function (req, res, next) {
+router.get('/category=:_idCategory', async function(req, res, next){
   const _idCategory = req.params._idCategory;
   const AllCategories = await getAllCategories();
-  const books = await getProductByCategory(_idCategory);
-  res.render('client/products', { title: 'Products', books, AllCategories });
+  const Products = await getProductByCategory(_idCategory);
+  res.render('client/products', { title: 'Products' ,Products , AllCategories});
 });
 router.get('/search', async function(req, res){
   const name = req.query.name;

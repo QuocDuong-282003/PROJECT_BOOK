@@ -118,7 +118,7 @@ var discountRouter = require('./routes/admin/discount');
 // Client routes
 app.use('/users', usersRouter);
 app.use('/products', productsRouter);
-app.use('/products', productdetail)
+app.use('/products', productdetail);
 app.use('/cart', cartRouter);
 app.use('/comment', cmtRouter);
 app.use('/auth', authRouter);
