@@ -1,6 +1,6 @@
 var express = require('express');
 
-var { register, login, logout, getMyAccount, updateAccount } = require('../controller/auth.controller');
+var { register, login, logout, getMyAccount, updateAccount } = require('../../controller/auth.controller');
 
 var router = express.Router();
 
