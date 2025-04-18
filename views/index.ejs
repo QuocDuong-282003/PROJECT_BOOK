@@ -60,40 +60,38 @@
                             <img class="img-fluid"
                                 src="images/action and advencture.jpg"
                                 width="352px" length="352px" alt />
-                            <a class="btn hvr-hover" href="#">Action and
-                                Adventure</a>
+                            <a class="btn hvr-hover" href="/products/category=680220f05a6a6b669489260b">Graphic Novels, Anime & Manga</a>
                         </div>
                         <div class="shop-cat-box">
                             <img class="img-fluid" src="images/Classics.png"
                                 alt />
-                            <a class="btn hvr-hover" href="#">Classics</a>
+                            <a class="btn hvr-hover" href="/products/category=680220a25a6a6b6694892603">Classics</a>
                         </div>
                     </div>
                     <div class="col-lg-4 col-md-4 col-sm-12 col-xs-12">
                         <div class="shop-cat-box">
                             <img class="img-fluid"
                                 src="images/Historical_fiction.jpg" alt />
-                            <a class="btn hvr-hover" href="#">Historical
+                            <a class="btn hvr-hover" href="/products/category=680220be5a6a6b6694892607">Historical
                                 Fiction</a>
                         </div>
                         <div class="shop-cat-box">
                             <img class="img-fluid" src="images/Litrature.jpg"
                                 alt />
-                            <a class="btn hvr-hover" href="#">Literary
-                                Fiction</a>
+                            <a class="btn hvr-hover" href="/products/category=680221285a6a6b669489260f">Contemporary Fiction</a>
                         </div>
                     </div>
                     <div class="col-lg-4 col-md-4 col-sm-12 col-xs-12">
                         <div class="shop-cat-box">
                             <img class="img-fluid"
                                 src="images/Science_fictiom.jpg" alt />
-                            <a class="btn hvr-hover" href="#">Science
+                            <a class="btn hvr-hover" href="/products/category=67f4fbbdc099e63bfd15d9b0">Science
                                 Fiction</a>
                         </div>
                         <div class="shop-cat-box">
                             <img class="img-fluid" src="images/Biography.jpg"
                                 alt />
-                            <a class="btn hvr-hover" href="#">Biography</a>
+                            <a class="btn hvr-hover" href="/products/category=67f4fbd3c099e63bfd15d9b4">Mystery</a>
                         </div>
                     </div>
                 </div>
@@ -129,7 +127,8 @@
 
                 <div class="row special-list">
 
-                    <% books.forEach(book => { %>
+                    <%  let count=0;
+                        books.forEach(book => { if(count>=8) return; %>
                         <% if (book.discountId) { %>
                             <div class="col-lg-3 col-md-6 special-grid best-seller">
                                 <div class="products-single fix">
@@ -156,7 +155,28 @@
                                                         title="Add to Wishlist"><i
                                                             class="far fa-heart"></i></a></li>
                                             </ul>
-                                            <a class="cart" href="#">Add to Cart</a>
+                                            <style>
+                                                .cart {
+                                                    background-color: red;
+                                                    color: white;
+                                                    border: none;
+                                                    padding: 10px 20px;
+                                                    text-align: center;
+                                                    text-decoration: none;
+                                                    display: inline-block;
+                                                    font-size: 16px;
+                                                    margin-top: 170px;
+                                                    cursor: pointer;
+                                                }
+                                                .cart:hover {
+                                                    background-color: darkred;
+                                                }
+                                             </style>
+                                            <form action="/cart/add" method="POST">
+                                                <button type="submit" class="cart">Add to Cart</button>
+                                                <input type="hidden" name="quantity" value="1" >
+                                                <input type="hidden" name="bookId" value="<%= book._id %>">
+                                            </form>
                                         </div>
                                     </div>
                                     <a
@@ -216,7 +236,28 @@
                                                         title="Add to Wishlist"><i
                                                             class="far fa-heart"></i></a></li>
                                             </ul>
-                                            <a class="cart" href="#">Add to Cart</a>
+                                            <style>
+                                                .cart {
+                                                    background-color: red;
+                                                    color: white;
+                                                    border: none;
+                                                    padding: 10px 20px;
+                                                    text-align: center;
+                                                    text-decoration: none;
+                                                    display: inline-block;
+                                                    font-size: 16px;
+                                                    margin-top: 170px;
+                                                    cursor: pointer;
+                                                }
+                                                .cart:hover {
+                                                    background-color: darkred;
+                                                }
+                                             </style>
+                                            <form action="/cart/add" method="POST">
+                                                <button type="submit" class="cart">Add to Cart</button>
+                                                <input type="hidden" name="quantity" value="1" >
+                                                <input type="hidden" name="bookId" value="<%= book._id %>">
+                                            </form>
                                         </div>
                                     </div>
                                     <div class="why-text">
@@ -248,13 +289,12 @@
                             </div>
                         <% } %>
                         
-                    <% }); %>
+                    <% count++ }); %>
 
                     
                 </div>
             </div>
         </div>
-        <!-- End Products  -->
     </div>
     <%- include('./client/layouts/footer') %>
     <%- include('./client/layouts/script') %>

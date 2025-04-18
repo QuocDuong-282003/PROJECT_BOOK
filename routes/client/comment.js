@@ -3,7 +3,7 @@ const router = express.Router();
 
 const { getCMTByBookId, addCMT } = require('../../controller/Client/comment.controller');
 const { getProductById, updateRating } = require('../../controller/Client/product.controller');
-
+const { updateFeedback } = require('../../controller/Client/order.controller');
 
 router.post('/add', async (req, res) => {
     try {
@@ -21,7 +21,8 @@ router.post('/add', async (req, res) => {
         for (const bookId of bookIds) {
             const newCmt = await addCMT(bookId, userId, content, rating);
             const rate = await updateRating(bookId, rating);
-            results.push({ bookId, cmt: newCmt, rate });
+            const feedback = await updateFeedback(bookId, true);
+            results.push({ bookId, cmt: newCmt, rate ,feedback});
         }
         return res.redirect('/orderlist');
 

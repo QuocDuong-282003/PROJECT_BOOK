@@ -33,6 +33,16 @@ const addOrder = async (orderId,userId,firstName,lastName, address,ward,district
         return null;
     }
 };
+const updateFeedback = async (orderId, feedback) => {
+    try {
+        const order = await Order.findOneAndUpdate({ orderId }, { feedback }, { new: true });
+        return order;
+    }
+    catch (error) {
+        console.error("Lỗi khi cập nhật phản hồi đơn hàng:", error);
+        return null;
+    }
+};
 const updateBook = async (items) => {
     try {
         if (!Array.isArray(items)) {
@@ -75,4 +85,4 @@ const updateStatus = async (orderID, newStatus) => {
         return null;
     }
 };
-module.exports = {getOrderByUserId,addOrder,updateStatus, updateBook};
+module.exports = {getOrderByUserId,addOrder,updateStatus, updateBook,updateFeedback};

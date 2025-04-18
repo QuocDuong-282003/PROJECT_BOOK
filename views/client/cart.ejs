@@ -72,9 +72,44 @@
                     </div>
                 </div>
             </div>
+            <%
+                let subTotal = 0;
+                let totalDiscount = 0;
+                let grandTotal = 0;
+                cart.items.forEach(item => {
+                    let discount = item.bookId.discountId ? item.bookId.discountId.value : 0;
+                    let originalPrice = item.bookId.price;
+                    let discountedPrice = originalPrice * (1 - discount / 100);
+                    totalDiscount += (originalPrice - discountedPrice) * item.quantity;
+                    subTotal+= originalPrice * item.quantity;
+                    grandTotal+= discountedPrice * item.quantity;
+                });
+            %>
 
             
+            <div class="row my-5">
+                <div class="col-lg-8 col-sm-12"></div>
+                <div class="col-lg-4 col-sm-12">
+                    <div class="order-box">
+                        <h3>Order summary</h3>
+                        <div class="d-flex">
+                            <h4>Sub Total</h4>
+                            <div class="ml-auto font-weight-bold"> <%= subTotal.toLocaleString('vi-VN') %> VNĐ</div>
+                        </div>
+                        <div class="d-flex">
+                            <h4>Discount</h4>
+                            <div class="ml-auto font-weight-bold"> -<%= totalDiscount.toLocaleString('vi-VN') %> VNĐ</div>
+                        </div>
+                        
+                        <hr>
+                        <div class="d-flex gr-total">
+                            <h5>Grand Total</h5>
+                            <div class="ml-auto h5"> <%= grandTotal.toLocaleString('vi-VN') %> VNĐ</div>
+                        </div>
+                        <hr> </div>
+                </div>
                 <div class="col-12 d-flex shopping-box"><a href="/checkout" class="ml-auto btn hvr-hover">Checkout</a> </div>
+            </div>
             </div>
 
         </div>

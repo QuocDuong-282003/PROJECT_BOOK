@@ -46,8 +46,36 @@
                 <div class="col-xl-7 col-lg-7 col-md-6">
                     <form action="/cart/add" method="POST">
                         <div class="single-product-details">
-                            <h2><%= book.title %></h2>
-                            <!-- <h5> <del>$ 60.00</del> $40.79</h5> -->
+                            <style>
+                                .title {
+                                    display: flex;
+                                    align-items: center;
+                                }
+                                .title .rating {
+                                    display: flex;
+                                    align-items: center;
+                                    
+                                    margin-left: 10px;
+                                }
+                            </style>
+                            <div class="title">
+                                <h2><%= book.title %></h2>
+                                <div class="rating" style="pointer-events: none;"> 
+                                    <% for (let i = 5; i >= 1; i--) { %>
+                                        <input 
+                                            type="radio" 
+                                            name="rating" 
+                                            value="<%= i %>" 
+                                            id="star<%= i %>" 
+                                            <%= Math.round(book.averageRating) === i ? "checked" : "" %> 
+                                            disabled
+                                        >
+                                        <label for="star<%= i %>">☆</label>
+                                    <% } %>
+                                    
+                                </div> 
+                            </div>
+                            
                             <% if (book.hasDiscount) { %>
                                 <h5>
                                     <span style="text-decoration: line-through; color: gray;"><%=book.originalPrice.toLocaleString('vi-VN')%> VNĐ </span>
