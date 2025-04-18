@@ -3,6 +3,8 @@ const Category = require('../../models/Category');
 const Publisher = require('../../models/Publisher');
 const Discount = require('../../models/Discount');
 const Image = require("../../models/Image");
+const path = require('path');
+const fs = require('fs');
 // Lấy danh sách sách
 exports.getBooks = async (req, res) => {
     try {
@@ -213,27 +215,51 @@ exports.updateBook = async (req, res) => {
     }
 };
 
+// exports.deleteBook = async (req, res) => {
+//     try {
+//         const book = await Book.findById(req.params.id);
+//         if (!book) return res.status(404).send("Không tìm thấy sách");
+
+//         // Xoá ảnh
+//         if (book.coverImage && book.coverImage !== '/uploads/default.jpg') {
+//             const imagePath = path.join(__dirname, '../../public', book.coverImage);
+//             if (fs.existsSync(imagePath)) {
+//                 fs.unlinkSync(imagePath);
+//             }
+//         }
+
+//         await Book.findByIdAndDelete(req.params.id);
+//         res.redirect('/admin/books');
+//     } catch (err) {
+//         console.error("Lỗi khi xóa sách:", err);
+//         res.status(500).send("Lỗi server khi xóa sách.");
+//     }
+// };
 exports.deleteBook = async (req, res) => {
     try {
         const book = await Book.findById(req.params.id);
         if (!book) return res.status(404).send("Không tìm thấy sách");
-
-        // Xoá ảnh
+        console.log('Book found for deletion:', book.title);
+        // Xoá ảnh cover nếu không phải ảnh mặc định
         if (book.coverImage && book.coverImage !== '/uploads/default.jpg') {
             const imagePath = path.join(__dirname, '../../public', book.coverImage);
+            console.log('Image path to delete:', imagePath);
             if (fs.existsSync(imagePath)) {
-                fs.unlinkSync(imagePath);
+                console.log('File exists, deleting it...');
+                fs.unlinkSync(imagePath);  // Xoá ảnh
+            } else {
+                console.log('File does not exist, skipping deletion');
             }
         }
-
+        // Xoá sách khỏi cơ sở dữ liệu
         await Book.findByIdAndDelete(req.params.id);
+        console.log(`Book with ID ${req.params.id} has been deleted.`);
         res.redirect('/admin/books');
     } catch (err) {
         console.error("Lỗi khi xóa sách:", err);
         res.status(500).send("Lỗi server khi xóa sách.");
     }
 };
-
 exports.searchBooks = async (req, res) => {
     try {
         const query = req.query.query;
@@ -259,40 +285,93 @@ exports.searchBooks = async (req, res) => {
     }
 };
 //
+// exports.assignDiscountToBook = async (req, res) => {
+//     const { bookId, discountId } = req.body;
+
+//     try {
+//         const discount = await Discount.findById(discountId);
+//         if (!discount) {
+//             return res.status(404).send('Discount not found');
+//         }
+//         // Tạo chuỗi ghi chú từ discount
+//         const note = `Mã: ${discount.code} - ${discount.description} - ${discount.discountType === 'percent' ? 'Phần trăm' : 'Cố định'
+//             } - ${discount.discountType === 'percent' ? discount.value + '%' : discount.value + 'đ'
+//             }`;
+
+//         // Cập nhật sách với note và discountId, trả về bản ghi đã cập nhật
+//         const updatedBook = await Book.findByIdAndUpdate(
+//             bookId,
+//             {
+//                 note: note,
+//                 discountId: discountId,
+//             },
+//             { new: true } // đảm bảo trả về bản ghi sau khi cập nhật
+//         );
+
+//         // Kiểm tra xem discountId đã được gán thành công chưa
+//         if (updatedBook && updatedBook.discountId && updatedBook.discountId.toString() === discountId) {
+//             console.log('Gán giảm giá thành công');
+//         } else {
+//             console.log('Gán giảm giá thất bại');
+//         }
+
+
+//         res.redirect('/admin/books');
+//     } catch (error) {
+//         console.error('Lỗi khi gán giảm giá:', error);
+//         res.status(500).send('Failed to assign discount');
+//     }
+// };
 exports.assignDiscountToBook = async (req, res) => {
-    const { bookId, discountId } = req.body;
-
+    const { bookId, discountId, action } = req.body;
     try {
-        const discount = await Discount.findById(discountId);
-        if (!discount) {
-            return res.status(404).send('Discount not found');
+        if (!bookId) {
+            return res.status(400).send('Thiếu bookId');
         }
-        // Tạo chuỗi ghi chú từ discount
-        const note = `Mã: ${discount.code} - ${discount.description} - ${discount.discountType === 'percent' ? 'Phần trăm' : 'Cố định'
-            } - ${discount.discountType === 'percent' ? discount.value + '%' : discount.value + 'đ'
-            }`;
+        if (action === 'assign') {
+            // Gán mã giảm giá
+            const discount = await Discount.findById(discountId);
+            if (!discount) {
+                return res.status(404).send('Không tìm thấy mã giảm giá');
+            }
+            const note = `Mã: ${discount.code} - ${discount.description} - ${discount.discountType === 'percent' ? 'Phần trăm' : 'Cố định'
+                } - ${discount.discountType === 'percent' ? discount.value + '%' : discount.value + 'đ'
+                }`;
 
-        // Cập nhật sách với note và discountId, trả về bản ghi đã cập nhật
-        const updatedBook = await Book.findByIdAndUpdate(
-            bookId,
-            {
-                note: note,
-                discountId: discountId,
-            },
-            { new: true } // đảm bảo trả về bản ghi sau khi cập nhật
-        );
-
-        // Kiểm tra xem discountId đã được gán thành công chưa
-        if (updatedBook && updatedBook.discountId && updatedBook.discountId.toString() === discountId) {
-            console.log('Gán giảm giá thành công');
+            const updatedBook = await Book.findByIdAndUpdate(
+                bookId,
+                {
+                    note: note,
+                    discountId: discountId,
+                },
+                { new: true }
+            );
+            if (updatedBook && updatedBook.discountId.toString() === discountId) {
+                console.log('Gán giảm giá thành công');
+            } else {
+                console.log(' Gán giảm giá thất bại');
+            }
+        } else if (action === 'cancel') {
+            // Huỷ mã giảm giá
+            const updatedBook = await Book.findByIdAndUpdate(
+                bookId,
+                {
+                    note: null,
+                    discountId: null
+                },
+                { new: true }
+            );
+            if (updatedBook) {
+                console.log(` Đã huỷ giảm giá cho sách: ${updatedBook.title}`);
+            } else {
+                console.log(' Không tìm thấy sách để huỷ');
+            }
         } else {
-            console.log('Gán giảm giá thất bại');
+            return res.status(400).send('Hành động không hợp lệ');
         }
-
-
         res.redirect('/admin/books');
     } catch (error) {
-        console.error('Lỗi khi gán giảm giá:', error);
-        res.status(500).send('Failed to assign discount');
+        console.error(' Lỗi xử lý mã giảm giá:', error);
+        res.status(500).send('Lỗi server');
     }
 };

@@ -28,6 +28,8 @@ router.post('/delete/:id', bookController.deleteBook);
 // Route tìm kiếm sách
 router.get('/search', bookController.searchBooks);
 
-//
+// add discount for product
 router.post('/assign/addProduct', bookController.assignDiscountToBook);
+// cancel discount for product
+//router.post('/assign/cancelDiscount', bookController.cancelDiscountForBook);
 module.exports = router;
