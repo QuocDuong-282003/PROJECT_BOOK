@@ -16,7 +16,7 @@ exports.getAllComments = async (req, res) => {
             .limit(limit)
             .populate('book', 'title') // Lấy thông tin sách (chỉ lấy trường 'title')
             .populate('user', 'name'); // Lấy thông tin người dùng (chỉ lấy trường 'name')
-
+        console.log(comments);
         const totalComments = await Comment.countDocuments(); // Tổng số bình luận
         const totalPages = Math.ceil(totalComments / limit); // Tổng số trang
 

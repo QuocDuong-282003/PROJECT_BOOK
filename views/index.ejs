@@ -119,8 +119,7 @@
                             <div class="button-group filter-button-group">
                                 <button class="active"
                                     data-filter="*">All</button>
-                                <button data-filter=".top-featured">Top
-                                    featured</button>
+                                <button data-filter=".top-featured">Hot</button>
                                 <button data-filter=".best-seller">Best
                                     seller</button>
                             </div>
@@ -131,100 +130,127 @@
                 <div class="row special-list">
 
                     <% books.forEach(book => { %>
-                    <div class="col-lg-3 col-md-6 special-grid best-seller">
-                        <div class="products-single fix">
-                            <div class="box-img-hover">
-                                <div class="type-lb">
-                                    <p class="sale">Sale</p>
-                                </div>
-                                <img src="<%= book.coverImage %>"
-                                    alt="Ảnh bìa sách"
-                                    style="width: 300px; height: auto;">
-
-                                <div class="mask-icon">
-                                    <ul>
-                                        <li><a href="#" data-toggle="tooltip"
-                                                data-placement="right"
-                                                title="View"><i
-                                                    class="fas fa-eye"></i></a></li>
-                                        <li><a href="#" data-toggle="tooltip"
-                                                data-placement="right"
-                                                title="Compare"><i
-                                                    class="fas fa-sync-alt"></i></a></li>
-                                        <li><a href="#" data-toggle="tooltip"
-                                                data-placement="right"
-                                                title="Add to Wishlist"><i
-                                                    class="far fa-heart"></i></a></li>
-                                    </ul>
-                                    <a class="cart" href="#">Add to Cart</a>
+                        <% if (book.discountId) { %>
+                            <div class="col-lg-3 col-md-6 special-grid best-seller">
+                                <div class="products-single fix">
+                                    <div class="box-img-hover">
+                                        <div class="type-lb">
+                                            <p class="sale">Sale</p>
+                                        </div>
+                                        <img src="<%= book.coverImage %>"
+                                            alt="Ảnh bìa sách"
+                                            style="width: 300px; height: auto;">
+    
+                                        <div class="mask-icon">
+                                            <ul>
+                                                <li><a href="#" data-toggle="tooltip"
+                                                        data-placement="right"
+                                                        title="View"><i
+                                                            class="fas fa-eye"></i></a></li>
+                                                <li><a href="#" data-toggle="tooltip"
+                                                        data-placement="right"
+                                                        title="Compare"><i
+                                                            class="fas fa-sync-alt"></i></a></li>
+                                                <li><a href="#" data-toggle="tooltip"
+                                                        data-placement="right"
+                                                        title="Add to Wishlist"><i
+                                                            class="far fa-heart"></i></a></li>
+                                            </ul>
+                                            <a class="cart" href="#">Add to Cart</a>
+                                        </div>
+                                    </div>
+                                    <a
+                                        href="/products/productdetail/<%= book ._id %>">
+                                        <div class="why-text">
+                                            <h4><%= book .title %></h4>
+                                            <% if (book.hasDiscount) { %>
+                                            <h5>
+                                                <span
+                                                    style="text-decoration: line-through; color: gray;">
+                                                    <%=
+                                                    book
+                                                    .originalPrice.toLocaleString('vi-VN')
+                                                    %> VNĐ
+                                                </span>
+                                                <span
+                                                    style="color: red; font-weight: bold;">
+                                                    <%=
+                                                    book
+                                                    .discountedPrice.toLocaleString('vi-VN')
+                                                    %> VNĐ
+                                                </span>
+                                            </h5>
+                                            <% } else { %>
+                                            <h5><%=
+                                                book .price.toLocaleString('vi-VN') %>
+                                                VNĐ</h5>
+                                            <% } %>
+                                        </div>
+    
+                                    </a>
+    
                                 </div>
                             </div>
-                            <a
-                                href="/products/productdetail/<%= book ._id %>">
-                                <div class="why-text">
-                                    <h4><%= book .title %></h4>
-                                    <% if (book.hasDiscount) { %>
-                                    <h5>
-                                        <span
-                                            style="text-decoration: line-through; color: gray;">
-                                            <%=
-                                            book
-                                            .originalPrice.toLocaleString('vi-VN')
-                                            %> VNĐ
-                                        </span>
-                                        <span
-                                            style="color: red; font-weight: bold;">
-                                            <%=
-                                            book
-                                            .discountedPrice.toLocaleString('vi-VN')
-                                            %> VNĐ
-                                        </span>
-                                    </h5>
-                                    <% } else { %>
-                                    <h5><%=
-                                        book .price.toLocaleString('vi-VN') %>
-                                        VNĐ</h5>
-                                    <% } %>
+                        <% } else{%>
+                            <div class="col-lg-3 col-md-6 special-grid top-featured">
+                                <div class="products-single fix">
+                                    <div class="box-img-hover">
+                                        <div class="type-lb">
+                                            <p class="new">HOT</p>
+                                        </div>
+                                        <img src="<%= book.coverImage %>"
+                                            alt="Ảnh bìa sách"
+                                            style="width: 300px; height: auto;">
+                                        <div class="mask-icon">
+                                            <ul>
+                                                <li><a href="#" data-toggle="tooltip"
+                                                        data-placement="right"
+                                                        title="View"><i
+                                                            class="fas fa-eye"></i></a></li>
+                                                <li><a href="#" data-toggle="tooltip"
+                                                        data-placement="right"
+                                                        title="Compare"><i
+                                                            class="fas fa-sync-alt"></i></a></li>
+                                                <li><a href="#" data-toggle="tooltip"
+                                                        data-placement="right"
+                                                        title="Add to Wishlist"><i
+                                                            class="far fa-heart"></i></a></li>
+                                            </ul>
+                                            <a class="cart" href="#">Add to Cart</a>
+                                        </div>
+                                    </div>
+                                    <div class="why-text">
+                                        <h4><%= book .title %></h4>
+                                        <% if (book.hasDiscount) { %>
+                                        <h5>
+                                            <span
+                                                style="text-decoration: line-through; color: gray;">
+                                                <%=
+                                                book
+                                                .originalPrice.toLocaleString('vi-VN')
+                                                %> VNĐ
+                                            </span>
+                                            <span
+                                                style="color: red; font-weight: bold;">
+                                                <%=
+                                                book
+                                                .discountedPrice.toLocaleString('vi-VN')
+                                                %> VNĐ
+                                            </span>
+                                        </h5>
+                                        <% } else { %>
+                                        <h5><%=
+                                            book .price.toLocaleString('vi-VN') %>
+                                            VNĐ</h5>
+                                        <% } %>
+                                    </div>
                                 </div>
-
-                            </a>
-
-                        </div>
-                    </div>
+                            </div>
+                        <% } %>
+                        
                     <% }); %>
 
-                    <div class="col-lg-3 col-md-6 special-grid top-featured">
-                        <div class="products-single fix">
-                            <div class="box-img-hover">
-                                <div class="type-lb">
-                                    <p class="new">New</p>
-                                </div>
-                                <img src="images/Alchemist.png"
-                                    class="img-fluid" alt="Image">
-                                <div class="mask-icon">
-                                    <ul>
-                                        <li><a href="#" data-toggle="tooltip"
-                                                data-placement="right"
-                                                title="View"><i
-                                                    class="fas fa-eye"></i></a></li>
-                                        <li><a href="#" data-toggle="tooltip"
-                                                data-placement="right"
-                                                title="Compare"><i
-                                                    class="fas fa-sync-alt"></i></a></li>
-                                        <li><a href="#" data-toggle="tooltip"
-                                                data-placement="right"
-                                                title="Add to Wishlist"><i
-                                                    class="far fa-heart"></i></a></li>
-                                    </ul>
-                                    <a class="cart" href="#">Add to Cart</a>
-                                </div>
-                            </div>
-                            <div class="why-text">
-                                <h4>Alchemist</h4>
-                                <h5> ₹160</h5>
-                            </div>
-                        </div>
-                    </div>
+                    
                 </div>
             </div>
         </div>

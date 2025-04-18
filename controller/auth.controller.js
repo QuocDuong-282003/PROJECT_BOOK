@@ -44,7 +44,10 @@ exports.login = async (req, res) => {
             req.session.message = 'Sai tài khoản hoặc mật khẩu!';
             return res.redirect('/auth/login');
         }
-
+        if (user.role !== 0 || user.isActive === false) {
+            req.session.message = 'Bạn không có quyền truy cập!';
+            return res.redirect('/auth/login');
+        }
         req.session.user = {
             id: user._id,
             email: user.email,

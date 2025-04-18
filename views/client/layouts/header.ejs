@@ -89,70 +89,16 @@
                 <div class="collapse navbar-collapse" id="navbar-menu">
                     <ul class="nav navbar-nav ml-auto" data-in="fadeInDown" data-out="fadeOutUp">
                         <li class="nav-item"><a class="nav-link" href="/">Home</a></li>
-                        <li class="nav-item"><a class="nav-link" href="about.html">About Us</a></li>
                         <li class="dropdown megamenu-fw">
                             <a href="/products" class="nav-link">Product</a>
 
-                            <ul class="dropdown-menu megamenu-content" role="menu">
-                                <li>
-                                    <div class="row">
-                                        <div class="col-menu col-md-3">
-                                            <h6 class="title">Top</h6>
-                                            <div class="content">
-                                                <ul class="menu-col">
-                                                    <li><a href="shop.html">Jackets</a></li>
-                                                    <li><a href="shop.html">Shirts</a></li>
-                                                    <li><a href="shop.html">Sweaters & Cardigans</a></li>
-                                                    <li><a href="shop.html">T-shirts</a></li>
-                                                </ul>
-                                            </div>
-                                        </div>
-                                        <!-- end col-3 -->
-                                        <div class="col-menu col-md-3">
-                                            <h6 class="title">Bottom</h6>
-                                            <div class="content">
-                                                <ul class="menu-col">
-                                                    <li><a href="shop.html">Swimwear</a></li>
-                                                    <li><a href="shop.html">Skirts</a></li>
-                                                    <li><a href="shop.html">Jeans</a></li>
-                                                    <li><a href="shop.html">Trousers</a></li>
-                                                </ul>
-                                            </div>
-                                        </div>
-                                        <!-- end col-3 -->
-                                        <div class="col-menu col-md-3">
-                                            <h6 class="title">Clothing</h6>
-                                            <div class="content">
-                                                <ul class="menu-col">
-                                                    <li><a href="shop.html">Top Wear</a></li>
-                                                    <li><a href="shop.html">Party wear</a></li>
-                                                    <li><a href="shop.html">Bottom Wear</a></li>
-                                                    <li><a href="shop.html">Indian Wear</a></li>
-                                                </ul>
-                                            </div>
-                                        </div>
-                                        <div class="col-menu col-md-3">
-                                            <h6 class="title">Accessories</h6>
-                                            <div class="content">
-                                                <ul class="menu-col">
-                                                    <li><a href="shop.html">Bags</a></li>
-                                                    <li><a href="shop.html">Sunglasses</a></li>
-                                                    <li><a href="shop.html">Fragrances</a></li>
-                                                    <li><a href="shop.html">Wallets</a></li>
-                                                </ul>
-                                            </div>
-                                        </div>
-                                        <!-- end col-3 -->
-                                    </div>
-                                    <!-- end row -->
-                                </li>
-                            </ul>
+                            
                         </li>
                         <% if (user) { %>
                             <li class="nav-item"><a class="nav-link" href="/orderlist">Order List</a></li>
                         <% } %>
                         
-                        <li class="nav-item"><a class="nav-link" href="contact-us.html">Contact Us</a></li>
+                        <!-- <li class="nav-item"><a class="nav-link" href="contact-us.html">Contact Us</a></li> -->
                     </ul>
                 </div>
                 <!-- /.navbar-collapse -->
@@ -189,20 +135,39 @@
                                     <li>
                                         <div style="display: flex; align-items: center; justify-content: space-between; border-bottom: 1px solid #ddd; padding: 10px;">
                                             <a href="/products/productdetail/<%= item.bookId._id %>" class="photo">
-                                                <img src="/images/img-pro-01.jpg" class="cart-thumb" alt="" style="width: 50px; height: 50px;">
+                                                <img src="<%= item.bookId.coverImage %>" class="cart-thumb" alt="" style="width: 50px; height: 50px;">
                                             </a>
                                             
-                                            <div style="flex-grow: 1; padding-left: 10px;">
-                                                <h6><a href="/products/productdetail/<%= item.bookId._id %>" > <%= item.bookId.title %> </a></h6>
+                                            <div class="item-cart" style="flex-grow: 1; padding-left: 10px;">
+                                                <h6><a href="/products/productdetail/<%= item.bookId._id %>"><%= item.bookId.title %></a></h6>
+                                                
                                                 <div class="btn_quantity" style="display: flex; align-items: center; gap: 5px;">
-                                                    <input type="button" value="-" id="minus" class="minus" data-id="<%= item.bookId._id %>" style="cursor: pointer;">
-                                                    <input type="number" id="quantity" class="quantity" value="<%= item.quantity %>" size="2%" style="text-align: center;" min="1" max="<%= item.bookId.stock %>">
-                                                    <input type="button" value="+" id="plus" class="plus" data-id="<%= item.bookId._id %>" style="cursor: pointer;">
+                                                    <input type="button" value="-" class="minus" data-id="<%= item.bookId._id %>" style="cursor: pointer;">
+                                                    <input type="number" class="quantity" value="<%= item.quantity %>" style="text-align: center;" min="1" max="<%= item.bookId.stock %>">
+                                                    <input type="button" value="+" class="plus" data-id="<%= item.bookId._id %>" style="cursor: pointer;">
                                                     <input type="hidden" class="bookId" value="<%= item.bookId._id %>">
+                                                    <% 
+                                                        let discount = item.bookId.discountId ? item.bookId.discountId.value : 0;
+                                                        let originalPrice = item.bookId.price;
+                                                        
+                                                        let discountedPrice = originalPrice * (1 - discount / 100);
+                                                    %>
+                                                    <% if (item.bookId.discountId) { %>
+                                                        <input type="hidden" class="price-book" value="<%= discountedPrice %>">
+                                                    <% } else  {%>
+                                                        <input type="hidden" class="price-book" value="<%= item.bookId.price %>">
+                                                    <% } %>
+                                                    
                                                 </div>
-                                 
-                                                <p><span class="price"> <%= item.price.toLocaleString('vi-VN') %> VNĐ</span></p>
+                                                <% if (item.bookId.discountId) { %>
+                                                    <p><span class="price"><%= (discountedPrice*item.quantity).toLocaleString('vi-VN') %> VNĐ</span></p>
+                                                <% } else  {%>
+                                                    <p><span class="price"><%= (originalPrice*item.quantity).toLocaleString('vi-VN') %> VNĐ</span></p>
+                                                <% } %>
+                                                
                                             </div>
+                                            
+
                                             <form action="/cart/remove"method="POST" style="padding-top: 7%;">
                                                 <input type="hidden" name="bookId" value="<%= item.bookId._id %>">
                                                 <input type="submit" value="X" style="background-color: red; color: white; border: none; padding: 5px 10px; cursor: pointer;">
@@ -215,7 +180,7 @@
                                 
                             <% }); %>
                                     <li class="total">
-                                        <span style="font-size: 150%;"><strong>Total</strong>: <%= cart.totalPrice.toLocaleString('vi-VN') %> VNĐ</span>
+                                        <span style="font-size: 150%;"><strong>Total</strong>: <span id="total"><%= cart.totalPrice.toLocaleString('vi-VN') %> </span>VNĐ</span>
                                         <a href="/cart" class="btn btn-default hvr-hover btn-cart">VIEW CART</a>
                                         
                                     </li>
@@ -266,86 +231,121 @@
     <!-- End Top Search -->
 
     <script>
-        document.querySelectorAll(".quantity").forEach(input =>{
-                input.addEventListener("change", async function(){
-                    try {
-                        const row = this.closest(".btn_quantity");
-                        const quantityInput = row.querySelector(".quantity");
-                        console.log(quantityInput.value);
-                        const bookIdInput = row.querySelector(".bookId").value;
-                        const response = await fetch('/cart/update',{
-                            method: "PUT",
-                            headers: {"Content-Type":"application/json"},
-                            body: JSON.stringify({bookId:bookIdInput,quantity:quantityInput.value})
-                        });
-                        
-                        if (!response.ok) {
-                            throw new Error(`Lỗi HTTP: ${response.status}`);
-                        }
-                        const result = await response.json();
-                        console.log("Kết quả API:", result);
-                    } catch (error) {
-                        console.error("Lỗi khi gọi API:", error);
-                    }
-                });
-
+        // Hàm cập nhật tổng tiền giỏ hàng
+        function updateCartTotal() {
+            let total = 0;
+            document.querySelectorAll(".item-cart").forEach(row => {
+                const price = parseInt(row.querySelector(".price-book").value);
+                const quantity = parseInt(row.querySelector(".quantity").value);
+                total += price * quantity;
+            });
+            const totalElement = document.getElementById("total");
+            if (totalElement) {
+                totalElement.innerText = total.toLocaleString("vi-VN") ;
+            }
+        }
+    
+        // Lắng nghe thay đổi thủ công ở input số lượng
+        document.querySelectorAll(".quantity").forEach(input => {
+            input.addEventListener("change", async function () {
+                try {
+                    const row = this.closest(".item-cart");
+                    const quantity = parseInt(this.value, 10) || 1;
+                    const priceBook = parseInt(row.querySelector(".price-book").value);
+                    const priceElement = row.querySelector(".price");
+                    const bookId = row.querySelector(".bookId").value;
+    
+                    // Cập nhật giá
+                    const totalPrice = priceBook * quantity;
+                    priceElement.innerText = totalPrice.toLocaleString('vi-VN') + " VNĐ";
+    
+                    // Gửi cập nhật lên server
+                    const response = await fetch('/cart/update', {
+                        method: "PUT",
+                        headers: { "Content-Type": "application/json" },
+                        body: JSON.stringify({ bookId, quantity })
+                    });
+    
+                    if (!response.ok) throw new Error(`Lỗi HTTP: ${response.status}`);
+                    const result = await response.json();
+    
+                    updateCartTotal();
+                } catch (error) {
+                    console.error("❌ Lỗi khi sửa số lượng thủ công:", error);
+                }
+            });
         });
+    
+        // Nút tăng số lượng
         document.querySelectorAll(".plus").forEach(button => {
             button.addEventListener("click", async function () {
                 try {
-                    const row = this.closest(".btn_quantity");
+                    const row = this.closest(".item-cart");
                     const quantityInput = row.querySelector(".quantity");
+                    const priceBook = parseInt(row.querySelector(".price-book").value);
+                    const priceElement = row.querySelector(".price");
                     let quantity = parseInt(quantityInput.value, 10) || 0;
-                    quantityInput.value = quantity + 1;
-
-                    const bookIdInput = row.querySelector(".bookId").value; // Lấy giá trị bookId từ input ẩn
-
+    
+                    const max = parseInt(quantityInput.getAttribute("max"));
+                    if (quantity >= max) return;
+    
+                    quantity++;
+                    quantityInput.value = quantity;
+    
+                    priceElement.innerText = (priceBook * quantity).toLocaleString("vi-VN") + " VNĐ";
+    
+                    const bookId = row.querySelector(".bookId").value;
+    
                     const response = await fetch('/cart/update', {
                         method: "PUT",
                         headers: { "Content-Type": "application/json" },
-                        body: JSON.stringify({ bookId: bookIdInput,quantity:quantityInput.value })
+                        body: JSON.stringify({ bookId, quantity })
                     });
-
-                    if (!response.ok) {
-                        throw new Error(`Lỗi HTTP: ${response.status}`);
-                    }
-
+    
+                    if (!response.ok) throw new Error(`Lỗi HTTP: ${response.status}`);
                     const result = await response.json();
-                    console.log("Kết quả API:", result);
+    
+                    updateCartTotal();
                 } catch (error) {
-                console.error("Lỗi khi gọi API:", error);
+                    console.error("❌ Lỗi khi tăng:", error);
                 }
             });
         });
+    
+        // Nút giảm số lượng
         document.querySelectorAll(".minus").forEach(button => {
             button.addEventListener("click", async function () {
                 try {
-                    const row = this.closest(".btn_quantity");
+                    const row = this.closest(".item-cart");
                     const quantityInput = row.querySelector(".quantity");
+                    const priceBook = parseInt(row.querySelector(".price-book").value);
+                    const priceElement = row.querySelector(".price");
                     let quantity = parseInt(quantityInput.value, 10) || 0;
-                    quantityInput.value = quantity - 1;
-
-                    const bookIdInput = row.querySelector(".bookId").value; // Lấy giá trị bookId từ input ẩn
-
+    
+                    if (quantity <= 1) return;
+    
+                    quantity--;
+                    quantityInput.value = quantity;
+    
+                    priceElement.innerText = (priceBook * quantity).toLocaleString("vi-VN") + " VNĐ";
+    
+                    const bookId = row.querySelector(".bookId").value;
+    
                     const response = await fetch('/cart/update', {
                         method: "PUT",
                         headers: { "Content-Type": "application/json" },
-                        body: JSON.stringify({ bookId: bookIdInput,quantity:quantityInput.value })
+                        body: JSON.stringify({ bookId, quantity })
                     });
-
-                    if (!response.ok) {
-                        throw new Error(`Lỗi HTTP: ${response.status}`);
-                    }
-
+    
+                    if (!response.ok) throw new Error(`Lỗi HTTP: ${response.status}`);
                     const result = await response.json();
-                    console.log("Kết quả API:", result);
+    
+                    updateCartTotal();
                 } catch (error) {
-                console.error("Lỗi khi gọi API:", error);
+                    console.error("❌ Lỗi khi giảm:", error);
                 }
             });
         });
-
-
     </script>
-
+    
 

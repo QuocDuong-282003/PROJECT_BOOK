@@ -41,7 +41,6 @@ exports.addUser = async (req, res) => {
 exports.updateUser = async (req, res) => {
     try {
         const { name, email, phone, address, role, isActive } = req.body;
-
         // Tìm và cập nhật người dùng
         const user = await User.findByIdAndUpdate(
             req.params.id,
@@ -69,7 +68,7 @@ exports.deleteUser = async (req, res) => {
             return res.status(404).send('Không tìm thấy người dùng.');
         }
 
-        if (user.role === 'admin') {
+        if (user.role === 1) {
             return res.status(403).send('Không được phép xóa tài khoản admin.');
         }
 

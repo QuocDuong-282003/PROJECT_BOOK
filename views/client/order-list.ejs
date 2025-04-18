@@ -206,6 +206,7 @@
           const jsonStr = decodeURIComponent(this.getAttribute("data-items"));
           const order = JSON.parse(jsonStr);
           const orderId = this.getAttribute("data-orderid");
+
           modalOrderIdSpan.textContent = orderId;
           if (order.length === 0) {
             modalItemsContainer.innerHTML = "<p>Không có sản phẩm nào.</p>";
@@ -231,11 +232,14 @@
                     Price: ${item.price.toLocaleString('vi-VN')} VNĐ
                     <span class="mx-2">|</span> Qty: ${item.quantity}
                     <span class="mx-2">|</span> Subtotal: ${(item.price * item.quantity).toLocaleString('vi-VN')} VNĐ
+                    
                   </div>
                 </div>
               </div>
             `;
             modalItemsContainer.innerHTML += itemHTML;
+
+                                        
           });
         });
       });

@@ -54,7 +54,8 @@ app.use(async (req, res, next) => {
     res.locals.count = 0; // Số lượng mặc định là 0
     if (req.session.user) {
         try {
-            const cart = await Cart.findOne({ userId: req.session.user.id }).populate("items.bookId");
+            const cart = await Cart.findOne({ userId: req.session.user.id }).populate({path: "items.bookId",populate: {path: "discountId"}});
+
             res.locals.cart = cart || { items: [] };  // Nếu không có giỏ hàng, gán mảng rỗng
             res.locals.count = res.locals.cart.items.length;
         } catch (error) {

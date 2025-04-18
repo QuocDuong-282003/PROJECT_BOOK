@@ -22,7 +22,6 @@ const applyDiscountInfoToBooks = (books) => {
         return bookObj;
     });
 };
-
 const getAllBooks = async () => {
     try {
         const books = await Book.find().populate("categoryId", "name").populate("publisherId", "name");
@@ -32,7 +31,15 @@ const getAllBooks = async () => {
         return [];
     }
 };
-
+const getBookisDiscount = async () => {
+    try {
+        const books = await Book.find({note: {$regex: "Mã:"}}).populate("categoryId", "name").populate("publisherId", "name");
+        return applyDiscountInfoToBooks(books);
+    } catch (error) {
+        console.error("Lỗi lấy dữ liệu:", error);
+        return [];
+    }
+}
 const getProductById = async (bookId) => {
     try {
         const book = await Book.findById(bookId).populate("categoryId", "name").populate("publisherId", "name");
@@ -117,5 +124,5 @@ const updateRating = async (bookId, rating) => {
     }
 }
 // Đảm bảo export đúng
-module.exports = { getAllBooks, getProductById , getProductByCategory, findProductByName, sortByPrice, sortBySelling ,updateRating, applyDiscountInfoToBooks, getProductByPublisher, getProductByFilter};
+module.exports = { getAllBooks,getBookisDiscount, getProductById , getProductByCategory, findProductByName, sortByPrice, sortBySelling ,updateRating, applyDiscountInfoToBooks, getProductByPublisher, getProductByFilter};
 

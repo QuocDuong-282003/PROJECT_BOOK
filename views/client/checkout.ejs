@@ -157,7 +157,8 @@
                                 </div>
                             </div>
                             
-                            <hr class="mb-1"> </form>
+                            <hr class="mb-1"> 
+                        </form>
                     </div>
                 </div>
                 <div class="col-sm-6 col-lg-6 mb-3">
@@ -182,6 +183,7 @@
                                 </div>
                             </div>
                         </div>
+                        
                         <div class="col-md-12 col-lg-12">
                             <div class="odr-box">
                                 <div class="title-left">
@@ -189,9 +191,19 @@
                                 </div>
                                 <div class="rounded p-2 bg-light">
                                     <% cart.items.forEach(item => { %>
+                                        <% 
+                                            let discount = item.bookId.discountId ? item.bookId.discountId.value : 0;
+                                            let originalPrice = item.bookId.price;
+                                            let discountedPrice = originalPrice * (1 - discount / 100);
+                                        %>
                                         <div class="media mb-2 border-bottom">
                                             <div class="media-body"> <a href="detail.html"> <%= item.bookId.title %></a>
-                                                <div class="small text-muted">Price: <%= item.bookId.price.toFixed(2) %> VNĐ<span class="mx-2">|</span> Qty: <%= item.quantity %> <span class="mx-2">|</span> Subtotal: $80.00</div>
+                                                <% if (discount!=0) { %>
+                                                    <div class="small text-muted">Price: <%= discountedPrice.toLocaleString('vi-VN') %> VNĐ<span class="mx-2">|</span> Qty: <%= item.quantity %> <span class="mx-2">|</span> Subtotal: <%= (discountedPrice*item.quantity).toLocaleString('vi-VN') %> VNĐ</div>
+                                                <% }else {%>
+                                                <div class="small text-muted">Price: <%= originalPrice.toLocaleString('vi-VN') %> VNĐ<span class="mx-2">|</span> Qty: <%= item.quantity %> <span class="mx-2">|</span> <%= (originalPrice*item.quantity).toLocaleString('vi-VN') %> VNĐ</div>
+                                                <% } %>
+                                                
                                             </div>
                                            
                                             
@@ -200,6 +212,7 @@
                                 </div>
                             </div>
                         </div>
+                        
                         <div class="col-md-12 col-lg-12">
                             <div class="order-box">
                                 <div class="title-left">
@@ -212,7 +225,7 @@
                                 <hr class="my-1">
                                 <div class="d-flex">
                                     <h4>Sub Total</h4>
-                                    <div class="ml-auto font-weight-bold"> <%= cart.totalPrice %> VNĐ</div>
+                                    <div class="ml-auto font-weight-bold"> <%= cart.totalPrice.toLocaleString('vi-VN') %> VNĐ</div>
                                 </div>
                                 <div class="d-flex">
                                     <h4>Discount</h4>
@@ -227,7 +240,7 @@
                                 <hr>
                                 <div class="d-flex gr-total">
                                     <h5>Grand Total</h5>
-                                    <div class="ml-auto h5"> <%= cart.totalPrice %> VNĐ </div>
+                                    <div class="ml-auto h5"> <%= cart.totalPrice.toLocaleString('vi-VN') %> VNĐ </div>
                                 </div>
                                 <hr> </div>
                         </div>
@@ -321,9 +334,12 @@
     <%- JSON.stringify(cart.items.map(item => ({
         bookId: item.bookId._id,
         quantity: item.quantity,
-        price: item.bookId.price
+        price: item.bookId.discountId ? 
+               item.bookId.price * (1 - item.bookId.discountId.value / 100) : 
+               item.bookId.price
     }))) %>
 </script>
+
 
 <script>
     const rawJson = document.getElementById('itemsData').textContent;

@@ -1,8 +1,3 @@
-/**
- * Created by CTT VNPAY
- */
-
-
 
 let express = require('express');
 let router = express.Router();

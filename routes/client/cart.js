@@ -1,7 +1,6 @@
 const express = require("express");
 const router = express.Router();
 const { getCartByUserId ,addBookToCart,removeBookFromCart, increaseQuantity , updateQuantity} = require("../../controller/Client/cart.controller");
-
 router.get("/", async (req, res) => {
   try {
     if (!req.session.user || !req.session.user.id) {
@@ -61,7 +60,6 @@ router.put("/update", async(req,res)=>{
     }
     
     const quantity = req.body.quantity;
-    console.log("So luong: ",quantity);
     await updateQuantity(userId,bookId,quantity);
     res.json({success: true, message:"Số lượng đã cập nhật"});
   } catch (error) {
