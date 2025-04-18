@@ -11,6 +11,7 @@ const cors = require('cors');
 
 
 const session = require('express-session'); //thông báo đăng ký tài khoản thành công
+const flash = require('connect-flash');
 
 const bodyParser = require('body-parser');
 const methodOverride = require('method-override');
@@ -20,6 +21,7 @@ const { scheduleDeleteExpiredDiscounts } = require('./controller/admin/discountC
 //
 var indexRouter = require('./routes/client/index');
 var indexADMIN = require('./routes/admin/indexADMIN');
+
 var authRouter = require('./routes/client/auth');
 const Cart = require('./models/Cart');
 const app = express();
@@ -66,6 +68,7 @@ app.use(async (req, res, next) => {
 
     next();
 });
+
 scheduleDeleteExpiredDiscounts();
 // Middleware
 app.use(cookieParser());
@@ -74,6 +77,7 @@ app.use(bodyParser.urlencoded({ extended: true }));
 app.use(bodyParser.json());
 app.use(express.urlencoded({ extended: true }));
 app.use(express.json());
+
 
 
 //
@@ -138,6 +142,7 @@ app.use('/admin/comment', checkAdmin, commentRouter);
 app.use('/admin/books', checkAdmin, bookRouter);
 app.use('/admin/discount', checkAdmin, discountRouter);
 app.use('/admin/publishers', checkAdmin, publisherRoutes);
+
 
 
 
