@@ -64,54 +64,41 @@ exports.getAllOrders = async (req, res) => {
         res.status(500).send('Error khi lấy danh sách đơn hàng');
     }
 };
+
+
 exports.searchOrders = async (req, res) => {
     try {
-        const { search, status } = req.query;
+        const searchQuery = req.query.search || '';
+        let orders = [];
 
-        let query = {};
-
-        // Tìm theo trạng thái nếu có
-        if (status) {
-            query.status = status;
-        }
-
-        if (search) {
-            // Tìm user có tên giống từ khóa
+        if (searchQuery) {
+            // Tìm tất cả users có tên khớp với query
             const users = await User.find({
-                name: { $regex: search, $options: 'i' }
-            }).select('_id');
+                name: { $regex: searchQuery, $options: 'i' }
+            });
 
+            // Lấy danh sách userId từ kết quả trên
             const userIds = users.map(user => user._id);
 
-            query.$or = [];
-
-            // Nếu search là ObjectId hợp lệ thì thêm vào tìm theo _id
-            if (mongoose.Types.ObjectId.isValid(search)) {
-                query.$or.push({ _id: new mongoose.Types.ObjectId(search) });
-            }
-
-            // Nếu tìm thấy user thì thêm vào tìm theo userId
-            if (userIds.length > 0) {
-                query.$or.push({ userId: { $in: userIds } });
-            }
-
-            // Nếu $or rỗng thì bỏ để không lỗi
-            if (query.$or.length === 0) delete query.$or;
+            // Tìm đơn hàng theo orderId hoặc userId nằm trong danh sách
+            orders = await Order.find({
+                $or: [
+                    { orderId: { $regex: searchQuery, $options: 'i' } },
+                    { userId: { $in: userIds } }
+                ]
+            }).populate('userId', 'name');
+        } else {
+            orders = await Order.find().populate('userId', 'name');
         }
-
-        const orders = await Order.find(query)
-            .populate({ path: 'userId', select: 'name' })
-            .populate('discountId')
-            .exec();
 
         res.render('orderAdmin', {
             title: 'Order',
             path: req.path,
-            orders
+            orders,
+            searchQuery
         });
-
     } catch (error) {
         console.error('Lỗi tìm kiếm đơn hàng:', error);
-        res.status(500).json({ success: false, message: 'Lỗi khi tìm kiếm đơn hàng' });
+        res.status(500).send('Lỗi khi tìm kiếm đơn hàng');
     }
 };

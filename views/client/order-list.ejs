@@ -1,177 +1,202 @@
 <%- include('./client/layouts/style') %>
 <%- include('./client/layouts/header') %>
 <div class="all-title-box">
-    <div class="container">
-        <div class="row">
-            <div class="col-lg-12">
-                <h2>Wishlist</h2>
-                <ul class="breadcrumb">
-                    <li class="breadcrumb-item"><a href="#">Shop</a></li>
-                    <li class="breadcrumb-item active">Wishlist</li>
-                </ul>
-            </div>
-        </div>
+  <div class="container">
+    <div class="row">
+      <div class="col-lg-12">
+        <h2>Wishlist</h2>
+        <ul class="breadcrumb">
+          <li class="breadcrumb-item"><a href="#">Shop</a></li>
+          <li class="breadcrumb-item active">Wishlist</li>
+        </ul>
+      </div>
     </div>
+  </div>
 </div>
 <!-- End All Title Box -->
 
 <!-- Start Wishlist  -->
 <div class="wishlist-box-main">
-    <div class="container">
-        <div class="row">
-            <div class="col-lg-12">
-                <div class="table-main table-responsive">
-                    <table class="table">
-                        <thead>
-                            <tr>
-                                <th>NO.</th>
-                                <th>Order ID</th>
-                                <th>Data Create </th>
-                                <th>Status</th>
-                                <th>Total Price</th>
-                                <th>View</th>
-                                <th>Feedback</th>
-                            </tr>
-                        </thead>
-                        <tbody>
-                            <% let NO = 1; %> 
-                            <% orders.forEach(order => { %>
-                                <tr>
-                                    <td class="thumbnail-img">
-                                        <%=NO++ %>
-                                    </td>
-                                    <td class="name-pr">
-                                        <%= order.orderId %>
-                                    </td>
-                                    <% function formatDate(date) { %>
-                                        <%= new Date(date).toLocaleString("en-GB", {
-                                            day: "2-digit",
-                                            month: "2-digit",
-                                            year: "numeric",
-                                            hour: "2-digit",
-                                            minute: "2-digit",
-                                            second: "2-digit",
-                                            hour12: false
-                                        }) %>
-                                      <% } %>
-                                      
-                                    <td class="price-pr">
-                                        <p><%= formatDate(order.orderDate )%></p>
-                                    </td>
-                                    <% 
-                                        let status ="";
-                                        if(order.status==0){
-                                            status ="Pending";
-                                        }else if(order.status==1){
-                                            status ="Success";
-                                        }else{
-                                            status ="Cancelled"
-                                        }
-                                    %>
-                                    <td class="quantity-box"><%= status %></td>
-                                    <td class="add-pr">
-                                        <%= order.totalAmount.toLocaleString('vi-VN') %> VNĐ
-                                    </td>
-                                    <td class="">
-                                        <button type="button" class="btn btn-primary btn-sm view-order-btn" data-toggle="modal" data-target="#modelId" data-items="<%- encodeURIComponent(JSON.stringify(order)) %>" data-orderid="<%= order.orderId %>">
-                                            View
-                                        </button>
-                                    </td>
-                                    <td>
-                                        <button type="button" class="btn btn-success btn-sm view-fback-btn" data-toggle="modal" data-target="#modelVote" data-items="<%- encodeURIComponent(JSON.stringify(order)) %>" data-orderid="<%= order.orderId %>">
-                                            Feedback
-                                        </button>
-                                    </td>
-                                </tr>
-                            <%}) %>
-                        </tbody>
-                    </table>
-                </div>
-            </div>
-        </div>
-    </div>
-</div>
+  <div class="container">
+    <div class="row">
+      <div class="col-lg-12">
+        <div class="table-main table-responsive">
+          <table class="table">
+            <thead>
+              <tr>
+                <th>NO.</th>
+                <th>Order ID</th>
+                <th>Data Create </th>
+                <th>Status</th>
+                <th>Total Price</th>
+                <th>View</th>
+                <th>Feedback</th>
+              </tr>
+            </thead>
+            <tbody>
+              <% let NO = 1; %>
+              <% orders.forEach(order => { %>
+              <tr>
+                <td class="thumbnail-img">
+                  <%=NO++ %>
+                </td>
+                <td class="name-pr">
+                  <%= order.orderId %>
+                </td>
+                <% function formatDate(date) { %>
+                <%= new Date(date).toLocaleString("en-GB", {
+                day: "2-digit",
+                month: "2-digit",
+                year: "numeric",
+                hour: "2-digit",
+                minute: "2-digit",
+                second: "2-digit",
+                hour12: false
+                }) %>
+                <% } %>
 
-<!-- Modal -->
-<div class="modal fade" id="modelId" tabindex="-1" role="dialog" aria-labelledby="modelTitleId" aria-hidden="true">
-    <div class="modal-dialog" role="document">
-      <div class="modal-content">
-        <div class="modal-header">
-          <h5 class="modal-title">Order Detail - <span id="modal-order-id"></span></h5>
-          <button type="button" class="close" data-dismiss="modal" aria-label="Close">
-            <span aria-hidden="true">&times;</span>
-          </button>
-        </div>
-        <div class="modal-body">
-          <div class="odr-box">
-            <div class="title-left">
-              <h3>Order List</h3>
-            </div>
-            <div class="rounded p-2 bg-light" id="modal-items-container">
-              <!-- Nội dung item sẽ được thêm bằng JS -->
-            </div>
-          </div>
-        </div>
-        <div class="modal-footer">
-          <button type="button" class="btn btn-secondary" data-dismiss="modal">Close</button>
+                <td class="price-pr">
+                  <p><%= formatDate(order.orderDate )%></p>
+                </td>
+                <%
+                let status ="";
+                if(order.status==0){
+                status ="Pending";
+                }else if(order.status==1){
+                status ="Success";
+                }else{
+                status ="Cancelled"
+                }
+                %>
+                <td class="quantity-box"><%= status %></td>
+                <td class="add-pr">
+                  <%= order.totalAmount.toLocaleString('vi-VN') %> VNĐ
+                </td>
+                <td class>
+                  <button type="button"
+                    class="btn btn-primary btn-sm view-order-btn"
+                    data-toggle="modal" data-target="#modelId"
+                    data-items="<%- encodeURIComponent(JSON.stringify(order)) %>"
+                    data-orderid="<%= order.orderId %>">
+                    View
+                  </button>
+                </td>
+                <td>
+                  <button type="button"
+                    class="btn btn-success btn-sm view-fback-btn"
+                    data-toggle="modal" data-target="#modelVote"
+                    data-items="<%- encodeURIComponent(JSON.stringify(order)) %>"
+                    data-orderid="<%= order.orderId %>">
+                    Feedback
+                  </button>
+                </td>
+              </tr>
+              <%}) %>
+            </tbody>
+          </table>
         </div>
       </div>
     </div>
   </div>
-  <div class="modal fade" id="modelVote" tabindex="-1" role="dialog" aria-labelledby="modelTitleId" aria-hidden="true">
-    <div class="modal-dialog" role="document">
-      <div class="modal-content">
-        <div class="modal-header">
+</div>
+
+<!-- Modal -->
+<div class="modal fade" id="modelId" tabindex="-1" role="dialog"
+  aria-labelledby="modelTitleId" aria-hidden="true">
+  <div class="modal-dialog" role="document">
+    <div class="modal-content">
+      <div class="modal-header">
+        <h5 class="modal-title">Order Detail - <span
+            id="modal-order-id"></span></h5>
+        <button type="button" class="close" data-dismiss="modal"
+          aria-label="Close">
+          <span aria-hidden="true">&times;</span>
+        </button>
+      </div>
+      <div class="modal-body">
+        <div class="odr-box">
           <div class="title-left">
-            <h3>FeedBack</h3>
+            <h3>Order List</h3>
           </div>
-          <button type="button" class="close" data-dismiss="modal" aria-label="Close">
-            <span aria-hidden="true">&times;</span>
-          </button>
+          <div class="rounded p-2 bg-light" id="modal-items-container">
+            <!-- Nội dung item sẽ được thêm bằng JS -->
+          </div>
         </div>
-        <div class="modal-body">
-          <div class="vote-box">
-            <div class="rounded p-2 bg-light" >
-              <!-- Nội dung item sẽ được thêm bằng JS -->
-              <form action="/comment/add" method="post">
-                <div class="card">
-                  <div class="row">   
-                      <div class="col-2"> 
-                          <img src="https://i.imgur.com/xELPaag.jpg" width="70" class="rounded-circle mt-2">          
-                      </div>                  
-                      <div class="col-10">                   
-                          <div class="comment-box ml-2">
-                              <div id="modal-fback-container"></div>
-                              <input type="hidden" name="orderId" id="orderId" value="${orderId}"> 
-                              <input type="hidden" name="userId" id="userId" value="<%= user.id %>">
-                              <h4 style="font-weight: bold;"><%= user.name %></h4>             
-                              <div class="rating"> 
-                                  <input type="radio" name="rating" value="5" id="5"><label for="5">☆</label>
-                                  <input type="radio" name="rating" value="4" id="4"><label for="4">☆</label> 
-                                  <input type="radio" name="rating" value="3" id="3"><label for="3">☆</label>
-                                  <input type="radio" name="rating" value="2" id="2"><label for="2">☆</label>
-                                  <input type="radio" name="rating" value="1" id="1"><label for="1">☆</label>
-                              </div>                         
-                              <div class="comment-area">                               
-                                  <textarea class="form-control" placeholder="what is your view?" rows="4" name="content"></textarea>                           
-                              </div>                                                                                             
-                          </div>                   
-                      </div>                
+      </div>
+      <div class="modal-footer">
+        <button type="button" class="btn btn-secondary"
+          data-dismiss="modal">Close</button>
+      </div>
+    </div>
+  </div>
+</div>
+<div class="modal fade" id="modelVote" tabindex="-1" role="dialog"
+  aria-labelledby="modelTitleId" aria-hidden="true">
+  <div class="modal-dialog" role="document">
+    <div class="modal-content">
+      <div class="modal-header">
+        <div class="title-left">
+          <h3>FeedBack</h3>
+        </div>
+        <button type="button" class="close" data-dismiss="modal"
+          aria-label="Close">
+          <span aria-hidden="true">&times;</span>
+        </button>
+      </div>
+      <div class="modal-body">
+        <div class="vote-box">
+          <div class="rounded p-2 bg-light">
+            <!-- Nội dung item sẽ được thêm bằng JS -->
+            <form action="/comment/add" method="post">
+              <div class="card">
+                <div class="row">
+                  <div class="col-2">
+                    <img src="https://i.imgur.com/xELPaag.jpg" width="70"
+                      class="rounded-circle mt-2">
+                  </div>
+                  <div class="col-10">
+                    <div class="comment-box ml-2">
+                      <div id="modal-fback-container"></div>
+                      <input type="hidden" name="orderId" id="orderId"
+                        value="${orderId}">
+                      <input type="hidden" name="userId" id="userId"
+                        value="<%= user.id %>">
+                      <h4 style="font-weight: bold;"><%= user.name %></h4>
+                      <div class="rating">
+                        <input type="radio" name="rating" value="5"
+                          id="5"><label for="5">☆</label>
+                        <input type="radio" name="rating" value="4"
+                          id="4"><label for="4">☆</label>
+                        <input type="radio" name="rating" value="3"
+                          id="3"><label for="3">☆</label>
+                        <input type="radio" name="rating" value="2"
+                          id="2"><label for="2">☆</label>
+                        <input type="radio" name="rating" value="1"
+                          id="1"><label for="1">☆</label>
+                      </div>
+                      <div class="comment-area">
+                        <textarea class="form-control"
+                          placeholder="what is your view?" rows="4"
+                          name="content"></textarea>
+                      </div>
+                    </div>
+                  </div>
                 </div>
-                 
-            </div>
+
+              </div>
             </div>
           </div>
         </div>
         <div class="modal-footer">
-          <input type="hidden" id="order" name="order" value="" >
-          <button type="button" class="btn btn-secondary" data-dismiss="modal">Close</button>
-          <button type="submit" class="btn btn-primary">Send </button>   
+          <input type="hidden" id="order" name="order" value>
+          <button type="button" class="btn btn-secondary"
+            data-dismiss="modal">Close</button>
+          <button type="submit" class="btn btn-primary">Send </button>
         </div>
-      </form> 
-      </div>
+      </form>
     </div>
-  </div> 
+  </div>
+</div>
 <%- include('./client/layouts/footer') %>
 <%- include('./client/layouts/script') %>
 
@@ -246,4 +271,3 @@
       });
     });
   </script>
-  
