@@ -33,9 +33,16 @@ const addOrder = async (orderId,userId,firstName,lastName, address,ward,district
         return null;
     }
 };
-const updateFeedback = async (orderId, feedback) => {
+const updateFeedback = async (orderId) => {
     try {
-        const order = await Order.findOneAndUpdate({ orderId }, { feedback }, { new: true });
+        const order = await Order.findOne({ orderId: orderId });
+        if (!order) {
+            console.error("Không tìm thấy đơn hàng với orderId:", orderId);
+            return null;
+        }
+        // Cập nhật trạng thái phản hồi cho đơn hàng
+        order.isFeedback = true;
+        await order.save();
         return order;
     }
     catch (error) {

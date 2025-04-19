@@ -11,17 +11,17 @@ router.post('/add', async (req, res) => {
         const userId = req.body.userId;
         const content = req.body.content;
         const rating = req.body.rating;
-
+        const orderId = req.body.order;
         if (!bookIds || !userId || !content || !rating) {
             return res.status(400).json({ message: "Thiếu thông tin" });
         }
 
         const results = [];
-
+        const feedback = await updateFeedback(orderId);
         for (const bookId of bookIds) {
             const newCmt = await addCMT(bookId, userId, content, rating);
             const rate = await updateRating(bookId, rating);
-            const feedback = await updateFeedback(bookId, true);
+            
             results.push({ bookId, cmt: newCmt, rate ,feedback});
         }
         return res.redirect('/orderlist');

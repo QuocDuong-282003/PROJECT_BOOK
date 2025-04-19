@@ -64,3 +64,54 @@ exports.getAllOrders = async (req, res) => {
         res.status(500).send('Error khi lấy danh sách đơn hàng');
     }
 };
+exports.searchOrders = async (req, res) => {
+    try {
+        const { search, status } = req.query;
+
+        let query = {};
+
+        // Tìm theo trạng thái nếu có
+        if (status) {
+            query.status = status;
+        }
+
+        if (search) {
+            // Tìm user có tên giống từ khóa
+            const users = await User.find({
+                name: { $regex: search, $options: 'i' }
+            }).select('_id');
+
+            const userIds = users.map(user => user._id);
+
+            query.$or = [];
+
+            // Nếu search là ObjectId hợp lệ thì thêm vào tìm theo _id
+            if (mongoose.Types.ObjectId.isValid(search)) {
+                query.$or.push({ _id: new mongoose.Types.ObjectId(search) });
+            }
+
+            // Nếu tìm thấy user thì thêm vào tìm theo userId
+            if (userIds.length > 0) {
+                query.$or.push({ userId: { $in: userIds } });
+            }
+
+            // Nếu $or rỗng thì bỏ để không lỗi
+            if (query.$or.length === 0) delete query.$or;
+        }
+
+        const orders = await Order.find(query)
+            .populate({ path: 'userId', select: 'name' })
+            .populate('discountId')
+            .exec();
+
+        res.render('orderAdmin', {
+            title: 'Order',
+            path: req.path,
+            orders
+        });
+
+    } catch (error) {
+        console.error('Lỗi tìm kiếm đơn hàng:', error);
+        res.status(500).json({ success: false, message: 'Lỗi khi tìm kiếm đơn hàng' });
+    }
+};

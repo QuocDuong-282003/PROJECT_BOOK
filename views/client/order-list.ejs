@@ -164,6 +164,7 @@
           </div>
         </div>
         <div class="modal-footer">
+          <input type="hidden" id="order" name="order" value="" >
           <button type="button" class="btn btn-secondary" data-dismiss="modal">Close</button>
           <button type="submit" class="btn btn-primary">Send </button>   
         </div>
@@ -184,7 +185,7 @@
           const jsonStr = decodeURIComponent(this.getAttribute("data-items"));
           const order = JSON.parse(jsonStr);
           const orderId = this.getAttribute("data-orderid");
-          
+          document.getElementById("order").value = order.orderId;
           if (order.length === 0) {
             modalFbackContainer.innerHTML = "<p>Không có sản phẩm nào.</p>";
             return;
@@ -206,7 +207,7 @@
           const jsonStr = decodeURIComponent(this.getAttribute("data-items"));
           const order = JSON.parse(jsonStr);
           const orderId = this.getAttribute("data-orderid");
-
+          
           modalOrderIdSpan.textContent = orderId;
           if (order.length === 0) {
             modalItemsContainer.innerHTML = "<p>Không có sản phẩm nào.</p>";

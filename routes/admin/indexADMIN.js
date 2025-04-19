@@ -59,7 +59,7 @@ router.delete('/publisher/delete/:id', publisherController.deletePublisher);
 router.post('/publisher/update/:id', publisherController.updatePublisher);
 //search
 router.get("/publishers", publisherController.getSearchPublishers);
-
+router.get('/orders/search', orderController.searchOrders);
 
 //
 

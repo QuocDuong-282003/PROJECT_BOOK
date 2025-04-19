@@ -269,13 +269,14 @@ exports.searchBooks = async (req, res) => {
                 { author: new RegExp(query, "i") }
             ]
         }).populate('categoryId publisherId');
-
+        const discounts = await Discount.find();
         res.render('admin/book/productsAdmin', {
             title: 'Kết quả tìm kiếm',
             books,
             categories: await Category.find(),
             publishers: await Publisher.find(),
             totalBooks: books.length,
+            discounts,
             totalPages: 1,
             currentPage: 1
         });

@@ -107,7 +107,7 @@ exports.deletePublisher = async (req, res) => {
     }
 };
 
-// Tìm kiếm nhà xuất bản
+
 exports.getSearchPublishers = async (req, res) => {
     try {
         let searchQuery = req.query.search || '';
@@ -120,6 +120,7 @@ exports.getSearchPublishers = async (req, res) => {
         let searchedPublisher = null;
         let searchedSTT = null;
 
+        // Nếu người dùng nhập số (tìm theo số thứ tự)
         if (!isNaN(searchQuery) && searchQuery > 0) {
             let index = parseInt(searchQuery) - 1;
             if (index >= 0 && index < allPublishers.length) {
@@ -129,7 +130,6 @@ exports.getSearchPublishers = async (req, res) => {
             } else {
                 return res.render('publisherAdmin', {
                     publishers: [],
-                    // categories: [], 
                     searchQuery,
                     searchedSTT: null,
                     currentPage: page,
@@ -138,6 +138,11 @@ exports.getSearchPublishers = async (req, res) => {
                     path: "publisher"
                 });
             }
+        } else if (searchQuery.trim() !== '') {
+            // tìm theo tên
+            filter = {
+                name: { $regex: searchQuery, $options: 'i' } // không phân biệt hoa thường
+            };
         }
 
         const totalPublisher = await Publisher.countDocuments(filter);
@@ -153,7 +158,6 @@ exports.getSearchPublishers = async (req, res) => {
 
         res.render('publisherAdmin', {
             publishers,
-            // categories: [], 
             searchQuery,
             searchedSTT,
             currentPage: page,
