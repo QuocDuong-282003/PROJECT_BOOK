@@ -21,10 +21,8 @@ router.post('/', handleMulter, bookController.createBook);
 
 // Route cập nhật sách
 router.post('/update/:id', handleMulter, bookController.updateBook);
-
 // Route xóa sách
 router.post('/delete/:id', bookController.deleteBook);
-
 // Route tìm kiếm sách
 router.get('/search', bookController.searchBooks);
 
