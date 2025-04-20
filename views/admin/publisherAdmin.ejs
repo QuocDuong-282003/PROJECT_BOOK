@@ -1,0 +1,162 @@
+<%- include('./layouts/style') %>
+<%- include('./layouts/head') %>
+<%- include('./layouts/menu-list') %>
+
+<div class="col-xl-12 col-md-12">
+    <div class="card table-card">
+        <div class="card-header">
+            <div class="title-container">
+                <h5><%= title %></h5>
+                <span class="search-container">
+                    <form action="/admin/publishers" method="GET"
+                        class="d-flex">
+                        <input id="Search" class="form-control" type="search"
+                            name="search" placeholder="Search..."
+                            value="<%= typeof searchQuery !== 'undefined' ? searchQuery : '' %>">
+                        <button type="submit" class="btn btn-primary">
+                            <i class="feather icon-search"></i>
+                        </button>
+                    </form>
+                </span>
+            </div>
+
+            <button type="button" class="btn btn-success" data-toggle="modal"
+                data-target="#exampleModalLive">
+                <i class="feather icon-plus"></i>
+            </button>
+        </div>
+        <div class="card-body p-0">
+            <div class="table-responsive">
+                <table class="table table-hover mb-0">
+                    <thead>
+                        <tr>
+                            <th class="text-center">NO</th>
+                            <th class="text-center">Publisher Name</th>
+                            <th class="text-center">Country</th>
+                            <!-- <th class="text-center">Category</th> -->
+                            <th class="text-center">Date</th>
+                            <th class="text-center">Action</th>
+                            <!-- Thêm cột Hành Động -->
+                        </tr>
+                    </thead>
+                    <tbody>
+                        <% publishers.forEach((publisher, index) => { %>
+                        <tr>
+                            <!-- <td class="text-center"><%= index + 1 %></td> -->
+                            <td><%= typeof searchedSTT !== 'undefined' &&
+                                searchedSTT ? searchedSTT : (currentPage - 1) *
+                                10 + (index + 1) %></td>
+
+                            <td class="text-center"><%= publisher.name %></td>
+                            <td class="text-center"><%= publisher.country
+                                %></td>
+                            <!-- <td class="text-center">
+                                <% if (publisher.categories &&
+                                publisher.categories.length > 0) { %>
+                                <ul class="list-unstyled">
+                                    <% publisher.categories.forEach(category =>
+                                    { %>
+                                    <li><%= category.name %> </li>
+                                     Hiển thị tên và mô tả của danh mục
+                                    <% }); %>
+                                </ul>
+                                <% } else { %>
+                                <p>Không có danh mục</p>
+                                <% } %>
+                            </td> -->
+                            <td class="text-center">
+                                <%= publisher.createdAt ?
+                                publisher.createdAt.toLocaleDateString() :
+                                'Chưa có thông tin' %>
+                            </td>
+                            <td class="text-center">
+                                <!-- Nút Edit -->
+                                <button class="btn btn-info editBtn"
+                                    data-id="<%= publisher._id %>"
+                                    data-name="<%= publisher.name %>"
+                                    data-country="<%= publisher.country %>"
+                                    data-createdAt="<%=publisher.createdAt %>"
+                                    data-toggle="modal"
+                                    data-target="#updateModalLive">
+                                    Edit
+                                </button>
+
+                                <!-- Nút Delete -->
+                                <form
+                                    action="/admin/publisher/delete/<%= publisher._id %>?_method=DELETE"
+                                    method="POST" style="display:inline;">
+                                    <button type="submit"
+                                        class="btn btn-danger">
+                                        <i class="feather icon-trash-2"></i>
+                                        Delete
+                                    </button>
+                                </form>
+                            </td>
+                        </tr>
+                        <% }); %>
+                    </tbody>
+                </table>
+            </div>
+            <!-- PHÂN TRANG -->
+            <nav>
+                <ul class="pagination">
+                    <% for(let i = 1; i <= totalPages; i++) { %>
+                    <li
+                        class="page-item <%= i === currentPage ? 'active' : '' %>">
+                        <a class="page-link"
+                            href="/admin/publisher?page=<%= i %>"><%= i %></a>
+
+                    </li>
+                    <% } %>
+                </ul>
+            </nav>
+        </div>
+    </div>
+</div>
+
+<%- include('./model-insert-publisher') %>
+<%- include('./model-update-publisher') %>
+<%- include('./layouts/footer') %>
+<%- include('./layouts/script') %>
+<script>
+    // document.addEventListener("DOMContentLoaded", function () {
+    //     document.querySelectorAll(".editBtn").forEach(button => {
+    //         button.addEventListener("click", function () {
+    //             document.getElementById("publisherId").value = this.dataset.id;
+    //             document.getElementById("name").value = this.dataset.name;
+    //             document.getElementById("country").value = this.dataset.country;
+    //             // document.getElementById("categories").value = this.dataset.categories;
+    //             document.getElementById("createdAt").value = this.dataset.createdAt;
+               
+    
+    //             // Cập nhật action của form
+    //             document.getElementById("updateForm").action = `/admin/publisher/update/${this.dataset.id}`;
+    //         });
+    //     });
+    // });
+    document.addEventListener("DOMContentLoaded", function () {
+    document.querySelectorAll(".editBtn").forEach(button => {
+        button.addEventListener("click", function () {
+            const publisherId = this.dataset.id;
+            const publisherName = this.dataset.name;
+            const publisherCountry = this.dataset.country;
+            const createdAt = this.dataset.createdat; // lấy giá trị createdAt từ data 
+            document.getElementById("publisherId").value = publisherId;
+            document.getElementById("name").value = publisherName;
+            document.getElementById("country").value = publisherCountry;
+            // Chuyển đổi ngày tạo (createdAt) thành định dạng YYYY-MM-DD
+            const date = new Date(createdAt);
+            const formattedDate = date.toISOString().split('T')[0]; // định dạng YYYY-MM-DD
+            document.getElementById("createdAt").value = formattedDate;
+            // Cập nhật action của form
+            document.getElementById("updateForm").action = `/admin/publisher/update/${publisherId}`;
+        });
+    });
+});
+
+    function searchDiscounts() {
+        const searchValue = document.getElementById('Search').value;
+        window.location.href = `/admin/search?search=${encodeURIComponent(searchValue)}`;
+    }
+    
+    </script>

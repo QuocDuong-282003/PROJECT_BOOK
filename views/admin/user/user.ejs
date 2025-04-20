@@ -1,0 +1,371 @@
+<%- include('../layouts/style') %>
+<%- include('../layouts/head') %>
+<%- include('../layouts/menu-list', { path: 'users', title: 'Quản lý Người dùng' }) %>
+
+<div class="col-xl-12 col-md-12">
+  <div class="card table-card">
+    <div class="card-header">
+      <div class="title-container">
+        <h5><%= title || 'Quản lý Người dùng' %></h5>
+        <h5>Tổng số người dùng: <strong><%= totalUsers %></strong></h5>
+        <button type="button" class="btn btn-success" data-toggle="modal" data-target="#addUserModal">
+          <i class="feather icon-plus"></i> Thêm người dùng
+        </button>
+        <form action="/admin/users/search" method="GET" class="search-container">
+          <input type="text" name="query" class="form-control" placeholder="Tìm kiếm người dùng..." />
+          <button type="submit" class="btn btn-primary">
+            <i class="feather icon-search"></i>
+          </button>
+        </form>
+      </div>
+      <div class="card-header-right">
+        <div class="btn-group card-option">
+          <button type="button" class="btn dropdown-toggle" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
+            <i class="feather icon-more-horizontal"></i>
+          </button>
+          <ul class="list-unstyled card-option dropdown-menu dropdown-menu-right">
+            <li class="dropdown-item full-card">
+              <a href="#!"><span><i class="feather icon-maximize"></i> maximize</span><span style="display: none"><i class="feather icon-minimize"></i> Restore</span></a>
+            </li>
+            <li class="dropdown-item minimize-card">
+              <a href="#!"><span><i class="feather icon-minus"></i> collapse</span><span style="display: none"><i class="feather icon-plus"></i> expand</span></a>
+            </li>
+            <li class="dropdown-item reload-card">
+              <a href="#!"><i class="feather icon-refresh-cw"></i> reload</a>
+            </li>
+          </ul>
+        </div>
+      </div>
+    </div>
+
+    <div class="card-body p-0">
+      <div class="container mt-3">
+        <div class="table-responsive">
+          <table class="table table-bordered" id="userTable">
+            <thead>
+              <tr>
+                <th class="text-center">#</th>
+                <th class="text-center">Tên</th>
+                <th class="text-center">Email</th>
+                <th class="text-center">Số điện thoại</th>
+                <th class="text-center">Địa chỉ</th>
+                <th class="text-center">Trạng thái</th>
+                <th class="text-center">Vai trò</th>
+                <th class="text-center">Số lần đăng nhập</th> <!-- Thêm cột mới -->
+                <th class="text-center">Hành động</th>
+              </tr>
+            </thead>
+            <tbody>
+              <% users.forEach((user, index) => { %>
+                  <tr data-id="<%= user._id %>">
+                      <td class="text-center"><%= index + 1 %></td>
+                      <td class="text-center"><%= user.name %></td>
+                      <td class="text-center"><%= user.email %></td>
+                      <td class="text-center"><%= user.phone %></td>
+                      <td class="text-center"><%= user.address %></td>
+                      <td class="text-center">
+                          <span class="badge <%= user.isActive ? 'badge-success' : 'badge-danger' %>">
+                              <%= user.isActive ? 'Active' : 'Inactive' %>
+                          </span>
+                      </td>
+                      <td class="text-center"><%= user.role %></td>
+                      <td class="text-center"><%= user.loginCount || 0 %></td> <!-- Hiển thị số lần đăng nhập -->
+                      <td class="text-center">
+                          <!-- Nút chỉnh sửa -->
+                          <% if (user.role !== 'admin') { %>
+                              <button type="button" class="btn btn-info btn-sm" data-toggle="modal" data-target="#editUserModal-<%= user._id %>">
+                                  <i class="feather icon-edit"></i>
+                              </button>
+                          <% } else { %>
+                              <button type="button" class="btn btn-info btn-sm" disabled>
+                                  <i class="feather icon-edit"></i>
+                              </button>
+                          <% } %>
+          
+                          <!-- Nút xóa (vô hiệu hóa nếu là admin) -->
+                          <% if (user.role === 'admin') { %>
+                              <button class="btn btn-danger btn-sm" disabled>
+                                  <i class="feather icon-trash-2"></i>
+                              </button>
+                          <% } else { %>
+                              <form action="/admin/users/<%= user._id %>/delete" method="POST" style="display:inline;">
+                                  <input type="hidden" name="_method" value="DELETE">
+                                  <button type="submit" class="btn btn-danger btn-sm" onclick="return confirm('Bạn có chắc chắn muốn xóa người dùng này?');">
+                                      <i class="feather icon-trash-2"></i>
+                                  </button>
+                              </form>
+                          <% } %>
+          
+                          <!-- Nút reset mật khẩu (vô hiệu hóa nếu là admin) -->
+                          <% if (user.role === 'admin') { %>
+                              <button class="btn btn-warning btn-sm" disabled>
+                                  <i class="feather icon-refresh-ccw"></i>
+                              </button>
+                          <% } else { %>
+                              <form action="/admin/users/<%= user._id %>/reset-password" method="POST" style="display:inline;">
+                                  <input type="hidden" name="_method" value="PUT">
+                                  <button type="submit" class="btn btn-warning btn-sm" onclick="return confirm('Bạn có chắc chắn muốn reset mật khẩu người dùng này?');">
+                                      <i class="feather icon-refresh-ccw"></i>
+                                  </button>
+                              </form>
+                          <% } %>
+                      </td>
+                  </tr>
+              <% }) %>
+          </tbody>
+          </table>
+        </div>
+
+        <!-- PHÂN TRANG -->
+        <nav>
+          <ul class="pagination">
+              <% for(let i = 1; i <= totalPages; i++) { %>
+                  <li class="page-item <%= i === currentPage ? 'active' : '' %>">
+                      <a class="page-link" href="/admin/users/search?query=<%= query || '' %>&page=<%= i %>"><%= i %></a>
+                  </li>
+              <% } %>
+          </ul>
+        </nav>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- Modal thêm người dùng -->
+<div class="modal fade" id="addUserModal" tabindex="-1" role="dialog">
+  <div class="modal-dialog modal-lg" role="document">
+    <div class="modal-content">
+      <div class="modal-header">
+        <h5 class="modal-title">Thêm người dùng mới</h5>
+        <button type="button" class="close" data-dismiss="modal">&times;</button>
+      </div>
+      <div class="modal-body">
+        <form action="/admin/users/add" method="POST">
+          <div class="form-group">
+            <label>Tên</label>
+            <input type="text" class="form-control" name="name" required>
+          </div>
+          <div class="form-group">
+            <label>Email</label>
+            <input type="email" class="form-control" name="email" required>
+          </div>
+          <div class="form-group">
+            <label>Mật khẩu</label>
+            <input type="password" class="form-control" name="password" required>
+          </div>
+          <div class="form-group">
+            <label>Số điện thoại</label>
+            <input type="text" class="form-control" name="phone">
+          </div>
+          <div class="form-group">
+            <label>Địa chỉ</label>
+            <input type="text" class="form-control" name="address">
+          </div>
+          <div class="form-group">
+            <label>Vai trò</label>
+            <select class="form-control" name="role" required>
+              <option value="0">Người dùng</option>
+              <option value="1">Quản trị viên</option>
+            </select>
+          </div>
+          <div class="modal-footer">
+            <button type="button" class="btn btn-secondary" data-dismiss="modal">Đóng</button>
+            <button type="submit" class="btn btn-primary">Thêm người dùng</button>
+          </div>
+        </form>
+      </div>
+    </div>
+  </div>
+</div>
+
+
+
+<% users.forEach((user) => { %>
+  <!-- Modal chỉnh sửa người dùng -->
+  <div class="modal fade" id="editUserModal-<%= user._id %>" tabindex="-1" role="dialog">
+    <div class="modal-dialog modal-lg" role="document">
+      <div class="modal-content">
+        <div class="modal-header">
+          <h5 class="modal-title">Chỉnh sửa người dùng</h5>
+          <button type="button" class="close" data-dismiss="modal">&times;</button>
+        </div>
+        <div class="modal-body">
+          <form action="/admin/users/<%= user._id %>/update" method="POST">
+            <div class="form-group">
+              <label>Tên</label>
+              <input type="text" class="form-control" name="name" value="<%= user.name %>" required>
+            </div>
+            <div class="form-group">
+              <label>Email</label>
+              <input type="email" class="form-control" name="email" value="<%= user.email %>" required>
+            </div>
+            <div class="form-group">
+              <label>Số điện thoại</label>
+              <input type="text" class="form-control" name="phone" value="<%= user.phone %>">
+            </div>
+            <div class="form-group">
+              <label>Địa chỉ</label>
+              <input type="text" class="form-control" name="address" value="<%= user.address %>">
+            </div>
+            <div class="form-group">
+              <label>Vai trò</label>
+              <select class="form-control" name="role" required>
+                <option value="0" <%= user.role === 0 ? 'selected' : '' %>>Người dùng</option>
+                <option value="1" <%= user.role === 1 ? 'selected' : '' %>>Quản trị viên</option>
+              </select>
+            </div>
+            <div class="form-group">
+              <label>Trạng thái</label>
+              <select class="form-control" name="isActive" required>
+                <option value="true" <%= user.isActive ? 'selected' : '' %>>Active</option>
+                <option value="false" <%= !user.isActive ? 'selected' : '' %>>Inactive</option>
+              </select>
+            </div>
+            <div class="modal-footer">
+              <button type="button" class="btn btn-secondary" data-dismiss="modal">Đóng</button>
+              <button type="submit" class="btn btn-primary">Lưu thay đổi</button>
+            </div>
+          </form>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Modal Reset Mật khẩu -->
+  <div class="modal fade" id="resetPasswordModal-<%= user._id %>" tabindex="-1" role="dialog">
+    <div class="modal-dialog" role="document">
+      <div class="modal-content">
+        <div class="modal-header">
+          <h5 class="modal-title">Reset Mật khẩu</h5>
+          <button type="button" class="close" data-dismiss="modal">&times;</button>
+        </div>
+        <div class="modal-body">
+          <p>Bạn có chắc chắn muốn reset mật khẩu người dùng này?</p>
+          <form action="/admin/users/<%= user._id %>/reset-password" method="POST">
+            <input type="hidden" name="_method" value="PUT">
+            <div class="modal-footer">
+              <button type="button" class="btn btn-secondary" data-dismiss="modal">Hủy</button>
+              <button type="submit" class="btn btn-warning">Reset Mật khẩu</button>
+            </div>
+          </form>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Modal Xem Đơn Hàng -->
+  <!-- <div class="modal fade" id="ordersUserModal-<%= user._id %>" tabindex="-1" role="dialog">
+    <div class="modal-dialog modal-lg" role="document">
+      <div class="modal-content">
+        <div class="modal-header">
+          <h5 class="modal-title">Đơn hàng của <%= user.name %></h5>
+          <button type="button" class="close" data-dismiss="modal">&times;</button>
+        </div>
+        <div class="modal-body">
+          <table class="table table-bordered">
+            <thead>
+              <tr>
+                <th>#</th>
+                <th>Mã đơn hàng</th>
+                <th>Ngày đặt</th>
+                <th>Tổng tiền</th>
+                <th>Trạng thái</th>
+              </tr>
+            </thead>
+            <tbody>
+              <% if (user.orders && user.orders.length > 0) { %>
+                <% user.orders.forEach((order, index) => { %>
+                  <tr>
+                    <td><%= index + 1 %></td>
+                    <td><%= order.orderId %></td>
+                    <td><%= order.orderDate.toLocaleDateString() %></td>
+                    <td><%= order.totalAmount.toLocaleString() %> VNĐ</td>
+                    <td><%= order.status %></td>
+                  </tr>
+                <% }) %>
+              <% } else { %>
+                <tr>
+                  <td colspan="5" class="text-center">Không có đơn hàng nào.</td>
+                </tr>
+              <% } %>
+            </tbody>
+          </table>
+        </div>
+        <div class="modal-footer">
+          <button type="button" class="btn btn-secondary" data-dismiss="modal">Đóng</button>
+        </div>
+      </div>
+    </div>
+  </div>
+
+
+  <div class="modal fade" id="userDetailModal-<%= user._id %>" tabindex="-1" role="dialog" aria-labelledby="userDetailModalLabel" aria-hidden="true">
+    <div class="modal-dialog" role="document">
+      <div class="modal-content">
+        <div class="modal-header">
+          <h5 class="modal-title" id="userDetailModalLabel">Thông tin chi tiết</h5>
+          <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+            <span aria-hidden="true">&times;</span>
+          </button>
+        </div>
+        <div class="modal-body">
+          <p><strong>Tên:</strong> <%= user.name %></p>
+          <p><strong>Email:</strong> <%= user.email %></p>
+          <p><strong>Số điện thoại:</strong> <%= user.phone %></p>
+          <p><strong>Địa chỉ:</strong> <%= user.address %></p>
+          <p><strong>Vai trò:</strong> <%= user.role %></p>
+          <p><strong>Trạng thái:</strong> <%= user.isActive ? 'Active' : 'Inactive' %></p>
+        </div>
+        <div class="modal-footer">
+          <button type="button" class="btn btn-secondary" data-dismiss="modal">Đóng</button>
+        </div>
+      </div>
+    </div>
+  </div> -->
+
+  <!-- <div class="modal fade" id="loginStatsModal-<%= user._id %>" tabindex="-1" role="dialog" aria-labelledby="loginStatsModalLabel" aria-hidden="true">
+    <div class="modal-dialog" role="document">
+      <div class="modal-content">
+        <div class="modal-header">
+          <h5 class="modal-title" id="loginStatsModalLabel">Thống kê đăng nhập của <%= user.name %></h5>
+          <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+            <span aria-hidden="true">&times;</span>
+          </button>
+        </div>
+        <div class="modal-body">
+          <p><strong>Số lần đăng nhập:</strong> <%= user.loginCount %></p>
+          <p><strong>Lần đăng nhập cuối cùng:</strong> <%= user.lastLoginAt ? user.lastLoginAt.toLocaleString() : 'Chưa đăng nhập' %></p>
+          <h5>Lịch sử đăng nhập</h5>
+          <table class="table table-bordered">
+            <thead>
+              <tr>
+                <th>#</th>
+                <th>Thời gian đăng nhập</th>
+              </tr>
+            </thead>
+            <tbody>
+              <% if (user.loginHistory && user.loginHistory.length > 0) { %>
+                <% user.loginHistory.forEach((login, index) => { %>
+                  <tr>
+                    <td><%= index + 1 %></td>
+                    <td><%= login.loginAt.toLocaleString() %></td>
+                  </tr>
+                <% }) %>
+              <% } else { %>
+                <tr>
+                  <td colspan="2" class="text-center">Không có lịch sử đăng nhập.</td>
+                </tr>
+              <% } %>
+            </tbody>
+          </table>
+        </div>
+        <div class="modal-footer">
+          <button type="button" class="btn btn-secondary" data-dismiss="modal">Đóng</button>
+        </div>
+      </div>
+    </div>
+  </div> -->
+ <% }) %>
+  
+<%- include('../layouts/footer') %>
+<%- include('../layouts/script') %>

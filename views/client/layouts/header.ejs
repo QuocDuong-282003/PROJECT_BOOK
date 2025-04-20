@@ -1,0 +1,351 @@
+<!DOCTYPE html>
+<html lang="en">
+<!-- Basic -->
+
+<head>
+    <meta charset="utf-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+
+    <!-- Mobile Metas -->
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+
+    <!-- Site Metas -->
+    <title>ThewayShop - Ecommerce Bootstrap 4 HTML Template</title>
+    <meta name="keywords" content="">
+    <meta name="description" content="">
+    <meta name="author" content="">
+
+    <!-- Site Icons -->
+    <link rel="shortcut icon" href="/images/favicon.ico" type="image/x-icon">
+    <link rel="apple-touch-icon" href="/images/apple-touch-icon.png">
+
+</head>
+
+<body>
+
+    <!-- Start Main Top -->
+    <div class="main-top">
+        <div class="container-fluid">
+            <div class="row">
+                <div class="col-lg-6 col-md-6 col-sm-12 col-xs-12">
+                    <div class="text-slid-box">
+                        <div id="offer-box" class="carouselTicker">
+                            <ul class="offer-box">
+                                <li>
+                                    <i class="fab fa-opencart"></i> Sale off 10% on History Books
+                                </li>
+                                <li>
+                                    <i class="fab fa-opencart"></i> Sale off 50% - 80% on Story Books
+                                </li>
+                                <li>
+                                    <i class="fab fa-opencart"></i> Sale off 50% - 80% on Manga
+                                </li>
+                            </ul>
+                        </div>
+                    </div>
+                </div>
+                <div class="col-lg-6 col-md-6 col-sm-12 col-xs-12">
+                    <div class="right-phone-box">
+                        <% if (user) { %>
+                            <p>Xin chào, <strong><%= user.name %></strong></p>
+                        <% } %>
+                    </div>
+                    
+                    <div class="our-link">
+                        <ul>
+                            <% if (user) { %>
+                                <li><a href="/auth/myaccount">My Account</a></li>
+                                <li><a href="/auth/logout">Logout</a></li>
+                            <% } else { %>
+                                <li><a href="/auth/login">Login</a></li>
+                                <li><a href="/auth/register">Sign Up</a></li>
+                            <% } %>   
+                        </ul>
+                    </div>                                       
+                        
+                    </div>
+                   
+                </div>
+            </div>
+        </div>
+    </div>
+    <!-- End Main Top -->
+
+    <!-- Start Main Top -->
+    <header class="main-header">
+        <!-- Start Navigation -->
+        <nav class="navbar navbar-expand-lg navbar-light bg-light navbar-default bootsnav">
+            <div class="container">
+                <!-- Start Header Navigation -->
+                <div class="navbar-header">
+                    <button class="navbar-toggler" type="button" data-toggle="collapse" data-target="#navbar-menu" aria-controls="navbars-rs-food" aria-expanded="false" aria-label="Toggle navigation">
+                    <i class="fa fa-bars"></i>
+                </button>
+                    <a class="navbar-brand" href="/"><img src="/images/logo.png" class="logo" alt=""></a>
+                </div>
+                <!-- End Header Navigation -->
+
+                <!-- Collect the nav links, forms, and other content for toggling -->
+                <div class="collapse navbar-collapse" id="navbar-menu">
+                    <ul class="nav navbar-nav ml-auto" data-in="fadeInDown" data-out="fadeOutUp">
+                        <li class="nav-item"><a class="nav-link" href="/">Home</a></li>
+                        <li class="dropdown megamenu-fw">
+                            <a href="/products" class="nav-link">Product</a>
+
+                            
+                        </li>
+                        <% if (user) { %>
+                            <li class="nav-item"><a class="nav-link" href="/orderlist">Order List</a></li>
+                        <% } %>
+                        
+                        <!-- <li class="nav-item"><a class="nav-link" href="contact-us.html">Contact Us</a></li> -->
+                    </ul>
+                </div>
+                <!-- /.navbar-collapse -->
+
+                <!-- Start Atribute Navigation -->
+                <div class="attr-nav">
+                    <ul>
+                        <li class="search"><a href="#"><i class="fa fa-search"></i></a></li>
+                        <li class="side-menu"><a href="#">
+						<i class="fa fa-shopping-bag"></i>
+                            <span class="badge">
+                                <% if (cart) { %>
+                                    <%= count %>
+                                <% } else { %>
+                                    0
+                                <% } %>
+                            
+                            </span>
+
+
+					</a></li>
+                    </ul>
+                </div>
+                <!-- End Atribute Navigation -->
+            </div>
+            <!-- Start Side Menu -->
+            <div class="side">
+                <a href="#" class="close-side"><i class="fa fa-times"></i></a>
+                <li class="cart-box">
+                    <% if (user) { %> <!-- Nếu đã đăng nhập -->
+                        <% if (cart && cart.items.length > 0) { %>
+                            <% cart.items.forEach(item => { %>
+                                <ul class="cart-list">
+                                    <li>
+                                        <div style="display: flex; align-items: center; justify-content: space-between; border-bottom: 1px solid #ddd; padding: 10px;">
+                                            <a href="/products/productdetail/<%= item.bookId._id %>" class="photo">
+                                                <img src="<%= item.bookId.coverImage %>" class="cart-thumb" alt="" style="width: 50px; height: 50px;">
+                                            </a>
+                                            
+                                            <div class="item-cart" style="flex-grow: 1; padding-left: 10px;">
+                                                <h6><a href="/products/productdetail/<%= item.bookId._id %>"><%= item.bookId.title %></a></h6>
+                                                
+                                                <div class="btn_quantity" style="display: flex; align-items: center; gap: 5px;">
+                                                    <input type="button" value="-" class="minus" data-id="<%= item.bookId._id %>" style="cursor: pointer;">
+                                                    <input type="number" class="quantity" value="<%= item.quantity %>" style="text-align: center;" min="1" max="<%= item.bookId.stock %>">
+                                                    <input type="button" value="+" class="plus" data-id="<%= item.bookId._id %>" style="cursor: pointer;">
+                                                    <input type="hidden" class="bookId" value="<%= item.bookId._id %>">
+                                                    <% 
+                                                        let discount = item.bookId.discountId ? item.bookId.discountId.value : 0;
+                                                        let originalPrice = item.bookId.price;
+                                                        
+                                                        let discountedPrice = originalPrice * (1 - discount / 100);
+                                                    %>
+                                                    <% if (item.bookId.discountId) { %>
+                                                        <input type="hidden" class="price-book" value="<%= discountedPrice %>">
+                                                    <% } else  {%>
+                                                        <input type="hidden" class="price-book" value="<%= item.bookId.price %>">
+                                                    <% } %>
+                                                    
+                                                </div>
+                                                <% if (item.bookId.discountId) { %>
+                                                    <p><span class="price"><%= (discountedPrice*item.quantity).toLocaleString('vi-VN') %> VNĐ</span></p>
+                                                <% } else  {%>
+                                                    <p><span class="price"><%= (originalPrice*item.quantity).toLocaleString('vi-VN') %> VNĐ</span></p>
+                                                <% } %>
+                                                
+                                            </div>
+                                            
+
+                                            <form action="/cart/remove"method="POST" style="padding-top: 7%;">
+                                                <input type="hidden" name="bookId" value="<%= item.bookId._id %>">
+                                                <input type="submit" value="X" style="background-color: red; color: white; border: none; padding: 5px 10px; cursor: pointer;">
+                                            </form>
+                                        </div>
+                                        
+                                        
+                                    </li>
+                                    
+                                
+                            <% }); %>
+                                    <li class="total">
+                                        <span style="font-size: 150%;"><strong>Total</strong>: <span id="total"><%= cart.totalPrice.toLocaleString('vi-VN') %> </span>VNĐ</span>
+                                        <a href="/cart" class="btn btn-default hvr-hover btn-cart">VIEW CART</a>
+                                        
+                                    </li>
+                                </ul>
+                        <% }else{%>
+                                <ul class="cart-list">
+                                    <li>
+                                        <h6>
+                                            <a href="/products" class="text-center" style="padding: 20px;">
+                                                Add items to cart!
+                                            </a>
+                                        </h6>
+                                    </li>
+                                </ul> 
+                            <%} %>
+                        
+                    <% } else { %> <!-- Nếu chưa đăng nhập -->
+                        <ul class="cart-list">
+                            <li>
+                                <h6>
+                                    <a href="/auth/login" class="text-center" style="padding: 20px;">
+                                        Please log in to view cart!
+                                    </a>
+                                </h6>
+                            </li>
+                        </ul>
+                    <% } %>
+
+                </li>
+            </div>
+            <!-- End Side Menu -->
+        </nav>
+        <!-- End Navigation -->
+    </header>
+    <!-- End Main Top -->
+
+    <!-- Start Top Search -->
+    <div class="top-search">
+        <div class="container">
+            <div class="input-group">
+                <span class="input-group-addon"><i class="fa fa-search"></i></span>
+                <input type="text" class="form-control" placeholder="Search">
+                <span class="input-group-addon close-search"><i class="fa fa-times"></i></span>
+            </div>
+        </div>
+    </div>
+
+    <!-- End Top Search -->
+
+    <script>
+        // Hàm cập nhật tổng tiền giỏ hàng
+        function updateCartTotal() {
+            let total = 0;
+            document.querySelectorAll(".item-cart").forEach(row => {
+                const price = parseInt(row.querySelector(".price-book").value);
+                const quantity = parseInt(row.querySelector(".quantity").value);
+                total += price * quantity;
+            });
+            const totalElement = document.getElementById("total");
+            if (totalElement) {
+                totalElement.innerText = total.toLocaleString("vi-VN") ;
+            }
+        }
+    
+        // Lắng nghe thay đổi thủ công ở input số lượng
+        document.querySelectorAll(".quantity").forEach(input => {
+            input.addEventListener("change", async function () {
+                try {
+                    const row = this.closest(".item-cart");
+                    const quantity = parseInt(this.value, 10) || 1;
+                    const priceBook = parseInt(row.querySelector(".price-book").value);
+                    const priceElement = row.querySelector(".price");
+                    const bookId = row.querySelector(".bookId").value;
+    
+                    // Cập nhật giá
+                    const totalPrice = priceBook * quantity;
+                    priceElement.innerText = totalPrice.toLocaleString('vi-VN') + " VNĐ";
+    
+                    // Gửi cập nhật lên server
+                    const response = await fetch('/cart/update', {
+                        method: "PUT",
+                        headers: { "Content-Type": "application/json" },
+                        body: JSON.stringify({ bookId, quantity })
+                    });
+    
+                    if (!response.ok) throw new Error(`Lỗi HTTP: ${response.status}`);
+                    const result = await response.json();
+    
+                    updateCartTotal();
+                } catch (error) {
+                    console.error("❌ Lỗi khi sửa số lượng thủ công:", error);
+                }
+            });
+        });
+    
+        // Nút tăng số lượng
+        document.querySelectorAll(".plus").forEach(button => {
+            button.addEventListener("click", async function () {
+                try {
+                    const row = this.closest(".item-cart");
+                    const quantityInput = row.querySelector(".quantity");
+                    const priceBook = parseInt(row.querySelector(".price-book").value);
+                    const priceElement = row.querySelector(".price");
+                    let quantity = parseInt(quantityInput.value, 10) || 0;
+    
+                    const max = parseInt(quantityInput.getAttribute("max"));
+                    if (quantity >= max) return;
+    
+                    quantity++;
+                    quantityInput.value = quantity;
+    
+                    priceElement.innerText = (priceBook * quantity).toLocaleString("vi-VN") + " VNĐ";
+    
+                    const bookId = row.querySelector(".bookId").value;
+    
+                    const response = await fetch('/cart/update', {
+                        method: "PUT",
+                        headers: { "Content-Type": "application/json" },
+                        body: JSON.stringify({ bookId, quantity })
+                    });
+    
+                    if (!response.ok) throw new Error(`Lỗi HTTP: ${response.status}`);
+                    const result = await response.json();
+    
+                    updateCartTotal();
+                } catch (error) {
+                    console.error("❌ Lỗi khi tăng:", error);
+                }
+            });
+        });
+    
+        // Nút giảm số lượng
+        document.querySelectorAll(".minus").forEach(button => {
+            button.addEventListener("click", async function () {
+                try {
+                    const row = this.closest(".item-cart");
+                    const quantityInput = row.querySelector(".quantity");
+                    const priceBook = parseInt(row.querySelector(".price-book").value);
+                    const priceElement = row.querySelector(".price");
+                    let quantity = parseInt(quantityInput.value, 10) || 0;
+    
+                    if (quantity <= 1) return;
+    
+                    quantity--;
+                    quantityInput.value = quantity;
+    
+                    priceElement.innerText = (priceBook * quantity).toLocaleString("vi-VN") + " VNĐ";
+    
+                    const bookId = row.querySelector(".bookId").value;
+    
+                    const response = await fetch('/cart/update', {
+                        method: "PUT",
+                        headers: { "Content-Type": "application/json" },
+                        body: JSON.stringify({ bookId, quantity })
+                    });
+    
+                    if (!response.ok) throw new Error(`Lỗi HTTP: ${response.status}`);
+                    const result = await response.json();
+    
+                    updateCartTotal();
+                } catch (error) {
+                    console.error("❌ Lỗi khi giảm:", error);
+                }
+            });
+        });
+    </script>
+    
+

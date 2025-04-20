@@ -1,0 +1,254 @@
+<body>
+    <%- include('./client/layouts/style') %>
+    <%- include('./client/layouts/header') %>
+    <div>
+        <%- include('./client/layouts/banner') %>
+            <!-- Start Shop Page  -->
+
+    <div class="shop-box-inner">
+        <div class="container">
+            <div class="row">
+                <div class="col-xl-3 col-lg-3 col-sm-12 col-xs-12 sidebar-shop-left">
+                    <div class="product-categori">
+                        <div class="search-product">
+                            <form action="/products/search" method="GET">
+                                <input class="form-control" placeholder="Search here..." type="text" name="name" >
+                                <button type="submit"> <i class="fa fa-search"></i> </button>
+                            </form>
+                        </div>
+                        <div class="filter-price-left">
+                            <div class="title-left">
+                                <h3>Price</h3>
+                            </div>
+                            <form action="/products/filter" method="get">
+                                <div class="price-box-slider">
+                                    <div id="slider-range"></div>
+                                    <input type="hidden" id="priceMin" name="priceMin" value="0">
+                                    <input type="hidden" id="priceMax" name="priceMax" value="10000000">  
+                                    <p>
+                                        <input type="text" id="amount" readonly style="border:0; color:#fbb714; font-weight:bold;">
+                                        <button class="btn hvr-hover" type="submit">Filter</button>
+                                    </p>
+                                </div>
+                            </form>
+                            
+                        </div>
+                        <div class="filter-sidebar-left">
+                            <div class="title-left">
+                                <h3>Categories</h3>
+                            </div>
+                            <div class="list-group list-group-collapse list-group-sm list-group-tree" id="list-group-men" data-children=".sub-men">
+                                    <a href="/products/" class="list-group-item list-group-item-action"> All </a>
+                                <% AllCategories.forEach( category => { %>
+                          
+                                    <a href="/products/category=<%=category._id%>" class="list-group-item list-group-item-action"> <%= category.name %> </a>
+                                <%}) %>
+                                
+                            </div>
+                        </div>
+                        
+                        <div class="filter-brand-left">
+                            <div class="title-left">
+                                <h3>Publisher</h3>
+                            </div>
+                            <div class="list-group list-group-collapse list-group-sm list-group-tree" id="list-group-men" data-children=".sub-men">
+                                <a href="/products/" class="list-group-item list-group-item-action"> All </a>
+                            <% AllPublishers.forEach( publisher => { %>
+                                <a href="/products/publisher=<%=publisher._id%>" class="list-group-item list-group-item-action"> <%= publisher.name %> </a>
+                            <%}) %>
+                            
+                        </div>
+                        </div>
+
+                    </div>
+                </div>
+                <div class="col-xl-9 col-lg-9 col-sm-12 col-xs-12 shop-content-right">
+                    <div class="right-product-box">
+                        <div class="product-item-filter row">
+                            <div class="col-12 col-sm-8 text-center text-sm-left">
+                                <div class="toolbar-sorter-right">
+                                    <span>Sort by </span>
+                                    <select id="basic" class="selectpicker show-tick form-control" data-placeholder="$ USD" onchange="getComboA(this)" name="sort">
+                                        <option data-display="Select">Nothing</option>
+                                        <option value="1">Popularity</option>
+                                        <option value="2">High Price → Low Price</option>
+                                        <option value="3">Low Price → High Price</option>
+                                        <option value="4">Best Selling</option>
+                                    </select>
+                                                                             
+                                </div>
+                                <p>Showing all <%= Products.length %> results</p>
+                            </div>
+                            <div class="col-12 col-sm-4 text-center text-sm-right">
+                                <ul class="nav nav-tabs ml-auto">
+                                    <li>
+                                        <a class="nav-link active" href="#grid-view" data-toggle="tab"> <i class="fa fa-th"></i> </a>
+                                    </li>
+                                    <li>
+                                        <a class="nav-link" href="#list-view" data-toggle="tab"> <i class="fa fa-list-ul"></i> </a>
+                                    </li>
+                                </ul>
+                            </div>
+                        </div>
+
+                        <div class="row product-categorie-box">
+                            <div class="tab-content">
+                                <div role="tabpanel" class="tab-pane fade show active" id="grid-view">
+                                    <div class="row" id="products-list">
+                                        <% Products.forEach(product => { %>
+                                            <div class="col-sm-6 col-md-6 col-lg-4 col-xl-4">
+                                                <div class="products-single fix">
+                                                    <div class="box-img-hover">
+                                                        <div class="type-lb">
+                                                            <% if (product.hasDiscount) { %>
+                                                                <p class="sale">Sale</p>
+                                                            <% } %>
+                                                            
+                                                        </div>
+                                                        <img src="<%= product.coverImage %>" class="img-fluid" alt="Image">
+                                                        <div class="mask-icon">
+                                                            <ul>
+                                                                <li><a href="#" data-toggle="tooltip" data-placement="right" title="View"><i class="fas fa-eye"></i></a></li>
+                                                                <li><a href="#" data-toggle="tooltip" data-placement="right" title="Compare"><i class="fas fa-sync-alt"></i></a></li>
+                                                                <li><a href="#" data-toggle="tooltip" data-placement="right" title="Add to Wishlist"><i class="far fa-heart"></i></a></li>
+                                                            </ul>
+                                                            <!-- Form thêm vào giỏ hàng -->
+                                                             <style>
+                                                                .cart {
+                                                                    background-color: red;
+                                                                    color: white;
+                                                                    border: none;
+                                                                    padding: 10px 20px;
+                                                                    text-align: center;
+                                                                    text-decoration: none;
+                                                                    display: inline-block;
+                                                                    font-size: 16px;
+                                                                    margin-top: 170px;
+                                                                    cursor: pointer;
+                                                                }
+                                                                .cart:hover {
+                                                                    background-color: darkred;
+                                                                }
+                                                             </style>
+                                                            <form action="/cart/add" method="POST">
+                                                                <button type="submit" class="cart">Add to Cart</button>
+                                                                <input type="hidden" name="quantity" value="1" >
+                                                                <input type="hidden" name="bookId" value="<%= product._id %>">
+                                                            </form>
+                                                        </div>
+                                                    </div>
+                                                    <a href="/products/productdetail/<%= product._id %>">
+                                                        <div class="why-text">
+                                                            <h4><%= product.title %></h4>
+                                                            <% if (product.hasDiscount) { %>
+                                                                <h5>
+                                                                    <span
+                                                                        style="text-decoration: line-through; color: gray;">
+                                                                        <%=
+                                                                        product
+                                                                        .originalPrice.toLocaleString('vi-VN')
+                                                                        %> VNĐ
+                                                                    </span>
+                                                                    <span
+                                                                        style="color: red; font-weight: bold;">
+                                                                        <%=
+                                                                        product
+                                                                        .discountedPrice.toLocaleString('vi-VN')
+                                                                        %> VNĐ
+                                                                    </span>
+                                                                </h5>
+                                                                <% } else { %>
+                                                                <h5><%=
+                                                                    product.price.toLocaleString('vi-VN') %>
+                                                                    VNĐ</h5>
+                                                                <% } %>
+                                                        </div>
+                                                    </a>
+                                                </div>
+                                            </div>
+                                        <% }) %>
+                                        
+                                        
+                                    </div>
+                                </div>
+
+                            </div>
+                        </div>
+
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+    <!-- End Shop Page -->
+    </div>
+    <%- include('./client/layouts/footer') %>
+    <%- include('./client/layouts/script') %>
+</body>
+<script>
+    function getComboA(selectObject) {
+        var value = selectObject.value;
+        fetch('/products/sort?value=' + value)
+            .then(response => {
+                if (!response.ok) {
+                    throw new Error('Network response was not ok ' + response.statusText);
+                }
+                return response.json(); // đọc JSON 1 lần duy nhất
+            })
+            .then(data => {
+                const products = data.Products
+                // TODO: cập nhật giao diện tại đây nếu cần
+                const productsList = document.getElementById('products-list');
+                productsList.innerHTML = ''; // Xóa nội dung hiện tại
+                products.forEach(product =>{
+                    const productHTML = `
+                                            <div class="col-sm-6 col-md-6 col-lg-4 col-xl-4">
+                                                <div class="products-single fix">
+                                                    <div class="box-img-hover">
+                                                        <div class="type-lb">
+                                                            <p class="sale">Sale</p>
+                                                        </div>
+                                                        <img src="${product.coverImage}" class="img-fluid" alt="Image">
+                                                        <div class="mask-icon">
+                                                            <ul>
+                                                                <li><a href="#" data-toggle="tooltip" data-placement="right" title="View"><i class="fas fa-eye"></i></a></li>
+                                                                <li><a href="#" data-toggle="tooltip" data-placement="right" title="Compare"><i class="fas fa-sync-alt"></i></a></li>
+                                                                <li><a href="#" data-toggle="tooltip" data-placement="right" title="Add to Wishlist"><i class="far fa-heart"></i></a></li>
+                                                            </ul>
+                                                            <!-- Form thêm vào giỏ hàng -->
+                                                             
+                                                            <form action="/cart/add" method="POST">
+                                                                <button type="submit" class="cart">Add to Cart</button>
+                                                                <input type="hidden" name="quantity" value="1" >
+                                                                <input type="hidden" name="bookId" value="${product._id}">
+                                                            </form>
+                                                        </div>
+                                                    </div>
+                                                    <a href="/products/productdetail/${product._id}">
+                                                        <div class="why-text">
+                                                            <h4>${product.title}</h4>
+                                                            
+                                                            ${product.hasDiscount ? `
+                                                                <h5 style="text-decoration: line-through; color: gray;">
+                                                                    ${product.originalPrice.toLocaleString('vi-VN')} VNĐ
+                                                                </h5>
+                                                                <h5 style="color: red; font-weight: bold;">
+                                                                    ${product.discountedPrice.toLocaleString('vi-VN')} VNĐ
+                                                                </h5>` : `
+                                                                <h5 style="color: black; font-weight: bold;">
+                                                                    ${product.price.toLocaleString('vi-VN')} VNĐ
+                                                                </h5>`}
+                                                        </div>
+                                                    </a>
+                                                </div>
+                                            </div>                        
+                    `;
+                    productsList.innerHTML += productHTML; // Thêm sản phẩm vào danh sách
+                });
+            })
+            .catch(error => {
+                console.error('Lỗi khi fetch dữ liệu:', error);
+            });
+    }
+
+</script>    

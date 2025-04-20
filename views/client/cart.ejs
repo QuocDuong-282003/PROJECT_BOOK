@@ -1,0 +1,121 @@
+<body>
+    <%- include('./client/layouts/style') %>
+    <%- include('./client/layouts/header') %>
+    <div>
+        <!-- Start Cart  -->
+    <div class="cart-box-main">
+        <div class="container">
+            <div class="row">
+                <div class="col-lg-12">
+                    <div class="table-main table-responsive">
+                        <table class="table">
+                            <thead>
+                                <tr>
+                                    <th>Images</th>
+                                    <th>Product Name</th>
+                                    <th>Price</th>
+                                    <th>Quantity</th>
+                                    <th>Total</th>
+                                    <th>Remove</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                <% cart.items.forEach(item => { %>
+                                    <tr>
+                                        <td class="thumbnail-img">
+                                            <a href="#">
+                                                <img class="img-fluid" src="<%= item.bookId.coverImage %>" alt="<%= item.bookId.title %>" />
+                                            </a>
+                                        </td>
+                                        <td class="name-pr">
+                                            <a href="#">
+                                                <%= item.bookId.title %>
+                                            </a>
+                                        </td>
+                                        <% 
+                                            let discount = item.bookId.discountId ? item.bookId.discountId.value : 0;
+                                            let originalPrice = item.bookId.price;
+                                            
+                                            let discountedPrice = originalPrice * (1 - discount / 100);
+                                        %>
+                                        <td class="price-pr">
+                                            <% if (item.bookId.discountId) { %>
+                                                <span style="text-decoration: line-through; color: gray;"> <%= originalPrice.toLocaleString('vi-VN') %> VNĐ</span>
+                                                <span style="color: red; font-weight: bold;"> <%= discountedPrice.toLocaleString('vi-VN') %> VNĐ</span>
+                                            <% }else {%>
+                                                <span style="font-weight: bold;"> <%= originalPrice.toLocaleString('vi-VN') %> VNĐ %></span>
+                                            <%}%>
+                                            
+                                        </td>
+                                        <td >
+                                             <input type="number" value="<%= item.quantity %>" min="0" step="1"  width="10%">
+                                        </td>
+                                        <td class="total-pr">
+                                            <% if (item.bookId.discountId) { %>
+                                                <span style="font-weight: bold;"><%= (discountedPrice* item.quantity).toLocaleString('vi-VN') %> VNĐ %></span>
+                                            <% }else {%>
+                                                <span style="font-weight: bold;"> <%= (originalPrice* item.quantity).toLocaleString('vi-VN') %> VNĐ %></span>
+                                            <%}%>
+                                            
+                                        </td>
+                                        <td class="remove">
+                                            <form action="/cart/remove" method="post">
+                                                <button type="submit" ><i class="fas fa-times"></i></button>
+                                                <input type="text" name="bookId" value="<%= item.bookId._id %>" hidden>
+                                            </form>
+                                        </td>
+                                    </tr>
+                                    <% }); %>
+                                    
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+            </div>
+            <%
+                let subTotal = 0;
+                let totalDiscount = 0;
+                let grandTotal = 0;
+                cart.items.forEach(item => {
+                    let discount = item.bookId.discountId ? item.bookId.discountId.value : 0;
+                    let originalPrice = item.bookId.price;
+                    let discountedPrice = originalPrice * (1 - discount / 100);
+                    totalDiscount += (originalPrice - discountedPrice) * item.quantity;
+                    subTotal+= originalPrice * item.quantity;
+                    grandTotal+= discountedPrice * item.quantity;
+                });
+            %>
+
+            
+            <div class="row my-5">
+                <div class="col-lg-8 col-sm-12"></div>
+                <div class="col-lg-4 col-sm-12">
+                    <div class="order-box">
+                        <h3>Order summary</h3>
+                        <div class="d-flex">
+                            <h4>Sub Total</h4>
+                            <div class="ml-auto font-weight-bold"> <%= subTotal.toLocaleString('vi-VN') %> VNĐ</div>
+                        </div>
+                        <div class="d-flex">
+                            <h4>Discount</h4>
+                            <div class="ml-auto font-weight-bold"> -<%= totalDiscount.toLocaleString('vi-VN') %> VNĐ</div>
+                        </div>
+                        
+                        <hr>
+                        <div class="d-flex gr-total">
+                            <h5>Grand Total</h5>
+                            <div class="ml-auto h5"> <%= grandTotal.toLocaleString('vi-VN') %> VNĐ</div>
+                        </div>
+                        <hr> </div>
+                </div>
+                <div class="col-12 d-flex shopping-box"><a href="/checkout" class="ml-auto btn hvr-hover">Checkout</a> </div>
+            </div>
+            </div>
+
+        </div>
+    </div>
+    <!-- End Cart -->
+    </div>
+    <%- include('./client/layouts/footer') %>
+    <%- include('./client/layouts/script') %>
+</body>

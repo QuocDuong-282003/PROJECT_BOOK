@@ -1,0 +1,120 @@
+<%- include('./layouts/style') %>
+<%- include('./layouts/head') %>
+<%- include('./layouts/menu-list', { path: 'comment', title: 'Quản lý Bình luận' }) %>
+<div class="col-xl-12 col-md-12">
+  <div class="card table-card">
+    <div class="card-header">
+      <div class="title-container">
+        <h5>
+          <a href="#" onclick="location.reload(); return false;">
+            <%= title || 'Quản lý Bình luận' %>
+          </a>
+        </h5>
+        <h5>Tổng số bình luận: <strong id="totalComments"><%= totalComments %></strong></h5>
+        <form action="/admin/comment/search" method="GET" class="search-container">
+          <input type="text" name="query" class="form-control" placeholder="Tìm kiếm bình luận...">
+          <button type="submit" class="btn btn-primary">
+            <i class="feather icon-search"></i>
+          </button>
+        </form>
+      </div>
+      <div class="card-header-right">
+        <div class="btn-group card-option">
+          <button type="button" class="btn dropdown-toggle" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
+            <i class="feather icon-more-horizontal"></i>
+          </button>
+          <ul class="list-unstyled card-option dropdown-menu dropdown-menu-right">
+            <li class="dropdown-item full-card"><a href="#!"><span><i class="feather icon-maximize"></i> maximize</span><span style="display:none"><i class="feather icon-minimize"></i> Restore</span></a></li>
+            <li class="dropdown-item minimize-card"><a href="#!"><span><i class="feather icon-minus"></i> collapse</span><span style="display:none"><i class="feather icon-plus"></i> expand</span></a></li>
+            <li class="dropdown-item reload-card"><a href="#!"><i class="feather icon-refresh-cw"></i> reload</a></li>
+          </ul>
+        </div>
+      </div>
+    </div>
+    <div class="card-body p-0">
+      <div class="container mt-3">
+        <div class="table-responsive">
+          <table class="table table-hover mb-0" id="commentTable">
+            <thead>
+              <tr>
+                <th class="text-center">STT</th>
+                <th class="text-center">Người dùng</th>
+                <th class="text-center">Sách</th>
+                <th class="text-center">Nội dung</th>
+                <th class="text-center">Ngày bình luận</th>
+                <th class="text-center">Hành động</th>
+              </tr>
+            </thead>
+            <tbody id="commentTableBody">
+              <% comments.forEach((comment, index) => { %>
+                <tr id="comment-<%= comment._id %>">
+                  <td class="text-center"><%= (currentPage - 1) * 10 + index + 1 %></td>
+                  <td class="text-center"><%= comment.user ? comment.user.name : 'Ẩn danh' %></td>
+                  <td class="text-center"><%= comment.book ? comment.book.title : 'Không xác định' %></td>
+                  <td class="text-center comment-content"><%= comment.content %></td>
+                  <td class="text-center"><%= new Date(comment.createdAt).toLocaleString("vi-VN") %></td>
+                  <td class="text-center">
+                    <!-- Nút mở modal chỉnh sửa -->
+                    <button class="btn btn-warning btn-sm" data-toggle="modal" data-target="#editCommentModal-<%= comment._id %>">
+                      <i class="feather icon-edit"></i> Sửa
+                    </button>
+                    <!-- Form xóa bình luận -->
+                    <form action="/admin/comment/delete/<%= comment._id %>" method="POST" style="display:inline;">
+                      <button type="submit" class="btn btn-danger btn-sm" onclick="return confirm('Bạn có chắc chắn muốn xóa bình luận này?');">
+                        <i class="feather icon-trash-2"></i> Xóa
+                      </button>
+                    </form>
+                  </td>
+                </tr>
+
+                <!-- Modal chỉnh sửa bình luận -->
+                <div class="modal fade" id="editCommentModal-<%= comment._id %>" tabindex="-1" aria-labelledby="editCommentModalLabel" aria-hidden="true">
+                  <div class="modal-dialog">
+                    <div class="modal-content">
+                      <div class="modal-header">
+                        <h5 class="modal-title" id="editCommentModalLabel">Chỉnh sửa bình luận</h5>
+                        <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                          <span aria-hidden="true">&times;</span>
+                        </button>
+                      </div>
+                      <div class="modal-body">
+                        <form action="/admin/comment/update/<%= comment._id %>" method="POST">
+                          <div class="form-group">
+                            <label for="editCommentContent">Nội dung</label>
+                            <textarea name="content" class="form-control"><%= comment.content %></textarea>
+                          </div>
+                          <div class="modal-footer">
+                            <button type="button" class="btn btn-secondary" data-dismiss="modal">Hủy</button>
+                            <button type="submit" class="btn btn-primary">Lưu</button>
+                          </div>
+                        </form>
+                      </div>
+                    </div>
+                  </div>
+                </div>
+              <% }); %>
+            </tbody>
+          </table>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- Phân trang -->
+<div class="pagination-container">
+  <% if (currentPage > 1) { %>
+    <a href="?page=<%= currentPage - 1 %>">Trang trước</a>
+  <% } %>
+
+  <% for (let i = 1; i <= totalPages; i++) { %>
+    <a href="?page=<%= i %>" class="<%= currentPage === i ? 'active' : '' %>"><%= i %></a>
+  <% } %>
+
+  <% if (currentPage < totalPages) { %>
+    <a href="?page=<%= currentPage + 1 %>">Trang sau</a>
+  <% } %>
+</div>
+
+<%- include('./layouts/footer') %>
+<%- include('./layouts/script') %>
