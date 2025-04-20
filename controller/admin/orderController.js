@@ -64,8 +64,6 @@ exports.getAllOrders = async (req, res) => {
         res.status(500).send('Error khi lấy danh sách đơn hàng');
     }
 };
-
-
 exports.searchOrders = async (req, res) => {
     try {
         const searchQuery = req.query.search || '';
